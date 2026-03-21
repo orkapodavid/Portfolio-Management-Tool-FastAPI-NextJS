@@ -1,7 +1,7 @@
 [project]
-name = "app"
-version = "0.0.6"
-description = ""
+name = "portfolio-management-tool-api"
+version = "0.1.0"
+description = "Portfolio Management Tool - FastAPI Backend"
 authors = []
 requires-python = ">=3.12,<3.13"
 readme = "README.md"
@@ -11,7 +11,10 @@ dependencies = [
     "fastapi-users[sqlalchemy]>=13.0.0,<14",
     "pydantic-settings>=2.5.2,<3",
     "fastapi-mail>=1.4.1,<2",
-    "fastapi-pagination==0.13.3"
+    "fastapi-pagination==0.13.3",
+    "pmt-core",
+    "yfinance>=0.2.0",
+    "cachetools>=5.0",
 ]
 
 [dependency-groups]
@@ -32,6 +35,9 @@ dev = [
 
 [tool.uv]
 package = false
+
+[tool.uv.sources]
+pmt-core = { path = "../pmt_core_pkg", editable = true }
 
 [tool.hatch.build.targets.sdist]
 include = ["commands"]

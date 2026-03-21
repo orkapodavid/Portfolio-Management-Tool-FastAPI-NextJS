@@ -13,6 +13,7 @@ services:
       - my_network
     volumes:
       - ./fastapi_backend:/app
+      - ./pmt_core_pkg:/pmt_core_pkg
       - fastapi-venv:/app/.venv
       - ./local-shared-data:/app/shared-data
     depends_on:

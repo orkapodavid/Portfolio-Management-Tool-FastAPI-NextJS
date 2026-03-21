@@ -1,66 +1,106 @@
-## Next.js FastAPI Template
+# Portfolio Management Tool
 
-<img src="docs/images/banner.png" alt="Next.js FastAPI Template" width="auto">
-<p align="center">
-    <em>Next.js FastAPI Template: Python + Modern TypeScript stack with Zod validation.</em>
-</p>
-<p align="center">
-<a href="https://github.com/orkapodavid/nextjs-fastapi-template/actions/workflows/ci.yml" target="_blank">
-    <img src="https://github.com/orkapodavid/nextjs-fastapi-template/actions/workflows/ci.yml/badge.svg" alt="CI">
-</a>
-<a href="https://coveralls.io/github/orkapodavid/nextjs-fastapi-template" target="_blank">
-    <img src="https://coveralls.io/repos/github/orkapodavid/nextjs-fastapi-template/badge.svg" alt="Coverage">
-</a>
-</p>
+A professional financial portfolio management dashboard built with **Next.js 16** (frontend) and **FastAPI** (backend), powered by the `pmt_core` business logic package.
 
----
+## Architecture
 
-**Documentation**: <a href="https://orkapodavid.github.io/nextjs-fastapi-template/" target="_blank">https://orkapodavid.github.io/nextjs-fastapi-template/</a>
+```
+Portfolio-Management-Tool/
+├── nextjs-frontend/          # Next.js 16 + TypeScript + Tailwind CSS
+│   ├── app/dashboard/        # Module pages (11 modules, 40+ pages)
+│   ├── components/layout/    # Top nav, performance header, subtabs, data table
+│   └── lib/                  # Constants, types, utilities
+├── fastapi_backend/          # FastAPI + pmt_core services
+│   └── app/routes/           # API routes for all PMT modules
+├── pmt_core_pkg/             # Business logic (framework-agnostic)
+│   └── pmt_core/
+│       ├── models/           # TypedDict data models + enums
+│       ├── services/         # 18+ business logic services
+│       └── repositories/     # Data access layer
+└── docker-compose.yml        # PostgreSQL + Backend + Frontend + MailHog
+```
 
-**Source Code**: <a href="https://github.com/orkapodavid/nextjs-fastapi-template/" target="_blank">https://github.com/orkapodavid/nextjs-fastapi-template/</a>
+## Modules
 
----
+| Module | Description |
+|--------|-------------|
+| **Market Data** | Real-time prices, FX rates, historical data, trading calendar |
+| **Positions** | Stock/Warrant/Bond holdings, trade summary |
+| **P&L** | YTD/MTD/DTD P&L, currency breakdown, full detail |
+| **Risk** | Delta/Gamma/Vega/Theta Greeks, risk measures |
+| **Recon** | PPS, settlement, failed trades, P&L recon |
+| **Compliance** | Restricted list, undertakings, beneficial ownership |
+| **Tools** | Pay-to-hold, stock borrow, resets, installments |
+| **Instruments** | Ticker data, stock screener, special terms |
+| **Events** | Event calendar, event stream, reverse inquiry |
+| **Operations** | Daily procedures, operation processes |
+| **Orders** | EMSX order management, routing |
 
-The Next.js FastAPI Template provides a solid foundation for scalable, high-performance web applications, following clean architecture and best practices. It simplifies development by integrating FastAPI, Pydantic, and Next.js with TypeScript and Zod, ensuring end-to-end type safety and schema validation between frontend and backend.
+## Quick Start
 
-The FastAPI backend supports fully asynchronous operations, optimizing database queries, API routes, and test execution for better performance. Deployment is seamless, with both backend and frontend fully deployable to Vercel, enabling quick product releases with minimal configuration.
+### Prerequisites
+- Node.js 20+ with pnpm
+- Python 3.12+ with uv
+- PostgreSQL 17 (or use Docker)
 
-### Key features
-✔ End-to-end type safety – Automatically generated typed clients from the OpenAPI schema ensure seamless API contracts between frontend and backend.
+### Development
 
-✔ Hot-reload updates – The client updates automatically when backend routes change, keeping FastAPI and Next.js in sync.
+```bash
+# Start database
+docker compose up db -d
 
-✔ Versatile foundation – Designed for MVPs and production-ready applications, with a pre-configured authentication system and API layer.
+# Backend
+cd fastapi_backend
+uv sync
+uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-✔ Quick deployment – Deploys a full-stack application—including authentication flow and a dashboard—on Vercel in just a few steps.
+# Frontend
+cd nextjs-frontend
+pnpm install
+pnpm dev
+```
 
-✔ Production-ready authentication – Includes a pre-configured authentication system and dashboard interface, allowing you to immediately start development with user management features.
+### Docker
 
-## Technology stack
-This template features a carefully selected set of technologies to ensure efficiency, scalability, and ease of use:
+```bash
+docker compose up --build
+```
 
-- Zod + TypeScript – Type safety and schema validation across the stack.
-- fastapi-users – Complete authentication system with:
-    - Secure password hashing
-    - JWT authentication
-- Email-based password recovery
-- shadcn/ui – Prebuilt React components with Tailwind CSS.
-- OpenAPI-fetch – Fully typed client generation from the OpenAPI schema.
-- UV – Simplified dependency management and packaging.
-- Docker Compose – Consistent environments for development and production.
-- Pre-commit hooks – Automated code linting, formatting, and validation before commits.
-- Vercel Deployment – Serverless backend and scalable frontend, deployable with minimal configuration.
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+- API Docs: http://localhost:8000/docs
 
-This is a partial list of the technologies included in the template. For a complete overview, visit our [Technology selection](https://orkapodavid.github.io/nextjs-fastapi-template/technology-selection/) page.
+## Tech Stack
 
-## Get Started
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/ui |
+| Backend | FastAPI, Python 3.12, SQLAlchemy, asyncpg |
+| Auth | fastapi-users (JWT) |
+| Business Logic | pmt_core (models, services, repositories) |
+| Database | PostgreSQL 17 |
+| API Contract | OpenAPI + @hey-api/openapi-ts (auto-generated typed client) |
+| Dev Tools | Docker Compose, uv, pnpm, ESLint, Ruff |
 
-To use this template, visit our [Get Started](https://orkapodavid.github.io/nextjs-fastapi-template/get-started/) and follow the steps.
+## API Endpoints
 
-## Contributing
+All PMT endpoints are under `/api/`:
 
-- Join the conversation on [GitHub Discussions](https://github.com/orkapodavid/nextjs-fastapi-template/discussions)
-- Report bugs or suggest improvements via [issues](https://github.com/orkapodavid/nextjs-fastapi-template/issues)
-- Check the [Contributing](https://orkapodavid.github.io/nextjs-fastapi-template/contributing/) guide to get involved
+- `GET /api/positions/` - All positions
+- `GET /api/positions/stocks` - Stock positions
+- `GET /api/pnl/changes` - P&L changes
+- `GET /api/pnl/summary` - P&L summary
+- `GET /api/market-data/` - Market data
+- `GET /api/market-data/fx` - FX rates
+- `GET /api/risk/measures` - Risk measures
+- `GET /api/compliance/restricted-list` - Restricted list
+- `GET /api/recon/pps` - PPS reconciliation
+- `GET /api/portfolio-tools/pay-to-hold` - Pay to hold
+- `GET /api/instruments/ticker-data` - Ticker data
+- `GET /api/events/calendar` - Event calendar
+- `GET /api/operations/daily-procedures` - Daily procedures
+- `GET /api/orders/` - EMSX orders
 
-*Disclaimer: This project is not affiliated with Vercel.*
+Auth endpoints (from template):
+- `POST /auth/jwt/login` - Login
+- `POST /auth/register` - Register

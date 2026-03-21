@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     MAIL_FROM: str | None = None
     MAIL_SERVER: str | None = None
     MAIL_PORT: int | None = None
-    MAIL_FROM_NAME: str = "FastAPI template"
+    MAIL_FROM_NAME: str = "Portfolio Management Tool"
     MAIL_STARTTLS: bool = True
     MAIL_SSL_TLS: bool = False
     USE_CREDENTIALS: bool = True
@@ -37,6 +37,9 @@ class Settings(BaseSettings):
 
     # CORS
     CORS_ORIGINS: Set[str]
+
+    # PMT Settings
+    MOCK_DATA: bool = True  # Use mock data from pmt_core
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", extra="ignore"
