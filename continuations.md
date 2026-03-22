@@ -10,39 +10,45 @@
 - Verified route count: `49` authenticated `/api/*` PMT routes, or `51` total PMT surface when `/items/` routes are included.
 
 ### PMT frontend
-- `pnpm tsc`, `pnpm lint`, and `pnpm build` were fixed and are green.
+- `pnpm tsc`, `pnpm lint`, `pnpm build`, and `pnpm exec jest --runInBand` are green.
+- Full frontend Jest now passes: `8/8` suites PASS, `33/33` tests PASS.
 - Generated client compatibility aliases were added in `nextjs-frontend/app/clientService.ts`.
 - Auth/register/reset/add-item flows were updated to return `redirectTo` from server actions and navigate in the client pages.
+- Auth page route modules were split into reusable page-view components, while route-level Jest coverage was restored for login redirect and reset-confirm missing-token behavior.
+- The first live dashboard module migration is complete for `/dashboard/market-data/market-data`.
+- Market data now loads through the generated client with the auth cookie:
+  - missing `accessToken` redirects to `/login`
+  - `401/403` API failures redirect to `/login`
+  - other client/backend failures throw instead of degrading to `[]`
 - Browser-visible polish fixes were added:
   - favicon metadata and asset in `nextjs-frontend/app/layout.tsx` and `nextjs-frontend/public/favicon.svg`
   - auth form `autocomplete` hints on login/register/password-recovery/reset-confirm pages
+- Latest pushed commit: `374a7a5` (`Fix auth page tests and market data failures`).
 
 ### PMT browser verification
 - Latest Playwright browser rerun is green.
+- Latest focused smoke rerun: `4/4` PASS.
 - Auth pages verified: `/`, `/login`, `/register`, `/password-recovery`, `/password-recovery/confirm?token=testtoken`
 - Invalid login shows `LOGIN_BAD_CREDENTIALS`.
 - Weak registration shows password validation errors.
 - Fresh register -> login -> dashboard redirect works.
+- First live market-data page load works after login.
 - Dashboard route matrix: `43/43` PASS.
 - Deep link `/dashboard/risk/risk-measures`: PASS.
 - Back/forward on Positions -> Trade Summary: PASS.
 - Browser console/page errors for the app were cleared after favicon + autocomplete fixes.
 
 ### PMT Jest status
-- Reviewed auth-action Jest regressions were fixed.
-- Targeted passing slice:
-  - `pnpm test -- --runInBand __tests__/register.test.ts __tests__/passwordReset.test.tsx __tests__/passwordResetConfirm.test.tsx`
-  - result: `3/3` suites PASS, `11/11` tests PASS
-- Latest known full frontend Jest status is still red:
+- Reviewed auth-action Jest regressions remain fixed.
+- Auth page suites are green again and the route-level behaviors are covered:
+  - login page redirect path
+  - password-reset-confirm missing-token `notFound()` path
+- Latest full frontend Jest run:
   - `pnpm exec jest --runInBand`
-  - failing suites: `4/8`
-  - failing page suites:
-    - `__tests__/loginPage.test.tsx`
-    - `__tests__/registerPage.test.tsx`
-    - `__tests__/passwordResetPage.test.tsx`
-    - `__tests__/passwordResetConfirmPage.test.tsx`
-  - failing tests: `16/31`
-  - failure mode: page-component Jest mounts around `useActionState` / Next client-hook rendering
+  - result: `8/8` suites PASS, `33/33` tests PASS
+- Residual non-blocking test noise:
+  - React 19 `act(...)` warnings still appear across the auth page suites
+  - warnings are noisy but non-failing in the current setup
 
 ### AG Grid demo app
 - AG Grid demo app work is complete enough for continuation purposes.
@@ -54,13 +60,12 @@
 ## Remaining Work
 
 ### High priority
-1. Fix the 4 failing PMT page-level Jest suites.
-2. Re-run the full frontend Jest suite and record exact counts after fixes.
-3. Keep browser/build verification green after those Jest fixes.
+1. Continue replacing PMT dashboard local mock data with live FastAPI calls through the generated client, preserving the current UI structure.
+2. Keep `pnpm exec jest --runInBand`, `pnpm tsc`, `pnpm lint`, `pnpm build`, and focused browser smoke green as each dashboard module is migrated.
 
 ### Medium priority
-1. Wire PMT dashboard pages from local mock data to the live FastAPI endpoints through the generated client.
-2. Add loading and error states to PMT dashboard pages.
+1. Reduce or eliminate the remaining React 19 `act(...)` warning noise in the auth page Jest suites.
+2. Add clearer loading and error states to PMT dashboard pages as more modules move off mocks.
 
 ## Environment Notes
 - Repo root: `/Users/orbot/Developer/work/Portfolio-Management-Tool`
@@ -97,7 +102,7 @@ pnpm exec jest --runInBand
 playwright-cli open http://127.0.0.1:3000/login
 ```
 
-## Continuation Prompt: PMT Frontend Jest + API Wiring
+## Continuation Prompt: PMT Dashboard API Wiring
 
 Use this in the next conversation if you want another coder to continue from the current state:
 
@@ -106,28 +111,30 @@ Resume work on /Users/orbot/Developer/work/Portfolio-Management-Tool.
 
 Current state:
 - Backend matrix is green: 116/116 PASS.
-- Frontend build/browser checks are green.
+- Frontend build checks are green: pnpm tsc, pnpm lint, pnpm build.
+- Full frontend Jest is green: 8/8 suites PASS, 33/33 tests PASS.
 - Generated OpenAPI client is synced to the live backend schema.
-- Browser E2E is green for auth + all 43 dashboard routes.
-- Remaining blocker is the full frontend Jest suite:
-  - pnpm exec jest --runInBand
-  - failing suites: 4/8
-  - failing page suites:
-    - __tests__/loginPage.test.tsx
-    - __tests__/registerPage.test.tsx
-    - __tests__/passwordResetPage.test.tsx
-    - __tests__/passwordResetConfirmPage.test.tsx
-  - latest known failing tests: 16/31
-  - likely cause: page-level test setup around useActionState / Next client hooks
+- Browser smoke is green for:
+  - /login invalid credentials
+  - /register weak password
+  - register -> login -> dashboard redirect
+  - /dashboard/risk/risk-measures deep link
+- Earlier dashboard route matrix is green: 43/43 PASS.
+- The first live dashboard migration is complete for /dashboard/market-data/market-data using the generated client.
+- Market-data auth/load handling is now correct:
+  - missing token redirects to /login
+  - 401/403 redirects to /login
+  - other client/backend failures throw
+- Latest pushed commit is 374a7a5 ("Fix auth page tests and market data failures").
 
 Your tasks:
-1. Fix the 4 failing page-level Jest suites.
-2. Re-run pnpm exec jest --runInBand and report exact final counts.
-3. Re-run pnpm tsc, pnpm lint, and a browser smoke test for login + dashboard navigation to ensure no regression.
-4. If Jest is green, start replacing local PMT page mock data with real API calls through the generated client, beginning with one module and preserving the existing UI.
+1. Migrate the next PMT dashboard module from local mock data to live API calls through the generated client without changing the current UI structure.
+2. Re-run pnpm exec jest --runInBand and report exact final counts after each meaningful migration step.
+3. Re-run pnpm tsc, pnpm lint, pnpm build, and a focused browser smoke test to ensure no regression.
+4. If time allows, reduce the remaining React 19 act(...) warning noise in the auth page Jest suites.
 
 Constraints:
-- Do not break the already-green backend matrix, browser auth flow, or dashboard route matrix.
+- Do not break the already-green backend matrix, browser auth flow, dashboard route matrix, or full frontend Jest pass.
 - Keep the generated OpenAPI client sourced from the live backend.
 - Report exact PASS/FAIL counts, not summaries without numbers.
 ```
