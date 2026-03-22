@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ctp-base: #1e1e2e;
+  --ctp-mantle: #181825;
+  --ctp-crust: #11111b;
+  --ctp-surface0: #313244;
+  --ctp-surface1: #45475a;
+  --ctp-surface2: #585b70;
+  --ctp-overlay0: #6c7086;
+  --ctp-text: #cdd6f4;
+  --ctp-subtext0: #a6adc8;
+  --ctp-blue: #89b4fa;
+  --ctp-green: #a6e3a1;
+  --ctp-red: #f38ba8;
+  --ctp-yellow: #f9e2af;
+  --ctp-peach: #fab387;
+  --ctp-mauve: #cba6f7;
+  --ctp-teal: #94e2d5;
+}
+
+html, body {
+  background-color: var(--ctp-base);
+  color: var(--ctp-text);
+  font-family: system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* AG Grid dark theme overrides for Catppuccin */
+[data-ag-theme-mode="dark"] {
+  --ag-background-color: var(--ctp-base);
+  --ag-header-background-color: var(--ctp-mantle);
+  --ag-odd-row-background-color: var(--ctp-crust);
+  --ag-row-hover-color: var(--ctp-surface0);
+  --ag-selected-row-background-color: rgba(137, 180, 250, 0.15);
+  --ag-foreground-color: var(--ctp-text);
+  --ag-border-color: var(--ctp-surface1);
+  --ag-secondary-foreground-color: var(--ctp-subtext0);
+  --ag-header-foreground-color: var(--ctp-text);
+  --ag-range-selection-background-color: rgba(137, 180, 250, 0.2);
+  --ag-range-selection-border-color: var(--ctp-blue);
+}
+
+/* Cell flash animation */
+.ag-cell-data-changed {
+  background-color: rgba(166, 227, 161, 0.3) !important;
+  transition: background-color 0.5s ease;
+}
+
+.ag-cell-data-changed-animation {
+  transition: background-color 1s ease;
+}
