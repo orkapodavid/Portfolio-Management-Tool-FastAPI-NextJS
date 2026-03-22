@@ -1,6 +1,6 @@
 # Portfolio Management Tool - Continuation Log
 
-## Current Status (2026-03-21)
+## Current Status (2026-03-22)
 
 ### Completed
 
@@ -21,6 +21,25 @@
 - React 19 + Radix UI type compatibility fixes (`label.tsx`, `dropdown-menu.tsx`)
 - shadcn/ui components with Tailwind CSS
 
+**AG Grid Demo App** (NEW - committed 2026-03-22)
+- 26 demo pages converted from reflex_ag_grid to pure Next.js + AG Grid 33 React
+- Frontend: `ag-grid-demo/frontend/` - Next.js 16, React 19, TypeScript, Tailwind CSS
+- Backend: `ag-grid-demo/backend/` - FastAPI with WebSocket, CRUD, validation, background task endpoints
+- Gallery page + NavBar with all 26 demo links
+- Shared components: DemoLayout, StatusBadge, NotificationPanel, GridProvider
+- Shared lib: types.ts, data.ts (with simulatePriceTick), columns.ts
+- Catppuccin Mocha dark theme with AG Grid Quartz
+- Demos 10/21 connect to FastAPI with automatic local fallback
+- Demos 07/14 use client-side logic (backend endpoints available for external use)
+- Demo 13 uses real `api.applyTransaction()` for add/update/remove
+- All demos use StrictMode-safe patterns (refs, pure updaters)
+- Backend has Pydantic v2 field validators (CRUD: name, email, department, salary)
+- Price simulation floors at 0.01 across all frontend and backend code
+- `enableCellChangeFlash` on `defaultColDef` (AG Grid v31.2+ column-level API)
+- Codex review: PASS (4 review cycles)
+- Playwright E2E: 26/26 demos render correctly
+- `next build` and `npx tsc --noEmit` pass with zero errors
+
 **Infrastructure**
 - Migrated from Reflex framework to Next.js + FastAPI template
 - JWT auth via fastapi-users preserved from template
@@ -28,97 +47,89 @@
 
 ### Remaining Work
 
-1. **Frontend-to-backend API wiring** - All 43 page files currently use local mock data; need to call FastAPI endpoints via the generated OpenAPI client
-2. **Loading/error states** - Pages need loading spinners and error boundaries
+1. **Frontend-to-backend API wiring** - All 43 PMT page files currently use local mock data; need to call FastAPI endpoints via the generated OpenAPI client
+2. **Loading/error states** - PMT pages need loading spinners and error boundaries
 3. **Test fixes** - Pre-existing `@testing-library/react` v16 export issues in template test files
-4. **Codex review cycle** - Last review returned REVIEW NEEDED; needs re-run after fixes to achieve PASS
-5. **OpenAPI client generation** - Run `@hey-api/openapi-ts` to generate typed client from FastAPI's OpenAPI schema
+4. **OpenAPI client generation** - Run `@hey-api/openapi-ts` to generate typed client from FastAPI's OpenAPI schema
 
 ---
 
-## Continuation Prompt: Convert reflex_ag_grid to Pure AG Grid Demo
+## Continuation Prompt: Test AG Grid Demo App
 
-Use the following prompt in a new conversation to convert the Reflex-based AG Grid demos to a pure Next.js TypeScript + FastAPI Python setup.
+Use the following prompt in a new conversation to have another LLM run comprehensive end-to-end testing of the AG Grid demo app.
 
 ### Prompt
 
 ```
-I need you to convert the `reflex_ag_grid` folder from my old Reflex project into a pure AG Grid
-demo folder that works within this Next.js TypeScript + FastAPI Python project.
+I need you to run comprehensive end-to-end testing on the AG Grid demo app at:
+/Users/orbot/Developer/work/Portfolio-Management-Tool/ag-grid-demo/
 
-**Source location:** /Users/orbot/Developer/work/Portfolio-Management-Tool-reflex/reflex_ag_grid/
-**Target location:** /Users/orbot/Developer/work/Portfolio-Management-Tool/ag-grid-demo/
+This app has 26 AG Grid feature demos built with Next.js 16 + FastAPI. It was just built
+and needs thorough testing before being considered production-ready.
 
-The source Reflex AG Grid package has:
-- 26 demo pages (req01_context_menu through req26_quick_filter) in examples/demo_app/ag_grid_demo/pages/
-- Supporting components: nav_bar, status_badge, notification_panel
-- Models: column_def.py, validation.py
-- Tests: test_validation.py, test_serialization.py, e2e_ag_grid.py
-- 26 docs (01_context_menu.md through 26_quick_filter.md) plus migration_guide.md and performance.md
-- A gallery page that lists all demos
+**Setup:**
+1. Install and start the frontend:
+   cd ag-grid-demo/frontend && npm install && npm run dev
+   (runs on http://localhost:3001)
 
-Here is what each demo covers:
-  01. Context Menu - right-click custom context menus
-  02. Range Selection - multi-cell range selection
-  03. Cell Flash - flash cells on value change
-  04. Jump Highlight - highlight and scroll to cells
-  05. Grouping - row grouping with aggregation
-  06. Notifications - toast notifications on grid events
-  07. Validation - cell-level validation rules
-  08. Clipboard - copy/paste with custom formatting
-  09. Excel Export - export grid data to Excel
-  10. WebSocket - real-time data streaming via WebSocket
-  11. Cell Editors - custom cell editor components
-  12. Edit Pause - pause/resume editing mode
-  13. Transaction API - batch row updates via transactions
-  14. Background Tasks - long-running tasks with progress
-  15. Column State - save/restore column order and visibility
-  16. Cell Renderers - custom cell renderer components
-  17. Tree Data - hierarchical tree data display
-  18. Performance Testing - large dataset rendering benchmarks
-  19. Status Bar - custom status bar panels
-  20. Overlays - loading and no-rows overlay customization
-  21. CRUD Data Source - full CRUD with server-side data source
-  22. Advanced Filter - advanced filter builder UI
-  23. Set Filter - set filter with checkboxes
-  24. Multi Filter - combined filter strategies
-  25. Row Numbers - automatic row numbering
-  26. Quick Filter - global text search across all columns
+2. Install and start the backend:
+   cd ag-grid-demo/backend && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+   uvicorn app.main:app --reload --port 8001
 
-**Requirements:**
-1. Create a new `ag-grid-demo/` folder at the project root
-2. Frontend: Next.js pages under `ag-grid-demo/frontend/` using AG Grid Community/Enterprise React
-   - Each of the 26 demos should be a separate page route
-   - Gallery page listing all demos with descriptions
-   - Use the same Catppuccin Mocha dark theme from the main PMT app
-   - AG Grid theming via ag-grid Quartz dark theme or custom CSS
-   - TypeScript throughout
-3. Backend: FastAPI endpoints under `ag-grid-demo/backend/` for demos that need server interaction
-   - WebSocket endpoint for req10 (real-time streaming)
-   - CRUD endpoints for req21 (data source)
-   - Background task endpoints for req14
-   - Validation endpoints for req07
-   - Any other demos that need server-side logic
-4. Read each source Reflex demo file to understand the exact behavior, then reimplement in pure
-   AG Grid React + FastAPI. Do NOT wrap Reflex components - use AG Grid's native React API directly.
-5. All demos must actually work - no placeholder "coming soon" pages.
-6. Include a README.md in ag-grid-demo/ explaining how to run both frontend and backend.
-7. Preserve the documentation from docs/ - convert to a docs section or keep as markdown reference.
+**What to test:**
 
-**Tech stack for the conversion:**
-- Frontend: Next.js 16, React 19, TypeScript, AG Grid React (ag-grid-react, ag-grid-community, ag-grid-enterprise)
-- Backend: FastAPI, Python 3.12, WebSockets (for req10), uvicorn
-- Styling: Tailwind CSS + AG Grid Quartz dark theme
-- State: React hooks (useState, useEffect, useCallback, useRef)
+1. **Build verification**
+   - Run `npx tsc --noEmit` in frontend/ - should pass with zero errors
+   - Run `npx next build` in frontend/ - should complete successfully
+   - Run `python3 -m py_compile` on all backend .py files
 
-**Important notes:**
-- The Reflex demos use Reflex's state management (rx.State subclasses with event handlers).
-  Convert these to React hooks + FastAPI API calls.
-- The Reflex demos use reflex-ag-grid component wrapper. Replace with direct ag-grid-react usage.
-- Some demos (01, 02, 05, 11, 16, 17) are purely client-side and need no backend.
-- Some demos (10, 13, 14, 21) need WebSocket or REST endpoints on the backend.
-- Keep the same demo data/mock data from the Reflex versions where possible.
+2. **Gallery page** (http://localhost:3001)
+   - All 26 demo cards render
+   - Each card links to the correct demo page
+   - NavBar shows all 26 links with correct active state highlighting
 
-Start by reading all 26 demo source files from the Reflex project, then create the complete
-ag-grid-demo/ folder with all working demos.
+3. **Interactive demo testing** - For each of the 26 demos, navigate to the page and verify:
+   - Page loads without errors (check browser console)
+   - AG Grid renders with correct data (8 stock rows for most demos)
+   - Buttons/controls work as described
+   - Key AG Grid features function (sorting, filtering, editing, etc.)
+
+4. **Critical demos requiring deeper testing:**
+   - **Demo 03 (Cell Flash)**: Click "Update Price" - cells should flash on change
+   - **Demo 05 (Grouping)**: Rows grouped by sector, grand total at bottom, drag-drop grouping panel
+   - **Demo 10 (WebSocket)**: Start streaming - prices update every 2s via WebSocket (or local fallback).
+     Badge should show "WebSocket" or "Local fallback". Notifications appear for large moves.
+   - **Demo 13 (Transaction API)**: Click Add/Update/Remove - status badge should show
+     `applyTransaction({ add/update/remove })` confirming real AG Grid API usage
+   - **Demo 17 (Tree Data)**: Hierarchical file/folder structure with expand/collapse
+   - **Demo 19 (Status Bar)**: Select cells with click+drag - aggregation panel should show sum/avg/min/max
+   - **Demo 20 (Overlays)**: Click "Load Data" - loading overlay shows for 2s, then data appears.
+     Click "Clear" during loading - should cancel and show no-rows overlay.
+   - **Demo 21 (CRUD)**: Should load data from FastAPI backend (badge shows "API").
+     Add/delete/edit rows - changes should go through the API.
+     Invalid edits (empty name, bad email) should be rejected and reverted.
+   - **Demo 26 (Quick Filter)**: Type in search box - rows filter instantly
+
+5. **Backend API testing** (http://localhost:8001):
+   - GET / - should return {"app": "AG Grid Demo API", "status": "running"}
+   - GET /health - should return {"status": "ok"}
+   - GET /api/crud/employees - should return 5 employees
+   - POST /api/crud/employees with invalid data (empty name, bad email, negative salary) - should return 422
+   - POST /api/validation/validate with {"field": "unknown", "value": "x"} - should return valid=false
+   - POST /api/validation/validate with {"field": "price", "value": "nan"} - should return valid=false
+   - WebSocket ws://localhost:8001/ws/stream - should stream price updates every 2s
+
+6. **Cross-demo navigation testing:**
+   - Demo 04 (Jump & Highlight): Click "Jump to AAPL" - should navigate to Demo 10 and highlight the AAPL row
+
+7. **Report format:**
+   For each demo, report: PASS / FAIL with details of any failures.
+   At the end, provide a summary: X/26 PASS, list any failures with reproduction steps.
+
+**Known acceptable issues:**
+- AG Grid Enterprise license warnings in console (expected for trial/demo usage)
+- Only console errors from AG Grid license are acceptable; any React errors or uncaught exceptions are failures
+
+Install playwright-cli if you want browser automation:
+npx skills add https://github.com/microsoft/playwright-cli --skill playwright-cli --yes
 ```
