@@ -1,7 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
-
 import { registerRegister } from "@/app/clientService";
 
 import { registerSchema } from "@/lib/definitions";
@@ -38,5 +36,5 @@ export async function register(prevState: unknown, formData: FormData) {
       server_error: "An unexpected error occurred. Please try again later.",
     };
   }
-  redirect(`/login`);
+  return { redirectTo: "/login" };
 }

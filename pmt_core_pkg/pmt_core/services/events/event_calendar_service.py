@@ -6,7 +6,7 @@ TODO: Replace mock data with actual database/repository calls.
 """
 
 import logging
-from typing import Any
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -19,13 +19,15 @@ class EventCalendarService:
     Real implementation would delegate to a repository layer.
     """
 
-    async def get_event_calendar(self) -> list[dict[str, Any]]:
-        """Get event calendar data. TODO: Replace with DB query."""
+    async def get_event_calendar(
+        self, start_date: Optional[str] = None, end_date: Optional[str] = None
+    ) -> list[dict[str, Any]]:
+        """Get event calendar data, optionally filtered by date bounds."""
         logger.info("Returning mock event calendar data")
         tickers = ["AAPL", "MSFT", "TSLA", "NVDA", "GOOGL", "META"]
         event_types = ["Earnings", "Dividend", "Split", "Conference", "Guidance"]
         days = ["Mon", "Tue", "Wed", "Thu", "Fri"]
-        return [
+        rows = [
             {
                 "id": i + 1,
                 "underlying": tickers[i % len(tickers)],
@@ -37,4 +39,11 @@ class EventCalendarService:
                 "time": f"{9 + (i % 4):02d}:00 AM",
             }
             for i in range(10)
+        ]
+
+        return [
+            row
+            for row in rows
+            if (start_date is None or row["event_date"] >= start_date)
+            and (end_date is None or row["event_date"] <= end_date)
         ]

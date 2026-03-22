@@ -1,10 +1,5 @@
 import { register } from "@/components/actions/register-action";
-import { redirect } from "next/navigation";
 import { registerRegister } from "@/app/clientService";
-
-jest.mock("next/navigation", () => ({
-  redirect: jest.fn(),
-}));
 
 jest.mock("../app/clientService", () => ({
   registerRegister: jest.fn(),
@@ -19,7 +14,7 @@ describe("register action", () => {
     // Mock a successful register
     (registerRegister as jest.Mock).mockResolvedValue({});
 
-    await register({}, formData);
+    const result = await register({}, formData);
 
     expect(registerRegister).toHaveBeenCalledWith({
       body: {
@@ -27,8 +22,7 @@ describe("register action", () => {
         password: "Q12341414#",
       },
     });
-
-    expect(redirect).toHaveBeenCalled();
+    expect(result).toEqual({ redirectTo: "/login" });
   });
   it("should should return an error if the server call fails", async () => {
     const formData = new FormData();

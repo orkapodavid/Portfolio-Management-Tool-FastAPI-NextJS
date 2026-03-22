@@ -9,6 +9,7 @@ TODO: Replace mock holdings with repository calls.
 
 import logging
 import random
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -169,4 +170,34 @@ class PerformanceService:
                 "daily_change_pct": -0.45,
                 "asset_class": "Finance",
             },
+        ]
+
+    async def get_top_movers(self) -> list[dict[str, Any]]:
+        """
+        Get the largest daily movers across current holdings.
+
+        Returns:
+            List of holding-level daily movers sorted by absolute percentage move.
+        """
+        logger.info("Computing top movers from holdings data")
+
+        holdings = await self.get_portfolio_holdings()
+        ranked_holdings = sorted(
+            holdings,
+            key=lambda holding: abs(holding["daily_change_pct"]),
+            reverse=True,
+        )
+
+        return [
+            {
+                "symbol": holding["symbol"],
+                "name": holding["name"],
+                "daily_change_pct": f"{holding['daily_change_pct']:+.2f}%",
+                "market_value": _format_large_number(
+                    holding["shares"] * holding["current_price"]
+                ),
+                "is_positive": holding["daily_change_pct"] >= 0,
+                "asset_class": holding["asset_class"],
+            }
+            for holding in ranked_holdings
         ]

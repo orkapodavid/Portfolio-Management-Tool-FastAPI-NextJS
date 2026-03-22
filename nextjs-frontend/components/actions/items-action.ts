@@ -3,7 +3,6 @@
 import { cookies } from "next/headers";
 import { readItem, deleteItem, createItem } from "@/app/clientService";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { itemSchema } from "@/lib/definitions";
 
 export async function fetchItems(page: number = 1, size: number = 10) {
@@ -88,5 +87,5 @@ export async function addItem(prevState: {}, formData: FormData) {
   if (error) {
     return { message: `${error.detail}` };
   }
-  redirect(`/dashboard`);
+  return { redirectTo: "/dashboard" };
 }

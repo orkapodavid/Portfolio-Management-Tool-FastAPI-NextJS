@@ -3,7 +3,6 @@
 import { cookies } from "next/headers";
 
 import { authJwtLogin } from "@/app/clientService";
-import { redirect } from "next/navigation";
 import { loginSchema } from "@/lib/definitions";
 import { getErrorMessage } from "@/lib/utils";
 
@@ -40,5 +39,5 @@ export async function login(prevState: unknown, formData: FormData) {
       server_error: "An unexpected error occurred. Please try again later.",
     };
   }
-  redirect("/dashboard");
+  return { redirectTo: "/dashboard" };
 }

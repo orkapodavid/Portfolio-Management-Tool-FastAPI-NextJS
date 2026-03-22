@@ -1,7 +1,6 @@
 "use server";
 
 import { resetForgotPassword, resetResetPassword } from "@/app/clientService";
-import { redirect } from "next/navigation";
 import { passwordResetConfirmSchema } from "@/lib/definitions";
 import { getErrorMessage } from "@/lib/utils";
 
@@ -54,7 +53,7 @@ export async function passwordResetConfirm(
     if (error) {
       return { server_validation_error: getErrorMessage(error) };
     }
-    redirect(`/login`);
+    return { redirectTo: "/login" };
   } catch (err) {
     console.error("Password reset confirmation error:", err);
     return {

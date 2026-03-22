@@ -3,7 +3,8 @@ import re
 
 from typing import Optional
 
-from fastapi import Depends, Request
+from fastapi import Depends, Request, status
+from fastapi.responses import JSONResponse, Response
 from fastapi_users import (
     BaseUserManager,
     FastAPIUsers,
@@ -25,6 +26,31 @@ from .models import User
 from .schemas import UserCreate
 
 AUTH_URL_PATH = "auth"
+
+
+class PMTBearerTransport(BearerTransport):
+    async def get_logout_response(self) -> Response:
+        return JSONResponse(
+            {"detail": "Successfully logged out"},
+            status_code=status.HTTP_200_OK,
+        )
+
+    @staticmethod
+    def get_openapi_logout_responses_success():
+        return {
+            status.HTTP_200_OK: {
+                "description": "Successful Response",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {"detail": {"type": "string"}},
+                        },
+                        "example": {"detail": "Successfully logged out"},
+                    }
+                },
+            }
+        }
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
@@ -68,7 +94,7 @@ async def get_user_manager(user_db: SQLAlchemyUserDatabase = Depends(get_user_db
     yield UserManager(user_db)
 
 
-bearer_transport = BearerTransport(tokenUrl=f"{AUTH_URL_PATH}/jwt/login")
+bearer_transport = PMTBearerTransport(tokenUrl=f"{AUTH_URL_PATH}/jwt/login")
 
 
 def get_jwt_strategy() -> JWTStrategy:

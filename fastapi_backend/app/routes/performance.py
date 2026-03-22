@@ -13,7 +13,7 @@ performance_service = PerformanceService()
 async def get_kpi_data(
     user: User = Depends(current_active_user),
 ):
-    return await performance_service.get_kpi_data()
+    return await performance_service.get_kpi_metrics()
 
 
 @router.get("/top-movers")

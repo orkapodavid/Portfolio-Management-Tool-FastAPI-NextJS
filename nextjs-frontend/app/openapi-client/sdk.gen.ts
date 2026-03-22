@@ -7,51 +7,175 @@ import {
   urlSearchParamsBodySerializer,
 } from "./client";
 import type {
-  AuthJwtLoginData,
-  AuthJwtLoginResponses,
-  AuthJwtLoginErrors,
-  AuthJwtLogoutData,
-  AuthJwtLogoutResponses,
-  AuthJwtLogoutErrors,
-  RegisterRegisterData,
-  RegisterRegisterResponses,
-  RegisterRegisterErrors,
-  ResetForgotPasswordData,
-  ResetForgotPasswordResponses,
-  ResetForgotPasswordErrors,
-  ResetResetPasswordData,
-  ResetResetPasswordResponses,
-  ResetResetPasswordErrors,
-  VerifyRequestTokenData,
-  VerifyRequestTokenResponses,
-  VerifyRequestTokenErrors,
-  VerifyVerifyData,
-  VerifyVerifyResponses,
-  VerifyVerifyErrors,
-  UsersCurrentUserData,
-  UsersCurrentUserResponses,
-  UsersCurrentUserErrors,
-  UsersPatchCurrentUserData,
-  UsersPatchCurrentUserResponses,
-  UsersPatchCurrentUserErrors,
-  UsersDeleteUserData,
-  UsersDeleteUserResponses,
-  UsersDeleteUserErrors,
-  UsersUserData,
-  UsersUserResponses,
-  UsersUserErrors,
-  UsersPatchUserData,
-  UsersPatchUserResponses,
-  UsersPatchUserErrors,
-  ReadItemData,
-  ReadItemResponses,
-  ReadItemErrors,
-  CreateItemData,
-  CreateItemResponses,
-  CreateItemErrors,
-  DeleteItemData,
-  DeleteItemResponses,
-  DeleteItemErrors,
+  AuthAuthJwtLoginData,
+  AuthAuthJwtLoginResponses,
+  AuthAuthJwtLoginErrors,
+  AuthAuthJwtLogoutData,
+  AuthAuthJwtLogoutResponses,
+  AuthAuthJwtLogoutErrors,
+  AuthRegisterRegisterData,
+  AuthRegisterRegisterResponses,
+  AuthRegisterRegisterErrors,
+  AuthResetForgotPasswordData,
+  AuthResetForgotPasswordResponses,
+  AuthResetForgotPasswordErrors,
+  AuthResetResetPasswordData,
+  AuthResetResetPasswordResponses,
+  AuthResetResetPasswordErrors,
+  AuthVerifyRequestTokenData,
+  AuthVerifyRequestTokenResponses,
+  AuthVerifyRequestTokenErrors,
+  AuthVerifyVerifyData,
+  AuthVerifyVerifyResponses,
+  AuthVerifyVerifyErrors,
+  UsersUsersCurrentUserData,
+  UsersUsersCurrentUserResponses,
+  UsersUsersCurrentUserErrors,
+  UsersUsersPatchCurrentUserData,
+  UsersUsersPatchCurrentUserResponses,
+  UsersUsersPatchCurrentUserErrors,
+  UsersUsersDeleteUserData,
+  UsersUsersDeleteUserResponses,
+  UsersUsersDeleteUserErrors,
+  UsersUsersUserData,
+  UsersUsersUserResponses,
+  UsersUsersUserErrors,
+  UsersUsersPatchUserData,
+  UsersUsersPatchUserResponses,
+  UsersUsersPatchUserErrors,
+  ItemReadItemData,
+  ItemReadItemResponses,
+  ItemReadItemErrors,
+  ItemCreateItemData,
+  ItemCreateItemResponses,
+  ItemCreateItemErrors,
+  ItemDeleteItemData,
+  ItemDeleteItemResponses,
+  ItemDeleteItemErrors,
+  PositionsGetPositionsData,
+  PositionsGetPositionsResponses,
+  PositionsGetPositionsErrors,
+  PositionsGetStockPositionsData,
+  PositionsGetStockPositionsResponses,
+  PositionsGetStockPositionsErrors,
+  PositionsGetWarrantPositionsData,
+  PositionsGetWarrantPositionsResponses,
+  PositionsGetWarrantPositionsErrors,
+  PositionsGetBondPositionsData,
+  PositionsGetBondPositionsResponses,
+  PositionsGetBondPositionsErrors,
+  PositionsGetTradeSummaryData,
+  PositionsGetTradeSummaryResponses,
+  PositionsGetTradeSummaryErrors,
+  PnlGetPnlChangesData,
+  PnlGetPnlChangesResponses,
+  PnlGetPnlChangesErrors,
+  PnlGetPnlSummaryData,
+  PnlGetPnlSummaryResponses,
+  PnlGetPnlSummaryErrors,
+  PnlGetPnlByCurrencyData,
+  PnlGetPnlByCurrencyResponses,
+  PnlGetPnlByCurrencyErrors,
+  PnlGetPnlFullData,
+  PnlGetPnlFullResponses,
+  PnlGetPnlFullErrors,
+  PnlGetKpiMetricsData,
+  PnlGetKpiMetricsResponses,
+  MarketDataGetMarketDataData,
+  MarketDataGetMarketDataResponses,
+  MarketDataGetFxDataData,
+  MarketDataGetFxDataResponses,
+  MarketDataGetTopMoversData,
+  MarketDataGetTopMoversResponses,
+  MarketDataGetTopMoversErrors,
+  MarketDataGetTradingCalendarData,
+  MarketDataGetTradingCalendarResponses,
+  MarketDataGetTradingCalendarErrors,
+  MarketDataGetMarketHoursData,
+  MarketDataGetMarketHoursResponses,
+  MarketDataGetTickerDataData,
+  MarketDataGetTickerDataResponses,
+  MarketDataGetHistoricalDataData,
+  MarketDataGetHistoricalDataResponses,
+  MarketDataGetHistoricalDataErrors,
+  MarketDataGetStockDataData,
+  MarketDataGetStockDataResponses,
+  MarketDataGetStockDataErrors,
+  MarketDataGetStockHistoryData,
+  MarketDataGetStockHistoryResponses,
+  MarketDataGetStockHistoryErrors,
+  MarketDataGetStockNewsData,
+  MarketDataGetStockNewsResponses,
+  MarketDataGetStockNewsErrors,
+  RiskGetDeltaChangeData,
+  RiskGetDeltaChangeResponses,
+  RiskGetDeltaChangeErrors,
+  RiskGetRiskMeasuresData,
+  RiskGetRiskMeasuresResponses,
+  RiskGetRiskMeasuresErrors,
+  RiskGetRiskInputsData,
+  RiskGetRiskInputsResponses,
+  RiskGetRiskInputsErrors,
+  ComplianceGetRestrictedListData,
+  ComplianceGetRestrictedListResponses,
+  ComplianceGetUndertakingsData,
+  ComplianceGetUndertakingsResponses,
+  ComplianceGetBeneficialOwnershipData,
+  ComplianceGetBeneficialOwnershipResponses,
+  ReconciliationGetPpsReconData,
+  ReconciliationGetPpsReconResponses,
+  ReconciliationGetPpsReconErrors,
+  ReconciliationGetSettlementReconData,
+  ReconciliationGetSettlementReconResponses,
+  ReconciliationGetSettlementReconErrors,
+  ReconciliationGetFailedTradesData,
+  ReconciliationGetFailedTradesResponses,
+  ReconciliationGetFailedTradesErrors,
+  ReconciliationGetPnlReconData,
+  ReconciliationGetPnlReconResponses,
+  ReconciliationGetPnlReconErrors,
+  ReconciliationGetRiskInputReconData,
+  ReconciliationGetRiskInputReconResponses,
+  ReconciliationGetRiskInputReconErrors,
+  PortfolioToolsGetPayToHoldData,
+  PortfolioToolsGetPayToHoldResponses,
+  PortfolioToolsGetStockBorrowData,
+  PortfolioToolsGetStockBorrowResponses,
+  PortfolioToolsGetResetDatesData,
+  PortfolioToolsGetResetDatesResponses,
+  PortfolioToolsGetComingResetsData,
+  PortfolioToolsGetComingResetsResponses,
+  PortfolioToolsGetCbInstallmentsData,
+  PortfolioToolsGetCbInstallmentsResponses,
+  PortfolioToolsGetExcessAmountData,
+  PortfolioToolsGetExcessAmountResponses,
+  InstrumentsGetTickerDataData,
+  InstrumentsGetTickerDataResponses,
+  InstrumentsGetStockScreenerData,
+  InstrumentsGetStockScreenerResponses,
+  InstrumentsGetSpecialTermsData,
+  InstrumentsGetSpecialTermsResponses,
+  EventsGetEventCalendarData,
+  EventsGetEventCalendarResponses,
+  EventsGetEventCalendarErrors,
+  EventsGetEventStreamData,
+  EventsGetEventStreamResponses,
+  EventsGetReverseInquiriesData,
+  EventsGetReverseInquiriesResponses,
+  EventsGetReverseInquiriesErrors,
+  OperationsGetDailyProceduresData,
+  OperationsGetDailyProceduresResponses,
+  OperationsGetOperationProcessesData,
+  OperationsGetOperationProcessesResponses,
+  OrdersGetOrdersData,
+  OrdersGetOrdersResponses,
+  OrdersGetOrderRoutesData,
+  OrdersGetOrderRoutesResponses,
+  OrdersGetOrderRoutesErrors,
+  PerformanceGetKpiDataData,
+  PerformanceGetKpiDataResponses,
+  PerformanceGetTopMoversData,
+  PerformanceGetTopMoversResponses,
 } from "./types.gen";
 import { client } from "./client.gen";
 
@@ -75,12 +199,12 @@ export type Options<
 /**
  * Auth:Jwt.Login
  */
-export const authJwtLogin = <ThrowOnError extends boolean = false>(
-  options: Options<AuthJwtLoginData, ThrowOnError>,
+export const authAuthJwtLogin = <ThrowOnError extends boolean = false>(
+  options: Options<AuthAuthJwtLoginData, ThrowOnError>,
 ) => {
   return (options.client ?? client).post<
-    AuthJwtLoginResponses,
-    AuthJwtLoginErrors,
+    AuthAuthJwtLoginResponses,
+    AuthAuthJwtLoginErrors,
     ThrowOnError
   >({
     ...urlSearchParamsBodySerializer,
@@ -97,12 +221,12 @@ export const authJwtLogin = <ThrowOnError extends boolean = false>(
 /**
  * Auth:Jwt.Logout
  */
-export const authJwtLogout = <ThrowOnError extends boolean = false>(
-  options?: Options<AuthJwtLogoutData, ThrowOnError>,
+export const authAuthJwtLogout = <ThrowOnError extends boolean = false>(
+  options?: Options<AuthAuthJwtLogoutData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).post<
-    AuthJwtLogoutResponses,
-    AuthJwtLogoutErrors,
+    AuthAuthJwtLogoutResponses,
+    AuthAuthJwtLogoutErrors,
     ThrowOnError
   >({
     responseType: "json",
@@ -120,12 +244,12 @@ export const authJwtLogout = <ThrowOnError extends boolean = false>(
 /**
  * Register:Register
  */
-export const registerRegister = <ThrowOnError extends boolean = false>(
-  options: Options<RegisterRegisterData, ThrowOnError>,
+export const authRegisterRegister = <ThrowOnError extends boolean = false>(
+  options: Options<AuthRegisterRegisterData, ThrowOnError>,
 ) => {
   return (options.client ?? client).post<
-    RegisterRegisterResponses,
-    RegisterRegisterErrors,
+    AuthRegisterRegisterResponses,
+    AuthRegisterRegisterErrors,
     ThrowOnError
   >({
     responseType: "json",
@@ -141,12 +265,12 @@ export const registerRegister = <ThrowOnError extends boolean = false>(
 /**
  * Reset:Forgot Password
  */
-export const resetForgotPassword = <ThrowOnError extends boolean = false>(
-  options: Options<ResetForgotPasswordData, ThrowOnError>,
+export const authResetForgotPassword = <ThrowOnError extends boolean = false>(
+  options: Options<AuthResetForgotPasswordData, ThrowOnError>,
 ) => {
   return (options.client ?? client).post<
-    ResetForgotPasswordResponses,
-    ResetForgotPasswordErrors,
+    AuthResetForgotPasswordResponses,
+    AuthResetForgotPasswordErrors,
     ThrowOnError
   >({
     responseType: "json",
@@ -162,12 +286,12 @@ export const resetForgotPassword = <ThrowOnError extends boolean = false>(
 /**
  * Reset:Reset Password
  */
-export const resetResetPassword = <ThrowOnError extends boolean = false>(
-  options: Options<ResetResetPasswordData, ThrowOnError>,
+export const authResetResetPassword = <ThrowOnError extends boolean = false>(
+  options: Options<AuthResetResetPasswordData, ThrowOnError>,
 ) => {
   return (options.client ?? client).post<
-    ResetResetPasswordResponses,
-    ResetResetPasswordErrors,
+    AuthResetResetPasswordResponses,
+    AuthResetResetPasswordErrors,
     ThrowOnError
   >({
     responseType: "json",
@@ -183,12 +307,12 @@ export const resetResetPassword = <ThrowOnError extends boolean = false>(
 /**
  * Verify:Request-Token
  */
-export const verifyRequestToken = <ThrowOnError extends boolean = false>(
-  options: Options<VerifyRequestTokenData, ThrowOnError>,
+export const authVerifyRequestToken = <ThrowOnError extends boolean = false>(
+  options: Options<AuthVerifyRequestTokenData, ThrowOnError>,
 ) => {
   return (options.client ?? client).post<
-    VerifyRequestTokenResponses,
-    VerifyRequestTokenErrors,
+    AuthVerifyRequestTokenResponses,
+    AuthVerifyRequestTokenErrors,
     ThrowOnError
   >({
     responseType: "json",
@@ -204,12 +328,12 @@ export const verifyRequestToken = <ThrowOnError extends boolean = false>(
 /**
  * Verify:Verify
  */
-export const verifyVerify = <ThrowOnError extends boolean = false>(
-  options: Options<VerifyVerifyData, ThrowOnError>,
+export const authVerifyVerify = <ThrowOnError extends boolean = false>(
+  options: Options<AuthVerifyVerifyData, ThrowOnError>,
 ) => {
   return (options.client ?? client).post<
-    VerifyVerifyResponses,
-    VerifyVerifyErrors,
+    AuthVerifyVerifyResponses,
+    AuthVerifyVerifyErrors,
     ThrowOnError
   >({
     responseType: "json",
@@ -225,12 +349,12 @@ export const verifyVerify = <ThrowOnError extends boolean = false>(
 /**
  * Users:Current User
  */
-export const usersCurrentUser = <ThrowOnError extends boolean = false>(
-  options?: Options<UsersCurrentUserData, ThrowOnError>,
+export const usersUsersCurrentUser = <ThrowOnError extends boolean = false>(
+  options?: Options<UsersUsersCurrentUserData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
-    UsersCurrentUserResponses,
-    UsersCurrentUserErrors,
+    UsersUsersCurrentUserResponses,
+    UsersUsersCurrentUserErrors,
     ThrowOnError
   >({
     responseType: "json",
@@ -248,12 +372,14 @@ export const usersCurrentUser = <ThrowOnError extends boolean = false>(
 /**
  * Users:Patch Current User
  */
-export const usersPatchCurrentUser = <ThrowOnError extends boolean = false>(
-  options: Options<UsersPatchCurrentUserData, ThrowOnError>,
+export const usersUsersPatchCurrentUser = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<UsersUsersPatchCurrentUserData, ThrowOnError>,
 ) => {
   return (options.client ?? client).patch<
-    UsersPatchCurrentUserResponses,
-    UsersPatchCurrentUserErrors,
+    UsersUsersPatchCurrentUserResponses,
+    UsersUsersPatchCurrentUserErrors,
     ThrowOnError
   >({
     responseType: "json",
@@ -275,12 +401,12 @@ export const usersPatchCurrentUser = <ThrowOnError extends boolean = false>(
 /**
  * Users:Delete User
  */
-export const usersDeleteUser = <ThrowOnError extends boolean = false>(
-  options: Options<UsersDeleteUserData, ThrowOnError>,
+export const usersUsersDeleteUser = <ThrowOnError extends boolean = false>(
+  options: Options<UsersUsersDeleteUserData, ThrowOnError>,
 ) => {
   return (options.client ?? client).delete<
-    UsersDeleteUserResponses,
-    UsersDeleteUserErrors,
+    UsersUsersDeleteUserResponses,
+    UsersUsersDeleteUserErrors,
     ThrowOnError
   >({
     security: [
@@ -297,12 +423,12 @@ export const usersDeleteUser = <ThrowOnError extends boolean = false>(
 /**
  * Users:User
  */
-export const usersUser = <ThrowOnError extends boolean = false>(
-  options: Options<UsersUserData, ThrowOnError>,
+export const usersUsersUser = <ThrowOnError extends boolean = false>(
+  options: Options<UsersUsersUserData, ThrowOnError>,
 ) => {
   return (options.client ?? client).get<
-    UsersUserResponses,
-    UsersUserErrors,
+    UsersUsersUserResponses,
+    UsersUsersUserErrors,
     ThrowOnError
   >({
     responseType: "json",
@@ -320,12 +446,12 @@ export const usersUser = <ThrowOnError extends boolean = false>(
 /**
  * Users:Patch User
  */
-export const usersPatchUser = <ThrowOnError extends boolean = false>(
-  options: Options<UsersPatchUserData, ThrowOnError>,
+export const usersUsersPatchUser = <ThrowOnError extends boolean = false>(
+  options: Options<UsersUsersPatchUserData, ThrowOnError>,
 ) => {
   return (options.client ?? client).patch<
-    UsersPatchUserResponses,
-    UsersPatchUserErrors,
+    UsersUsersPatchUserResponses,
+    UsersUsersPatchUserErrors,
     ThrowOnError
   >({
     responseType: "json",
@@ -347,12 +473,12 @@ export const usersPatchUser = <ThrowOnError extends boolean = false>(
 /**
  * Read Item
  */
-export const readItem = <ThrowOnError extends boolean = false>(
-  options?: Options<ReadItemData, ThrowOnError>,
+export const itemReadItem = <ThrowOnError extends boolean = false>(
+  options?: Options<ItemReadItemData, ThrowOnError>,
 ) => {
   return (options?.client ?? client).get<
-    ReadItemResponses,
-    ReadItemErrors,
+    ItemReadItemResponses,
+    ItemReadItemErrors,
     ThrowOnError
   >({
     responseType: "json",
@@ -370,12 +496,12 @@ export const readItem = <ThrowOnError extends boolean = false>(
 /**
  * Create Item
  */
-export const createItem = <ThrowOnError extends boolean = false>(
-  options: Options<CreateItemData, ThrowOnError>,
+export const itemCreateItem = <ThrowOnError extends boolean = false>(
+  options: Options<ItemCreateItemData, ThrowOnError>,
 ) => {
   return (options.client ?? client).post<
-    CreateItemResponses,
-    CreateItemErrors,
+    ItemCreateItemResponses,
+    ItemCreateItemErrors,
     ThrowOnError
   >({
     responseType: "json",
@@ -397,12 +523,12 @@ export const createItem = <ThrowOnError extends boolean = false>(
 /**
  * Delete Item
  */
-export const deleteItem = <ThrowOnError extends boolean = false>(
-  options: Options<DeleteItemData, ThrowOnError>,
+export const itemDeleteItem = <ThrowOnError extends boolean = false>(
+  options: Options<ItemDeleteItemData, ThrowOnError>,
 ) => {
   return (options.client ?? client).delete<
-    DeleteItemResponses,
-    DeleteItemErrors,
+    ItemDeleteItemResponses,
+    ItemDeleteItemErrors,
     ThrowOnError
   >({
     responseType: "json",
@@ -413,6 +539,1171 @@ export const deleteItem = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/items/{item_id}",
+    ...options,
+  });
+};
+
+/**
+ * Get Positions
+ */
+export const positionsGetPositions = <ThrowOnError extends boolean = false>(
+  options?: Options<PositionsGetPositionsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PositionsGetPositionsResponses,
+    PositionsGetPositionsErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/positions/",
+    ...options,
+  });
+};
+
+/**
+ * Get Stock Positions
+ */
+export const positionsGetStockPositions = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<PositionsGetStockPositionsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PositionsGetStockPositionsResponses,
+    PositionsGetStockPositionsErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/positions/stocks",
+    ...options,
+  });
+};
+
+/**
+ * Get Warrant Positions
+ */
+export const positionsGetWarrantPositions = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<PositionsGetWarrantPositionsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PositionsGetWarrantPositionsResponses,
+    PositionsGetWarrantPositionsErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/positions/warrants",
+    ...options,
+  });
+};
+
+/**
+ * Get Bond Positions
+ */
+export const positionsGetBondPositions = <ThrowOnError extends boolean = false>(
+  options?: Options<PositionsGetBondPositionsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PositionsGetBondPositionsResponses,
+    PositionsGetBondPositionsErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/positions/bonds",
+    ...options,
+  });
+};
+
+/**
+ * Get Trade Summary
+ */
+export const positionsGetTradeSummary = <ThrowOnError extends boolean = false>(
+  options?: Options<PositionsGetTradeSummaryData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PositionsGetTradeSummaryResponses,
+    PositionsGetTradeSummaryErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/positions/trade-summary",
+    ...options,
+  });
+};
+
+/**
+ * Get Pnl Changes
+ */
+export const pnlGetPnlChanges = <ThrowOnError extends boolean = false>(
+  options?: Options<PnlGetPnlChangesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PnlGetPnlChangesResponses,
+    PnlGetPnlChangesErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/pnl/changes",
+    ...options,
+  });
+};
+
+/**
+ * Get Pnl Summary
+ */
+export const pnlGetPnlSummary = <ThrowOnError extends boolean = false>(
+  options?: Options<PnlGetPnlSummaryData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PnlGetPnlSummaryResponses,
+    PnlGetPnlSummaryErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/pnl/summary",
+    ...options,
+  });
+};
+
+/**
+ * Get Pnl By Currency
+ */
+export const pnlGetPnlByCurrency = <ThrowOnError extends boolean = false>(
+  options?: Options<PnlGetPnlByCurrencyData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PnlGetPnlByCurrencyResponses,
+    PnlGetPnlByCurrencyErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/pnl/currency",
+    ...options,
+  });
+};
+
+/**
+ * Get Pnl Full
+ */
+export const pnlGetPnlFull = <ThrowOnError extends boolean = false>(
+  options?: Options<PnlGetPnlFullData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PnlGetPnlFullResponses,
+    PnlGetPnlFullErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/pnl/full",
+    ...options,
+  });
+};
+
+/**
+ * Get Kpi Metrics
+ */
+export const pnlGetKpiMetrics = <ThrowOnError extends boolean = false>(
+  options?: Options<PnlGetKpiMetricsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PnlGetKpiMetricsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/pnl/kpi",
+    ...options,
+  });
+};
+
+/**
+ * Get Market Data
+ */
+export const marketDataGetMarketData = <ThrowOnError extends boolean = false>(
+  options?: Options<MarketDataGetMarketDataData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    MarketDataGetMarketDataResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/market-data/",
+    ...options,
+  });
+};
+
+/**
+ * Get Fx Data
+ */
+export const marketDataGetFxData = <ThrowOnError extends boolean = false>(
+  options?: Options<MarketDataGetFxDataData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    MarketDataGetFxDataResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/market-data/fx",
+    ...options,
+  });
+};
+
+/**
+ * Get Top Movers
+ */
+export const marketDataGetTopMovers = <ThrowOnError extends boolean = false>(
+  options?: Options<MarketDataGetTopMoversData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    MarketDataGetTopMoversResponses,
+    MarketDataGetTopMoversErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/market-data/top-movers",
+    ...options,
+  });
+};
+
+/**
+ * Get Trading Calendar
+ */
+export const marketDataGetTradingCalendar = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<MarketDataGetTradingCalendarData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    MarketDataGetTradingCalendarResponses,
+    MarketDataGetTradingCalendarErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/market-data/trading-calendar",
+    ...options,
+  });
+};
+
+/**
+ * Get Market Hours
+ */
+export const marketDataGetMarketHours = <ThrowOnError extends boolean = false>(
+  options?: Options<MarketDataGetMarketHoursData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    MarketDataGetMarketHoursResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/market-data/market-hours",
+    ...options,
+  });
+};
+
+/**
+ * Get Ticker Data
+ */
+export const marketDataGetTickerData = <ThrowOnError extends boolean = false>(
+  options?: Options<MarketDataGetTickerDataData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    MarketDataGetTickerDataResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/market-data/ticker",
+    ...options,
+  });
+};
+
+/**
+ * Get Historical Data
+ */
+export const marketDataGetHistoricalData = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<MarketDataGetHistoricalDataData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    MarketDataGetHistoricalDataResponses,
+    MarketDataGetHistoricalDataErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/market-data/historical",
+    ...options,
+  });
+};
+
+/**
+ * Get Stock Data
+ */
+export const marketDataGetStockData = <ThrowOnError extends boolean = false>(
+  options: Options<MarketDataGetStockDataData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    MarketDataGetStockDataResponses,
+    MarketDataGetStockDataErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/market-data/stock/{symbol}",
+    ...options,
+  });
+};
+
+/**
+ * Get Stock History
+ */
+export const marketDataGetStockHistory = <ThrowOnError extends boolean = false>(
+  options: Options<MarketDataGetStockHistoryData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    MarketDataGetStockHistoryResponses,
+    MarketDataGetStockHistoryErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/market-data/stock/{symbol}/history",
+    ...options,
+  });
+};
+
+/**
+ * Get Stock News
+ */
+export const marketDataGetStockNews = <ThrowOnError extends boolean = false>(
+  options: Options<MarketDataGetStockNewsData, ThrowOnError>,
+) => {
+  return (options.client ?? client).get<
+    MarketDataGetStockNewsResponses,
+    MarketDataGetStockNewsErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/market-data/stock/{symbol}/news",
+    ...options,
+  });
+};
+
+/**
+ * Get Delta Change
+ */
+export const riskGetDeltaChange = <ThrowOnError extends boolean = false>(
+  options?: Options<RiskGetDeltaChangeData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    RiskGetDeltaChangeResponses,
+    RiskGetDeltaChangeErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/risk/delta-change",
+    ...options,
+  });
+};
+
+/**
+ * Get Risk Measures
+ */
+export const riskGetRiskMeasures = <ThrowOnError extends boolean = false>(
+  options?: Options<RiskGetRiskMeasuresData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    RiskGetRiskMeasuresResponses,
+    RiskGetRiskMeasuresErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/risk/measures",
+    ...options,
+  });
+};
+
+/**
+ * Get Risk Inputs
+ */
+export const riskGetRiskInputs = <ThrowOnError extends boolean = false>(
+  options?: Options<RiskGetRiskInputsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    RiskGetRiskInputsResponses,
+    RiskGetRiskInputsErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/risk/inputs",
+    ...options,
+  });
+};
+
+/**
+ * Get Restricted List
+ */
+export const complianceGetRestrictedList = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<ComplianceGetRestrictedListData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ComplianceGetRestrictedListResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/compliance/restricted-list",
+    ...options,
+  });
+};
+
+/**
+ * Get Undertakings
+ */
+export const complianceGetUndertakings = <ThrowOnError extends boolean = false>(
+  options?: Options<ComplianceGetUndertakingsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ComplianceGetUndertakingsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/compliance/undertakings",
+    ...options,
+  });
+};
+
+/**
+ * Get Beneficial Ownership
+ */
+export const complianceGetBeneficialOwnership = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<ComplianceGetBeneficialOwnershipData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ComplianceGetBeneficialOwnershipResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/compliance/beneficial-ownership",
+    ...options,
+  });
+};
+
+/**
+ * Get Pps Recon
+ */
+export const reconciliationGetPpsRecon = <ThrowOnError extends boolean = false>(
+  options?: Options<ReconciliationGetPpsReconData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ReconciliationGetPpsReconResponses,
+    ReconciliationGetPpsReconErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/recon/pps",
+    ...options,
+  });
+};
+
+/**
+ * Get Settlement Recon
+ */
+export const reconciliationGetSettlementRecon = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<ReconciliationGetSettlementReconData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ReconciliationGetSettlementReconResponses,
+    ReconciliationGetSettlementReconErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/recon/settlement",
+    ...options,
+  });
+};
+
+/**
+ * Get Failed Trades
+ */
+export const reconciliationGetFailedTrades = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<ReconciliationGetFailedTradesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ReconciliationGetFailedTradesResponses,
+    ReconciliationGetFailedTradesErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/recon/failed-trades",
+    ...options,
+  });
+};
+
+/**
+ * Get Pnl Recon
+ */
+export const reconciliationGetPnlRecon = <ThrowOnError extends boolean = false>(
+  options?: Options<ReconciliationGetPnlReconData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ReconciliationGetPnlReconResponses,
+    ReconciliationGetPnlReconErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/recon/pnl",
+    ...options,
+  });
+};
+
+/**
+ * Get Risk Input Recon
+ */
+export const reconciliationGetRiskInputRecon = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<ReconciliationGetRiskInputReconData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ReconciliationGetRiskInputReconResponses,
+    ReconciliationGetRiskInputReconErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/recon/risk-input",
+    ...options,
+  });
+};
+
+/**
+ * Get Pay To Hold
+ */
+export const portfolioToolsGetPayToHold = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<PortfolioToolsGetPayToHoldData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PortfolioToolsGetPayToHoldResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/portfolio-tools/pay-to-hold",
+    ...options,
+  });
+};
+
+/**
+ * Get Stock Borrow
+ */
+export const portfolioToolsGetStockBorrow = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<PortfolioToolsGetStockBorrowData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PortfolioToolsGetStockBorrowResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/portfolio-tools/stock-borrow",
+    ...options,
+  });
+};
+
+/**
+ * Get Reset Dates
+ */
+export const portfolioToolsGetResetDates = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<PortfolioToolsGetResetDatesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PortfolioToolsGetResetDatesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/portfolio-tools/reset-dates",
+    ...options,
+  });
+};
+
+/**
+ * Get Coming Resets
+ */
+export const portfolioToolsGetComingResets = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<PortfolioToolsGetComingResetsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PortfolioToolsGetComingResetsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/portfolio-tools/coming-resets",
+    ...options,
+  });
+};
+
+/**
+ * Get Cb Installments
+ */
+export const portfolioToolsGetCbInstallments = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<PortfolioToolsGetCbInstallmentsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PortfolioToolsGetCbInstallmentsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/portfolio-tools/cb-installments",
+    ...options,
+  });
+};
+
+/**
+ * Get Excess Amount
+ */
+export const portfolioToolsGetExcessAmount = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<PortfolioToolsGetExcessAmountData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PortfolioToolsGetExcessAmountResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/portfolio-tools/excess-amount",
+    ...options,
+  });
+};
+
+/**
+ * Get Ticker Data
+ */
+export const instrumentsGetTickerData = <ThrowOnError extends boolean = false>(
+  options?: Options<InstrumentsGetTickerDataData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    InstrumentsGetTickerDataResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/instruments/ticker-data",
+    ...options,
+  });
+};
+
+/**
+ * Get Stock Screener
+ */
+export const instrumentsGetStockScreener = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<InstrumentsGetStockScreenerData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    InstrumentsGetStockScreenerResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/instruments/stock-screener",
+    ...options,
+  });
+};
+
+/**
+ * Get Special Terms
+ */
+export const instrumentsGetSpecialTerms = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<InstrumentsGetSpecialTermsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    InstrumentsGetSpecialTermsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/instruments/special-terms",
+    ...options,
+  });
+};
+
+/**
+ * Get Event Calendar
+ */
+export const eventsGetEventCalendar = <ThrowOnError extends boolean = false>(
+  options?: Options<EventsGetEventCalendarData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    EventsGetEventCalendarResponses,
+    EventsGetEventCalendarErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/events/calendar",
+    ...options,
+  });
+};
+
+/**
+ * Get Event Stream
+ */
+export const eventsGetEventStream = <ThrowOnError extends boolean = false>(
+  options?: Options<EventsGetEventStreamData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    EventsGetEventStreamResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/events/stream",
+    ...options,
+  });
+};
+
+/**
+ * Get Reverse Inquiries
+ */
+export const eventsGetReverseInquiries = <ThrowOnError extends boolean = false>(
+  options?: Options<EventsGetReverseInquiriesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    EventsGetReverseInquiriesResponses,
+    EventsGetReverseInquiriesErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/events/reverse-inquiry",
+    ...options,
+  });
+};
+
+/**
+ * Get Daily Procedures
+ */
+export const operationsGetDailyProcedures = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<OperationsGetDailyProceduresData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    OperationsGetDailyProceduresResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/operations/daily-procedures",
+    ...options,
+  });
+};
+
+/**
+ * Get Operation Processes
+ */
+export const operationsGetOperationProcesses = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<OperationsGetOperationProcessesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    OperationsGetOperationProcessesResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/operations/processes",
+    ...options,
+  });
+};
+
+/**
+ * Get Orders
+ */
+export const ordersGetOrders = <ThrowOnError extends boolean = false>(
+  options?: Options<OrdersGetOrdersData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    OrdersGetOrdersResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/orders/",
+    ...options,
+  });
+};
+
+/**
+ * Get Order Routes
+ */
+export const ordersGetOrderRoutes = <ThrowOnError extends boolean = false>(
+  options?: Options<OrdersGetOrderRoutesData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    OrdersGetOrderRoutesResponses,
+    OrdersGetOrderRoutesErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/orders/routes",
+    ...options,
+  });
+};
+
+/**
+ * Get Kpi Data
+ */
+export const performanceGetKpiData = <ThrowOnError extends boolean = false>(
+  options?: Options<PerformanceGetKpiDataData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PerformanceGetKpiDataResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/performance/kpi",
+    ...options,
+  });
+};
+
+/**
+ * Get Top Movers
+ */
+export const performanceGetTopMovers = <ThrowOnError extends boolean = false>(
+  options?: Options<PerformanceGetTopMoversData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PerformanceGetTopMoversResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/performance/top-movers",
     ...options,
   });
 };

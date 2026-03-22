@@ -18,7 +18,7 @@ async def get_delta_change(
     user: User = Depends(current_active_user),
 ):
     date = validate_date(trade_date, "trade_date")
-    return await risk_service.get_delta_change(date)
+    return await risk_service.get_delta_changes(date)
 
 
 @router.get("/measures")

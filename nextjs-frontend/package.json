@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "generate-client": "openapi-ts",
+    "generate-client": "node ./generate-client.js",
     "test": "jest",
     "coverage": "jest --coverage",
     "prettier": "prettier --write '**/*.{js,jsx,ts,tsx,json,css,html}'",

@@ -1,7 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "FastAPI",
+    "title": "Portfolio Management Tool API",
+    "description": "API for Portfolio Management Tool - positions, P&L, risk, market data, and more",
     "version": "0.1.0"
   },
   "paths": {
@@ -11,7 +12,7 @@
           "auth"
         ],
         "summary": "Auth:Jwt.Login",
-        "operationId": "auth:jwt.login",
+        "operationId": "auth-auth:jwt.login",
         "requestBody": {
           "content": {
             "application/x-www-form-urlencoded": {
@@ -80,13 +81,23 @@
           "auth"
         ],
         "summary": "Auth:Jwt.Logout",
-        "operationId": "auth:jwt.logout",
+        "operationId": "auth-auth:jwt.logout",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "properties": {
+                    "detail": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "example": {
+                  "detail": "Successfully logged out"
+                }
               }
             }
           },
@@ -107,7 +118,7 @@
           "auth"
         ],
         "summary": "Register:Register",
-        "operationId": "register:register",
+        "operationId": "auth-register:register",
         "requestBody": {
           "content": {
             "application/json": {
@@ -175,7 +186,7 @@
           "auth"
         ],
         "summary": "Reset:Forgot Password",
-        "operationId": "reset:forgot_password",
+        "operationId": "auth-reset:forgot_password",
         "requestBody": {
           "content": {
             "application/json": {
@@ -214,7 +225,7 @@
           "auth"
         ],
         "summary": "Reset:Reset Password",
-        "operationId": "reset:reset_password",
+        "operationId": "auth-reset:reset_password",
         "requestBody": {
           "content": {
             "application/json": {
@@ -280,7 +291,7 @@
           "auth"
         ],
         "summary": "Verify:Request-Token",
-        "operationId": "verify:request-token",
+        "operationId": "auth-verify:request-token",
         "requestBody": {
           "content": {
             "application/json": {
@@ -319,7 +330,7 @@
           "auth"
         ],
         "summary": "Verify:Verify",
-        "operationId": "verify:verify",
+        "operationId": "auth-verify:verify",
         "requestBody": {
           "content": {
             "application/json": {
@@ -384,7 +395,7 @@
           "users"
         ],
         "summary": "Users:Current User",
-        "operationId": "users:current_user",
+        "operationId": "users-users:current_user",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -411,7 +422,7 @@
           "users"
         ],
         "summary": "Users:Patch Current User",
-        "operationId": "users:patch_current_user",
+        "operationId": "users-users:patch_current_user",
         "requestBody": {
           "content": {
             "application/json": {
@@ -432,9 +443,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Missing token or inactive user."
           },
           "400": {
             "description": "Bad Request",
@@ -463,6 +471,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing token or inactive user."
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -487,7 +498,7 @@
           "users"
         ],
         "summary": "Users:User",
-        "operationId": "users:user",
+        "operationId": "users-users:user",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -541,7 +552,7 @@
           "users"
         ],
         "summary": "Users:Patch User",
-        "operationId": "users:patch_user",
+        "operationId": "users-users:patch_user",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -579,15 +590,6 @@
               }
             }
           },
-          "401": {
-            "description": "Missing token or inactive user."
-          },
-          "403": {
-            "description": "Not a superuser."
-          },
-          "404": {
-            "description": "The user does not exist."
-          },
           "400": {
             "content": {
               "application/json": {
@@ -615,6 +617,15 @@
             },
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Missing token or inactive user."
+          },
+          "403": {
+            "description": "Not a superuser."
+          },
+          "404": {
+            "description": "The user does not exist."
+          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -632,7 +643,7 @@
           "users"
         ],
         "summary": "Users:Delete User",
-        "operationId": "users:delete_user",
+        "operationId": "users-users:delete_user",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -681,7 +692,7 @@
           "item"
         ],
         "summary": "Read Item",
-        "operationId": "read_item",
+        "operationId": "item-read_item",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -744,7 +755,7 @@
           "item"
         ],
         "summary": "Create Item",
-        "operationId": "create_item",
+        "operationId": "item-create_item",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -790,7 +801,7 @@
           "item"
         ],
         "summary": "Delete Item",
-        "operationId": "delete_item",
+        "operationId": "item-delete_item",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -828,6 +839,2017 @@
             }
           }
         }
+      }
+    },
+    "/api/positions/": {
+      "get": {
+        "tags": [
+          "positions"
+        ],
+        "summary": "Get Positions",
+        "operationId": "positions-get_positions",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "position_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Position date (YYYY-MM-DD)",
+              "title": "Position Date"
+            },
+            "description": "Position date (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/positions/stocks": {
+      "get": {
+        "tags": [
+          "positions"
+        ],
+        "summary": "Get Stock Positions",
+        "operationId": "positions-get_stock_positions",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "position_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Position Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/positions/warrants": {
+      "get": {
+        "tags": [
+          "positions"
+        ],
+        "summary": "Get Warrant Positions",
+        "operationId": "positions-get_warrant_positions",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "position_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Position Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/positions/bonds": {
+      "get": {
+        "tags": [
+          "positions"
+        ],
+        "summary": "Get Bond Positions",
+        "operationId": "positions-get_bond_positions",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "position_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Position Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/positions/trade-summary": {
+      "get": {
+        "tags": [
+          "positions"
+        ],
+        "summary": "Get Trade Summary",
+        "operationId": "positions-get_trade_summary",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start Date"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pnl/changes": {
+      "get": {
+        "tags": [
+          "pnl"
+        ],
+        "summary": "Get Pnl Changes",
+        "operationId": "pnl-get_pnl_changes",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Trade date (YYYY-MM-DD)",
+              "title": "Trade Date"
+            },
+            "description": "Trade date (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pnl/summary": {
+      "get": {
+        "tags": [
+          "pnl"
+        ],
+        "summary": "Get Pnl Summary",
+        "operationId": "pnl-get_pnl_summary",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Trade Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pnl/currency": {
+      "get": {
+        "tags": [
+          "pnl"
+        ],
+        "summary": "Get Pnl By Currency",
+        "operationId": "pnl-get_pnl_by_currency",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Trade Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pnl/full": {
+      "get": {
+        "tags": [
+          "pnl"
+        ],
+        "summary": "Get Pnl Full",
+        "operationId": "pnl-get_pnl_full",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Trade Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pnl/kpi": {
+      "get": {
+        "tags": [
+          "pnl"
+        ],
+        "summary": "Get Kpi Metrics",
+        "operationId": "pnl-get_kpi_metrics",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/market-data/": {
+      "get": {
+        "tags": [
+          "market-data"
+        ],
+        "summary": "Get Market Data",
+        "operationId": "market-data-get_market_data",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/market-data/fx": {
+      "get": {
+        "tags": [
+          "market-data"
+        ],
+        "summary": "Get Fx Data",
+        "operationId": "market-data-get_fx_data",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/market-data/top-movers": {
+      "get": {
+        "tags": [
+          "market-data"
+        ],
+        "summary": "Get Top Movers",
+        "operationId": "market-data-get_top_movers",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "ops",
+                "ytd",
+                "delta",
+                "price",
+                "volume"
+              ],
+              "type": "string",
+              "description": "Category: ops, ytd, delta, price, volume",
+              "default": "ops",
+              "title": "Category"
+            },
+            "description": "Category: ops, ytd, delta, price, volume"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/market-data/trading-calendar": {
+      "get": {
+        "tags": [
+          "market-data"
+        ],
+        "summary": "Get Trading Calendar",
+        "operationId": "market-data-get_trading_calendar",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Start date (YYYY-MM-DD)",
+              "title": "Start Date"
+            },
+            "description": "Start date (YYYY-MM-DD)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "End date (YYYY-MM-DD)",
+              "title": "End Date"
+            },
+            "description": "End date (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/market-data/market-hours": {
+      "get": {
+        "tags": [
+          "market-data"
+        ],
+        "summary": "Get Market Hours",
+        "operationId": "market-data-get_market_hours",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/market-data/ticker": {
+      "get": {
+        "tags": [
+          "market-data"
+        ],
+        "summary": "Get Ticker Data",
+        "operationId": "market-data-get_ticker_data",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/market-data/historical": {
+      "get": {
+        "tags": [
+          "market-data"
+        ],
+        "summary": "Get Historical Data",
+        "operationId": "market-data-get_historical_data",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tickers",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Comma-separated ticker symbols",
+              "title": "Tickers"
+            },
+            "description": "Comma-separated ticker symbols"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Start date (YYYY-MM-DD)",
+              "title": "Start Date"
+            },
+            "description": "Start date (YYYY-MM-DD)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "End date (YYYY-MM-DD)",
+              "title": "End Date"
+            },
+            "description": "End date (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/market-data/stock/{symbol}": {
+      "get": {
+        "tags": [
+          "market-data"
+        ],
+        "summary": "Get Stock Data",
+        "operationId": "market-data-get_stock_data",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Symbol"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/market-data/stock/{symbol}/history": {
+      "get": {
+        "tags": [
+          "market-data"
+        ],
+        "summary": "Get Stock History",
+        "operationId": "market-data-get_stock_history",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Symbol"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "1mo",
+                "3mo",
+                "6mo",
+                "ytd",
+                "1y",
+                "2y",
+                "5y",
+                "max"
+              ],
+              "type": "string",
+              "description": "Period: 1mo, 3mo, 6mo, ytd, 1y, 2y, 5y, max",
+              "default": "1mo",
+              "title": "Period"
+            },
+            "description": "Period: 1mo, 3mo, 6mo, ytd, 1y, 2y, 5y, max"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/market-data/stock/{symbol}/news": {
+      "get": {
+        "tags": [
+          "market-data"
+        ],
+        "summary": "Get Stock News",
+        "operationId": "market-data-get_stock_news",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "symbol",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Symbol"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/risk/delta-change": {
+      "get": {
+        "tags": [
+          "risk"
+        ],
+        "summary": "Get Delta Change",
+        "operationId": "risk-get_delta_change",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Trade Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/risk/measures": {
+      "get": {
+        "tags": [
+          "risk"
+        ],
+        "summary": "Get Risk Measures",
+        "operationId": "risk-get_risk_measures",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Trade Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/risk/inputs": {
+      "get": {
+        "tags": [
+          "risk"
+        ],
+        "summary": "Get Risk Inputs",
+        "operationId": "risk-get_risk_inputs",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Trade Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/compliance/restricted-list": {
+      "get": {
+        "tags": [
+          "compliance"
+        ],
+        "summary": "Get Restricted List",
+        "operationId": "compliance-get_restricted_list",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/compliance/undertakings": {
+      "get": {
+        "tags": [
+          "compliance"
+        ],
+        "summary": "Get Undertakings",
+        "operationId": "compliance-get_undertakings",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/compliance/beneficial-ownership": {
+      "get": {
+        "tags": [
+          "compliance"
+        ],
+        "summary": "Get Beneficial Ownership",
+        "operationId": "compliance-get_beneficial_ownership",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/recon/pps": {
+      "get": {
+        "tags": [
+          "reconciliation"
+        ],
+        "summary": "Get Pps Recon",
+        "operationId": "reconciliation-get_pps_recon",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Trade Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/recon/settlement": {
+      "get": {
+        "tags": [
+          "reconciliation"
+        ],
+        "summary": "Get Settlement Recon",
+        "operationId": "reconciliation-get_settlement_recon",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Trade Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/recon/failed-trades": {
+      "get": {
+        "tags": [
+          "reconciliation"
+        ],
+        "summary": "Get Failed Trades",
+        "operationId": "reconciliation-get_failed_trades",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Trade Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/recon/pnl": {
+      "get": {
+        "tags": [
+          "reconciliation"
+        ],
+        "summary": "Get Pnl Recon",
+        "operationId": "reconciliation-get_pnl_recon",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Trade Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/recon/risk-input": {
+      "get": {
+        "tags": [
+          "reconciliation"
+        ],
+        "summary": "Get Risk Input Recon",
+        "operationId": "reconciliation-get_risk_input_recon",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "trade_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Trade Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/portfolio-tools/pay-to-hold": {
+      "get": {
+        "tags": [
+          "portfolio-tools"
+        ],
+        "summary": "Get Pay To Hold",
+        "operationId": "portfolio-tools-get_pay_to_hold",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/portfolio-tools/stock-borrow": {
+      "get": {
+        "tags": [
+          "portfolio-tools"
+        ],
+        "summary": "Get Stock Borrow",
+        "operationId": "portfolio-tools-get_stock_borrow",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/portfolio-tools/reset-dates": {
+      "get": {
+        "tags": [
+          "portfolio-tools"
+        ],
+        "summary": "Get Reset Dates",
+        "operationId": "portfolio-tools-get_reset_dates",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/portfolio-tools/coming-resets": {
+      "get": {
+        "tags": [
+          "portfolio-tools"
+        ],
+        "summary": "Get Coming Resets",
+        "operationId": "portfolio-tools-get_coming_resets",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/portfolio-tools/cb-installments": {
+      "get": {
+        "tags": [
+          "portfolio-tools"
+        ],
+        "summary": "Get Cb Installments",
+        "operationId": "portfolio-tools-get_cb_installments",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/portfolio-tools/excess-amount": {
+      "get": {
+        "tags": [
+          "portfolio-tools"
+        ],
+        "summary": "Get Excess Amount",
+        "operationId": "portfolio-tools-get_excess_amount",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/instruments/ticker-data": {
+      "get": {
+        "tags": [
+          "instruments"
+        ],
+        "summary": "Get Ticker Data",
+        "operationId": "instruments-get_ticker_data",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/instruments/stock-screener": {
+      "get": {
+        "tags": [
+          "instruments"
+        ],
+        "summary": "Get Stock Screener",
+        "operationId": "instruments-get_stock_screener",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/instruments/special-terms": {
+      "get": {
+        "tags": [
+          "instruments"
+        ],
+        "summary": "Get Special Terms",
+        "operationId": "instruments-get_special_terms",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/events/calendar": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Get Event Calendar",
+        "operationId": "events-get_event_calendar",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Start date (YYYY-MM-DD)",
+              "title": "Start Date"
+            },
+            "description": "Start date (YYYY-MM-DD)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "End date (YYYY-MM-DD)",
+              "title": "End Date"
+            },
+            "description": "End date (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/events/stream": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Get Event Stream",
+        "operationId": "events-get_event_stream",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/events/reverse-inquiry": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "Get Reverse Inquiries",
+        "operationId": "events-get_reverse_inquiries",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "position_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Position date (YYYY-MM-DD)",
+              "title": "Position Date"
+            },
+            "description": "Position date (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/operations/daily-procedures": {
+      "get": {
+        "tags": [
+          "operations"
+        ],
+        "summary": "Get Daily Procedures",
+        "operationId": "operations-get_daily_procedures",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/operations/processes": {
+      "get": {
+        "tags": [
+          "operations"
+        ],
+        "summary": "Get Operation Processes",
+        "operationId": "operations-get_operation_processes",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/orders/": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Get Orders",
+        "operationId": "orders-get_orders",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/orders/routes": {
+      "get": {
+        "tags": [
+          "orders"
+        ],
+        "summary": "Get Order Routes",
+        "operationId": "orders-get_order_routes",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "order_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional EMSX order identifier",
+              "title": "Order Id"
+            },
+            "description": "Optional EMSX order identifier"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/performance/kpi": {
+      "get": {
+        "tags": [
+          "performance"
+        ],
+        "summary": "Get Kpi Data",
+        "operationId": "performance-get_kpi_data",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/performance/top-movers": {
+      "get": {
+        "tags": [
+          "performance"
+        ],
+        "summary": "Get Top Movers",
+        "operationId": "performance-get_top_movers",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
       }
     }
   },
@@ -1041,7 +3063,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 0.0
+                "minimum": 0
               },
               {
                 "type": "null"
@@ -1053,7 +3075,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 1.0
+                "minimum": 1
               },
               {
                 "type": "null"
@@ -1065,7 +3087,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 1.0
+                "minimum": 1
               },
               {
                 "type": "null"
@@ -1077,7 +3099,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 0.0
+                "minimum": 0
               },
               {
                 "type": "null"

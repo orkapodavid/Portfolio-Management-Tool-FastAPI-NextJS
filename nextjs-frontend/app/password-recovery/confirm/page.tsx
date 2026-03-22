@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
-import { notFound, useSearchParams } from "next/navigation";
+import { useActionState, useEffect } from "react";
+import { notFound, useRouter, useSearchParams } from "next/navigation";
 import { passwordResetConfirm } from "@/components/actions/password-reset-action";
 import { SubmitButton } from "@/components/ui/submitButton";
 import {
@@ -17,6 +17,7 @@ import { Suspense } from "react";
 import { FieldError, FormError } from "@/components/ui/FormError";
 
 function ResetPasswordForm() {
+  const router = useRouter();
   const [state, dispatch] = useActionState(passwordResetConfirm, undefined);
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -24,6 +25,12 @@ function ResetPasswordForm() {
   if (!token) {
     notFound();
   }
+
+  useEffect(() => {
+    if (state?.redirectTo) {
+      router.replace(state.redirectTo);
+    }
+  }, [router, state?.redirectTo]);
 
   return (
     <form action={dispatch}>
@@ -37,7 +44,13 @@ function ResetPasswordForm() {
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" name="password" type="password" required />
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              required
+            />
           </div>
           <FieldError state={state} field="password" />
           <div className="grid gap-2">
@@ -46,6 +59,7 @@ function ResetPasswordForm() {
               id="passwordConfirm"
               name="passwordConfirm"
               type="password"
+              autoComplete="new-password"
               required
             />
           </div>

@@ -11,13 +11,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { register } from "@/components/actions/register-action";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { SubmitButton } from "@/components/ui/submitButton";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FieldError, FormError } from "@/components/ui/FormError";
 
 export default function Page() {
+  const router = useRouter();
   const [state, dispatch] = useActionState(register, undefined);
+
+  useEffect(() => {
+    if (state?.redirectTo) {
+      router.replace(state.redirectTo);
+    }
+  }, [router, state?.redirectTo]);
+
   return (
     <div className="flex h-screen w-full items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <form action={dispatch}>
@@ -42,6 +51,7 @@ export default function Page() {
                 id="email"
                 name="email"
                 type="email"
+                autoComplete="email"
                 placeholder="m@example.com"
                 required
                 className="border-gray-300 dark:border-gray-600"
@@ -59,6 +69,7 @@ export default function Page() {
                 id="password"
                 name="password"
                 type="password"
+                autoComplete="new-password"
                 required
                 className="border-gray-300 dark:border-gray-600"
               />

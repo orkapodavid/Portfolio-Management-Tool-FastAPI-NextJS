@@ -3,13 +3,21 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { addItem } from "@/components/actions/items-action";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { SubmitButton } from "@/components/ui/submitButton";
+import { useRouter } from "next/navigation";
 
 const initialState = { message: "" };
 
 export default function CreateItemPage() {
+  const router = useRouter();
   const [state, dispatch] = useActionState(addItem, initialState);
+
+  useEffect(() => {
+    if (state.redirectTo) {
+      router.replace(state.redirectTo);
+    }
+  }, [router, state]);
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">

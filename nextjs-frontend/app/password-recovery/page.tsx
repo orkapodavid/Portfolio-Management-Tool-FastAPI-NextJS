@@ -43,6 +43,7 @@ export default function Page() {
                 id="email"
                 name="email"
                 type="email"
+                autoComplete="email"
                 placeholder="m@example.com"
                 required
                 className="border-gray-300 dark:border-gray-600"

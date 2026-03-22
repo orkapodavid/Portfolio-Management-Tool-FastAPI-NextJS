@@ -278,14 +278,14 @@ export type Login = {
   client_secret?: string | null;
 };
 
-export type AuthJwtLoginData = {
+export type AuthAuthJwtLoginData = {
   body: Login;
   path?: never;
   query?: never;
   url: "/auth/jwt/login";
 };
 
-export type AuthJwtLoginErrors = {
+export type AuthAuthJwtLoginErrors = {
   /**
    * Bad Request
    */
@@ -296,47 +296,53 @@ export type AuthJwtLoginErrors = {
   422: HttpValidationError;
 };
 
-export type AuthJwtLoginError = AuthJwtLoginErrors[keyof AuthJwtLoginErrors];
+export type AuthAuthJwtLoginError =
+  AuthAuthJwtLoginErrors[keyof AuthAuthJwtLoginErrors];
 
-export type AuthJwtLoginResponses = {
+export type AuthAuthJwtLoginResponses = {
   /**
    * Successful Response
    */
   200: BearerResponse;
 };
 
-export type AuthJwtLoginResponse =
-  AuthJwtLoginResponses[keyof AuthJwtLoginResponses];
+export type AuthAuthJwtLoginResponse =
+  AuthAuthJwtLoginResponses[keyof AuthAuthJwtLoginResponses];
 
-export type AuthJwtLogoutData = {
+export type AuthAuthJwtLogoutData = {
   body?: never;
   path?: never;
   query?: never;
   url: "/auth/jwt/logout";
 };
 
-export type AuthJwtLogoutErrors = {
+export type AuthAuthJwtLogoutErrors = {
   /**
    * Missing token or inactive user.
    */
   401: unknown;
 };
 
-export type AuthJwtLogoutResponses = {
+export type AuthAuthJwtLogoutResponses = {
   /**
    * Successful Response
    */
-  200: unknown;
+  200: {
+    detail?: string;
+  };
 };
 
-export type RegisterRegisterData = {
+export type AuthAuthJwtLogoutResponse =
+  AuthAuthJwtLogoutResponses[keyof AuthAuthJwtLogoutResponses];
+
+export type AuthRegisterRegisterData = {
   body: UserCreate;
   path?: never;
   query?: never;
   url: "/auth/register";
 };
 
-export type RegisterRegisterErrors = {
+export type AuthRegisterRegisterErrors = {
   /**
    * Bad Request
    */
@@ -347,51 +353,51 @@ export type RegisterRegisterErrors = {
   422: HttpValidationError;
 };
 
-export type RegisterRegisterError =
-  RegisterRegisterErrors[keyof RegisterRegisterErrors];
+export type AuthRegisterRegisterError =
+  AuthRegisterRegisterErrors[keyof AuthRegisterRegisterErrors];
 
-export type RegisterRegisterResponses = {
+export type AuthRegisterRegisterResponses = {
   /**
    * Successful Response
    */
   201: UserRead;
 };
 
-export type RegisterRegisterResponse =
-  RegisterRegisterResponses[keyof RegisterRegisterResponses];
+export type AuthRegisterRegisterResponse =
+  AuthRegisterRegisterResponses[keyof AuthRegisterRegisterResponses];
 
-export type ResetForgotPasswordData = {
+export type AuthResetForgotPasswordData = {
   body: BodyAuthResetForgotPassword;
   path?: never;
   query?: never;
   url: "/auth/forgot-password";
 };
 
-export type ResetForgotPasswordErrors = {
+export type AuthResetForgotPasswordErrors = {
   /**
    * Validation Error
    */
   422: HttpValidationError;
 };
 
-export type ResetForgotPasswordError =
-  ResetForgotPasswordErrors[keyof ResetForgotPasswordErrors];
+export type AuthResetForgotPasswordError =
+  AuthResetForgotPasswordErrors[keyof AuthResetForgotPasswordErrors];
 
-export type ResetForgotPasswordResponses = {
+export type AuthResetForgotPasswordResponses = {
   /**
    * Successful Response
    */
   202: unknown;
 };
 
-export type ResetResetPasswordData = {
+export type AuthResetResetPasswordData = {
   body: BodyAuthResetResetPassword;
   path?: never;
   query?: never;
   url: "/auth/reset-password";
 };
 
-export type ResetResetPasswordErrors = {
+export type AuthResetResetPasswordErrors = {
   /**
    * Bad Request
    */
@@ -402,48 +408,48 @@ export type ResetResetPasswordErrors = {
   422: HttpValidationError;
 };
 
-export type ResetResetPasswordError =
-  ResetResetPasswordErrors[keyof ResetResetPasswordErrors];
+export type AuthResetResetPasswordError =
+  AuthResetResetPasswordErrors[keyof AuthResetResetPasswordErrors];
 
-export type ResetResetPasswordResponses = {
+export type AuthResetResetPasswordResponses = {
   /**
    * Successful Response
    */
   200: unknown;
 };
 
-export type VerifyRequestTokenData = {
+export type AuthVerifyRequestTokenData = {
   body: BodyAuthVerifyRequestToken;
   path?: never;
   query?: never;
   url: "/auth/request-verify-token";
 };
 
-export type VerifyRequestTokenErrors = {
+export type AuthVerifyRequestTokenErrors = {
   /**
    * Validation Error
    */
   422: HttpValidationError;
 };
 
-export type VerifyRequestTokenError =
-  VerifyRequestTokenErrors[keyof VerifyRequestTokenErrors];
+export type AuthVerifyRequestTokenError =
+  AuthVerifyRequestTokenErrors[keyof AuthVerifyRequestTokenErrors];
 
-export type VerifyRequestTokenResponses = {
+export type AuthVerifyRequestTokenResponses = {
   /**
    * Successful Response
    */
   202: unknown;
 };
 
-export type VerifyVerifyData = {
+export type AuthVerifyVerifyData = {
   body: BodyAuthVerifyVerify;
   path?: never;
   query?: never;
   url: "/auth/verify";
 };
 
-export type VerifyVerifyErrors = {
+export type AuthVerifyVerifyErrors = {
   /**
    * Bad Request
    */
@@ -454,50 +460,51 @@ export type VerifyVerifyErrors = {
   422: HttpValidationError;
 };
 
-export type VerifyVerifyError = VerifyVerifyErrors[keyof VerifyVerifyErrors];
+export type AuthVerifyVerifyError =
+  AuthVerifyVerifyErrors[keyof AuthVerifyVerifyErrors];
 
-export type VerifyVerifyResponses = {
+export type AuthVerifyVerifyResponses = {
   /**
    * Successful Response
    */
   200: UserRead;
 };
 
-export type VerifyVerifyResponse =
-  VerifyVerifyResponses[keyof VerifyVerifyResponses];
+export type AuthVerifyVerifyResponse =
+  AuthVerifyVerifyResponses[keyof AuthVerifyVerifyResponses];
 
-export type UsersCurrentUserData = {
+export type UsersUsersCurrentUserData = {
   body?: never;
   path?: never;
   query?: never;
   url: "/users/me";
 };
 
-export type UsersCurrentUserErrors = {
+export type UsersUsersCurrentUserErrors = {
   /**
    * Missing token or inactive user.
    */
   401: unknown;
 };
 
-export type UsersCurrentUserResponses = {
+export type UsersUsersCurrentUserResponses = {
   /**
    * Successful Response
    */
   200: UserRead;
 };
 
-export type UsersCurrentUserResponse =
-  UsersCurrentUserResponses[keyof UsersCurrentUserResponses];
+export type UsersUsersCurrentUserResponse =
+  UsersUsersCurrentUserResponses[keyof UsersUsersCurrentUserResponses];
 
-export type UsersPatchCurrentUserData = {
+export type UsersUsersPatchCurrentUserData = {
   body: UserUpdate;
   path?: never;
   query?: never;
   url: "/users/me";
 };
 
-export type UsersPatchCurrentUserErrors = {
+export type UsersUsersPatchCurrentUserErrors = {
   /**
    * Bad Request
    */
@@ -512,20 +519,20 @@ export type UsersPatchCurrentUserErrors = {
   422: HttpValidationError;
 };
 
-export type UsersPatchCurrentUserError =
-  UsersPatchCurrentUserErrors[keyof UsersPatchCurrentUserErrors];
+export type UsersUsersPatchCurrentUserError =
+  UsersUsersPatchCurrentUserErrors[keyof UsersUsersPatchCurrentUserErrors];
 
-export type UsersPatchCurrentUserResponses = {
+export type UsersUsersPatchCurrentUserResponses = {
   /**
    * Successful Response
    */
   200: UserRead;
 };
 
-export type UsersPatchCurrentUserResponse =
-  UsersPatchCurrentUserResponses[keyof UsersPatchCurrentUserResponses];
+export type UsersUsersPatchCurrentUserResponse =
+  UsersUsersPatchCurrentUserResponses[keyof UsersUsersPatchCurrentUserResponses];
 
-export type UsersDeleteUserData = {
+export type UsersUsersDeleteUserData = {
   body?: never;
   path: {
     /**
@@ -537,7 +544,7 @@ export type UsersDeleteUserData = {
   url: "/users/{id}";
 };
 
-export type UsersDeleteUserErrors = {
+export type UsersUsersDeleteUserErrors = {
   /**
    * Missing token or inactive user.
    */
@@ -556,20 +563,20 @@ export type UsersDeleteUserErrors = {
   422: HttpValidationError;
 };
 
-export type UsersDeleteUserError =
-  UsersDeleteUserErrors[keyof UsersDeleteUserErrors];
+export type UsersUsersDeleteUserError =
+  UsersUsersDeleteUserErrors[keyof UsersUsersDeleteUserErrors];
 
-export type UsersDeleteUserResponses = {
+export type UsersUsersDeleteUserResponses = {
   /**
    * Successful Response
    */
   204: void;
 };
 
-export type UsersDeleteUserResponse =
-  UsersDeleteUserResponses[keyof UsersDeleteUserResponses];
+export type UsersUsersDeleteUserResponse =
+  UsersUsersDeleteUserResponses[keyof UsersUsersDeleteUserResponses];
 
-export type UsersUserData = {
+export type UsersUsersUserData = {
   body?: never;
   path: {
     /**
@@ -581,7 +588,7 @@ export type UsersUserData = {
   url: "/users/{id}";
 };
 
-export type UsersUserErrors = {
+export type UsersUsersUserErrors = {
   /**
    * Missing token or inactive user.
    */
@@ -600,18 +607,20 @@ export type UsersUserErrors = {
   422: HttpValidationError;
 };
 
-export type UsersUserError = UsersUserErrors[keyof UsersUserErrors];
+export type UsersUsersUserError =
+  UsersUsersUserErrors[keyof UsersUsersUserErrors];
 
-export type UsersUserResponses = {
+export type UsersUsersUserResponses = {
   /**
    * Successful Response
    */
   200: UserRead;
 };
 
-export type UsersUserResponse = UsersUserResponses[keyof UsersUserResponses];
+export type UsersUsersUserResponse =
+  UsersUsersUserResponses[keyof UsersUsersUserResponses];
 
-export type UsersPatchUserData = {
+export type UsersUsersPatchUserData = {
   body: UserUpdate;
   path: {
     /**
@@ -623,7 +632,7 @@ export type UsersPatchUserData = {
   url: "/users/{id}";
 };
 
-export type UsersPatchUserErrors = {
+export type UsersUsersPatchUserErrors = {
   /**
    * Bad Request
    */
@@ -646,20 +655,20 @@ export type UsersPatchUserErrors = {
   422: HttpValidationError;
 };
 
-export type UsersPatchUserError =
-  UsersPatchUserErrors[keyof UsersPatchUserErrors];
+export type UsersUsersPatchUserError =
+  UsersUsersPatchUserErrors[keyof UsersUsersPatchUserErrors];
 
-export type UsersPatchUserResponses = {
+export type UsersUsersPatchUserResponses = {
   /**
    * Successful Response
    */
   200: UserRead;
 };
 
-export type UsersPatchUserResponse =
-  UsersPatchUserResponses[keyof UsersPatchUserResponses];
+export type UsersUsersPatchUserResponse =
+  UsersUsersPatchUserResponses[keyof UsersUsersPatchUserResponses];
 
-export type ReadItemData = {
+export type ItemReadItemData = {
   body?: never;
   path?: never;
   query?: {
@@ -677,50 +686,53 @@ export type ReadItemData = {
   url: "/items/";
 };
 
-export type ReadItemErrors = {
+export type ItemReadItemErrors = {
   /**
    * Validation Error
    */
   422: HttpValidationError;
 };
 
-export type ReadItemError = ReadItemErrors[keyof ReadItemErrors];
+export type ItemReadItemError = ItemReadItemErrors[keyof ItemReadItemErrors];
 
-export type ReadItemResponses = {
+export type ItemReadItemResponses = {
   /**
    * Successful Response
    */
   200: PageItemRead;
 };
 
-export type ReadItemResponse = ReadItemResponses[keyof ReadItemResponses];
+export type ItemReadItemResponse =
+  ItemReadItemResponses[keyof ItemReadItemResponses];
 
-export type CreateItemData = {
+export type ItemCreateItemData = {
   body: ItemCreate;
   path?: never;
   query?: never;
   url: "/items/";
 };
 
-export type CreateItemErrors = {
+export type ItemCreateItemErrors = {
   /**
    * Validation Error
    */
   422: HttpValidationError;
 };
 
-export type CreateItemError = CreateItemErrors[keyof CreateItemErrors];
+export type ItemCreateItemError =
+  ItemCreateItemErrors[keyof ItemCreateItemErrors];
 
-export type CreateItemResponses = {
+export type ItemCreateItemResponses = {
   /**
    * Successful Response
    */
   200: ItemRead;
 };
 
-export type CreateItemResponse = CreateItemResponses[keyof CreateItemResponses];
+export type ItemCreateItemResponse =
+  ItemCreateItemResponses[keyof ItemCreateItemResponses];
 
-export type DeleteItemData = {
+export type ItemDeleteItemData = {
   body?: never;
   path: {
     /**
@@ -732,16 +744,1130 @@ export type DeleteItemData = {
   url: "/items/{item_id}";
 };
 
-export type DeleteItemErrors = {
+export type ItemDeleteItemErrors = {
   /**
    * Validation Error
    */
   422: HttpValidationError;
 };
 
-export type DeleteItemError = DeleteItemErrors[keyof DeleteItemErrors];
+export type ItemDeleteItemError =
+  ItemDeleteItemErrors[keyof ItemDeleteItemErrors];
 
-export type DeleteItemResponses = {
+export type ItemDeleteItemResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PositionsGetPositionsData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Position Date
+     * Position date (YYYY-MM-DD)
+     */
+    position_date?: string | null;
+  };
+  url: "/api/positions/";
+};
+
+export type PositionsGetPositionsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PositionsGetPositionsError =
+  PositionsGetPositionsErrors[keyof PositionsGetPositionsErrors];
+
+export type PositionsGetPositionsResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PositionsGetStockPositionsData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Position Date
+     */
+    position_date?: string | null;
+  };
+  url: "/api/positions/stocks";
+};
+
+export type PositionsGetStockPositionsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PositionsGetStockPositionsError =
+  PositionsGetStockPositionsErrors[keyof PositionsGetStockPositionsErrors];
+
+export type PositionsGetStockPositionsResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PositionsGetWarrantPositionsData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Position Date
+     */
+    position_date?: string | null;
+  };
+  url: "/api/positions/warrants";
+};
+
+export type PositionsGetWarrantPositionsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PositionsGetWarrantPositionsError =
+  PositionsGetWarrantPositionsErrors[keyof PositionsGetWarrantPositionsErrors];
+
+export type PositionsGetWarrantPositionsResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PositionsGetBondPositionsData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Position Date
+     */
+    position_date?: string | null;
+  };
+  url: "/api/positions/bonds";
+};
+
+export type PositionsGetBondPositionsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PositionsGetBondPositionsError =
+  PositionsGetBondPositionsErrors[keyof PositionsGetBondPositionsErrors];
+
+export type PositionsGetBondPositionsResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PositionsGetTradeSummaryData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start Date
+     */
+    start_date?: string | null;
+    /**
+     * End Date
+     */
+    end_date?: string | null;
+  };
+  url: "/api/positions/trade-summary";
+};
+
+export type PositionsGetTradeSummaryErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PositionsGetTradeSummaryError =
+  PositionsGetTradeSummaryErrors[keyof PositionsGetTradeSummaryErrors];
+
+export type PositionsGetTradeSummaryResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PnlGetPnlChangesData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Trade Date
+     * Trade date (YYYY-MM-DD)
+     */
+    trade_date?: string | null;
+  };
+  url: "/api/pnl/changes";
+};
+
+export type PnlGetPnlChangesErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PnlGetPnlChangesError =
+  PnlGetPnlChangesErrors[keyof PnlGetPnlChangesErrors];
+
+export type PnlGetPnlChangesResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PnlGetPnlSummaryData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Trade Date
+     */
+    trade_date?: string | null;
+  };
+  url: "/api/pnl/summary";
+};
+
+export type PnlGetPnlSummaryErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PnlGetPnlSummaryError =
+  PnlGetPnlSummaryErrors[keyof PnlGetPnlSummaryErrors];
+
+export type PnlGetPnlSummaryResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PnlGetPnlByCurrencyData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Trade Date
+     */
+    trade_date?: string | null;
+  };
+  url: "/api/pnl/currency";
+};
+
+export type PnlGetPnlByCurrencyErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PnlGetPnlByCurrencyError =
+  PnlGetPnlByCurrencyErrors[keyof PnlGetPnlByCurrencyErrors];
+
+export type PnlGetPnlByCurrencyResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PnlGetPnlFullData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Trade Date
+     */
+    trade_date?: string | null;
+  };
+  url: "/api/pnl/full";
+};
+
+export type PnlGetPnlFullErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PnlGetPnlFullError = PnlGetPnlFullErrors[keyof PnlGetPnlFullErrors];
+
+export type PnlGetPnlFullResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PnlGetKpiMetricsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/pnl/kpi";
+};
+
+export type PnlGetKpiMetricsResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type MarketDataGetMarketDataData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/market-data/";
+};
+
+export type MarketDataGetMarketDataResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type MarketDataGetFxDataData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/market-data/fx";
+};
+
+export type MarketDataGetFxDataResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type MarketDataGetTopMoversData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Category
+     * Category: ops, ytd, delta, price, volume
+     */
+    category?: "ops" | "ytd" | "delta" | "price" | "volume";
+  };
+  url: "/api/market-data/top-movers";
+};
+
+export type MarketDataGetTopMoversErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type MarketDataGetTopMoversError =
+  MarketDataGetTopMoversErrors[keyof MarketDataGetTopMoversErrors];
+
+export type MarketDataGetTopMoversResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type MarketDataGetTradingCalendarData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start Date
+     * Start date (YYYY-MM-DD)
+     */
+    start_date?: string | null;
+    /**
+     * End Date
+     * End date (YYYY-MM-DD)
+     */
+    end_date?: string | null;
+  };
+  url: "/api/market-data/trading-calendar";
+};
+
+export type MarketDataGetTradingCalendarErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type MarketDataGetTradingCalendarError =
+  MarketDataGetTradingCalendarErrors[keyof MarketDataGetTradingCalendarErrors];
+
+export type MarketDataGetTradingCalendarResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type MarketDataGetMarketHoursData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/market-data/market-hours";
+};
+
+export type MarketDataGetMarketHoursResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type MarketDataGetTickerDataData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/market-data/ticker";
+};
+
+export type MarketDataGetTickerDataResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type MarketDataGetHistoricalDataData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Tickers
+     * Comma-separated ticker symbols
+     */
+    tickers?: string | null;
+    /**
+     * Start Date
+     * Start date (YYYY-MM-DD)
+     */
+    start_date?: string | null;
+    /**
+     * End Date
+     * End date (YYYY-MM-DD)
+     */
+    end_date?: string | null;
+  };
+  url: "/api/market-data/historical";
+};
+
+export type MarketDataGetHistoricalDataErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type MarketDataGetHistoricalDataError =
+  MarketDataGetHistoricalDataErrors[keyof MarketDataGetHistoricalDataErrors];
+
+export type MarketDataGetHistoricalDataResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type MarketDataGetStockDataData = {
+  body?: never;
+  path: {
+    /**
+     * Symbol
+     */
+    symbol: string;
+  };
+  query?: never;
+  url: "/api/market-data/stock/{symbol}";
+};
+
+export type MarketDataGetStockDataErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type MarketDataGetStockDataError =
+  MarketDataGetStockDataErrors[keyof MarketDataGetStockDataErrors];
+
+export type MarketDataGetStockDataResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type MarketDataGetStockHistoryData = {
+  body?: never;
+  path: {
+    /**
+     * Symbol
+     */
+    symbol: string;
+  };
+  query?: {
+    /**
+     * Period
+     * Period: 1mo, 3mo, 6mo, ytd, 1y, 2y, 5y, max
+     */
+    period?: "1mo" | "3mo" | "6mo" | "ytd" | "1y" | "2y" | "5y" | "max";
+  };
+  url: "/api/market-data/stock/{symbol}/history";
+};
+
+export type MarketDataGetStockHistoryErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type MarketDataGetStockHistoryError =
+  MarketDataGetStockHistoryErrors[keyof MarketDataGetStockHistoryErrors];
+
+export type MarketDataGetStockHistoryResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type MarketDataGetStockNewsData = {
+  body?: never;
+  path: {
+    /**
+     * Symbol
+     */
+    symbol: string;
+  };
+  query?: never;
+  url: "/api/market-data/stock/{symbol}/news";
+};
+
+export type MarketDataGetStockNewsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type MarketDataGetStockNewsError =
+  MarketDataGetStockNewsErrors[keyof MarketDataGetStockNewsErrors];
+
+export type MarketDataGetStockNewsResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type RiskGetDeltaChangeData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Trade Date
+     */
+    trade_date?: string | null;
+  };
+  url: "/api/risk/delta-change";
+};
+
+export type RiskGetDeltaChangeErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type RiskGetDeltaChangeError =
+  RiskGetDeltaChangeErrors[keyof RiskGetDeltaChangeErrors];
+
+export type RiskGetDeltaChangeResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type RiskGetRiskMeasuresData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Trade Date
+     */
+    trade_date?: string | null;
+  };
+  url: "/api/risk/measures";
+};
+
+export type RiskGetRiskMeasuresErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type RiskGetRiskMeasuresError =
+  RiskGetRiskMeasuresErrors[keyof RiskGetRiskMeasuresErrors];
+
+export type RiskGetRiskMeasuresResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type RiskGetRiskInputsData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Trade Date
+     */
+    trade_date?: string | null;
+  };
+  url: "/api/risk/inputs";
+};
+
+export type RiskGetRiskInputsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type RiskGetRiskInputsError =
+  RiskGetRiskInputsErrors[keyof RiskGetRiskInputsErrors];
+
+export type RiskGetRiskInputsResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type ComplianceGetRestrictedListData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/compliance/restricted-list";
+};
+
+export type ComplianceGetRestrictedListResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type ComplianceGetUndertakingsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/compliance/undertakings";
+};
+
+export type ComplianceGetUndertakingsResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type ComplianceGetBeneficialOwnershipData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/compliance/beneficial-ownership";
+};
+
+export type ComplianceGetBeneficialOwnershipResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type ReconciliationGetPpsReconData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Trade Date
+     */
+    trade_date?: string | null;
+  };
+  url: "/api/recon/pps";
+};
+
+export type ReconciliationGetPpsReconErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type ReconciliationGetPpsReconError =
+  ReconciliationGetPpsReconErrors[keyof ReconciliationGetPpsReconErrors];
+
+export type ReconciliationGetPpsReconResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type ReconciliationGetSettlementReconData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Trade Date
+     */
+    trade_date?: string | null;
+  };
+  url: "/api/recon/settlement";
+};
+
+export type ReconciliationGetSettlementReconErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type ReconciliationGetSettlementReconError =
+  ReconciliationGetSettlementReconErrors[keyof ReconciliationGetSettlementReconErrors];
+
+export type ReconciliationGetSettlementReconResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type ReconciliationGetFailedTradesData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Trade Date
+     */
+    trade_date?: string | null;
+  };
+  url: "/api/recon/failed-trades";
+};
+
+export type ReconciliationGetFailedTradesErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type ReconciliationGetFailedTradesError =
+  ReconciliationGetFailedTradesErrors[keyof ReconciliationGetFailedTradesErrors];
+
+export type ReconciliationGetFailedTradesResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type ReconciliationGetPnlReconData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Trade Date
+     */
+    trade_date?: string | null;
+  };
+  url: "/api/recon/pnl";
+};
+
+export type ReconciliationGetPnlReconErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type ReconciliationGetPnlReconError =
+  ReconciliationGetPnlReconErrors[keyof ReconciliationGetPnlReconErrors];
+
+export type ReconciliationGetPnlReconResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type ReconciliationGetRiskInputReconData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Trade Date
+     */
+    trade_date?: string | null;
+  };
+  url: "/api/recon/risk-input";
+};
+
+export type ReconciliationGetRiskInputReconErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type ReconciliationGetRiskInputReconError =
+  ReconciliationGetRiskInputReconErrors[keyof ReconciliationGetRiskInputReconErrors];
+
+export type ReconciliationGetRiskInputReconResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PortfolioToolsGetPayToHoldData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/portfolio-tools/pay-to-hold";
+};
+
+export type PortfolioToolsGetPayToHoldResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PortfolioToolsGetStockBorrowData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/portfolio-tools/stock-borrow";
+};
+
+export type PortfolioToolsGetStockBorrowResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PortfolioToolsGetResetDatesData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/portfolio-tools/reset-dates";
+};
+
+export type PortfolioToolsGetResetDatesResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PortfolioToolsGetComingResetsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/portfolio-tools/coming-resets";
+};
+
+export type PortfolioToolsGetComingResetsResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PortfolioToolsGetCbInstallmentsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/portfolio-tools/cb-installments";
+};
+
+export type PortfolioToolsGetCbInstallmentsResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PortfolioToolsGetExcessAmountData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/portfolio-tools/excess-amount";
+};
+
+export type PortfolioToolsGetExcessAmountResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type InstrumentsGetTickerDataData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/instruments/ticker-data";
+};
+
+export type InstrumentsGetTickerDataResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type InstrumentsGetStockScreenerData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/instruments/stock-screener";
+};
+
+export type InstrumentsGetStockScreenerResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type InstrumentsGetSpecialTermsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/instruments/special-terms";
+};
+
+export type InstrumentsGetSpecialTermsResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type EventsGetEventCalendarData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Start Date
+     * Start date (YYYY-MM-DD)
+     */
+    start_date?: string | null;
+    /**
+     * End Date
+     * End date (YYYY-MM-DD)
+     */
+    end_date?: string | null;
+  };
+  url: "/api/events/calendar";
+};
+
+export type EventsGetEventCalendarErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type EventsGetEventCalendarError =
+  EventsGetEventCalendarErrors[keyof EventsGetEventCalendarErrors];
+
+export type EventsGetEventCalendarResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type EventsGetEventStreamData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/events/stream";
+};
+
+export type EventsGetEventStreamResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type EventsGetReverseInquiriesData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Position Date
+     * Position date (YYYY-MM-DD)
+     */
+    position_date?: string | null;
+  };
+  url: "/api/events/reverse-inquiry";
+};
+
+export type EventsGetReverseInquiriesErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type EventsGetReverseInquiriesError =
+  EventsGetReverseInquiriesErrors[keyof EventsGetReverseInquiriesErrors];
+
+export type EventsGetReverseInquiriesResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type OperationsGetDailyProceduresData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/operations/daily-procedures";
+};
+
+export type OperationsGetDailyProceduresResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type OperationsGetOperationProcessesData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/operations/processes";
+};
+
+export type OperationsGetOperationProcessesResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type OrdersGetOrdersData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/orders/";
+};
+
+export type OrdersGetOrdersResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type OrdersGetOrderRoutesData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Order Id
+     * Optional EMSX order identifier
+     */
+    order_id?: number | null;
+  };
+  url: "/api/orders/routes";
+};
+
+export type OrdersGetOrderRoutesErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type OrdersGetOrderRoutesError =
+  OrdersGetOrderRoutesErrors[keyof OrdersGetOrderRoutesErrors];
+
+export type OrdersGetOrderRoutesResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PerformanceGetKpiDataData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/performance/kpi";
+};
+
+export type PerformanceGetKpiDataResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type PerformanceGetTopMoversData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/performance/top-movers";
+};
+
+export type PerformanceGetTopMoversResponses = {
   /**
    * Successful Response
    */

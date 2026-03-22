@@ -3,9 +3,13 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query
 
 from app.database import User
-from app.users import current_active_user
 from app.routes._validation import validate_date
-from pmt_core.services import EventCalendarService, EventStreamService, ReverseInquiryService
+from app.users import current_active_user
+from pmt_core.services import (
+    EventCalendarService,
+    EventStreamService,
+    ReverseInquiryService,
+)
 
 router = APIRouter(tags=["events"])
 
@@ -22,18 +26,22 @@ async def get_event_calendar(
 ):
     start = validate_date(start_date, "start_date")
     end = validate_date(end_date, "end_date")
-    return await event_calendar_service.get_events(start, end)
+    return await event_calendar_service.get_event_calendar(start, end)
 
 
 @router.get("/stream")
 async def get_event_stream(
     user: User = Depends(current_active_user),
 ):
-    return await event_stream_service.get_events()
+    return await event_stream_service.get_event_stream()
 
 
 @router.get("/reverse-inquiry")
 async def get_reverse_inquiries(
+    position_date: Optional[str] = Query(
+        None, description="Position date (YYYY-MM-DD)"
+    ),
     user: User = Depends(current_active_user),
 ):
-    return await reverse_inquiry_service.get_inquiries()
+    date = validate_date(position_date, "position_date")
+    return await reverse_inquiry_service.get_reverse_inquiry(date)
