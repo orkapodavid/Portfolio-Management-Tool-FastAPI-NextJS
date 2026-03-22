@@ -1,138 +1,134 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import type { ReactNode } from "react";
 
-import Page from "@/app/register/page";
-import { register } from "@/components/actions/register-action";
+import { RegisterPageView } from "../app/register/register-page-view";
 
-jest.mock("../components/actions/register-action", () => ({
-  register: jest.fn(),
+jest.mock("next/link", () => ({
+  __esModule: true,
+  default: ({
+    children,
+    href,
+    ...props
+  }: {
+    children: ReactNode;
+    href: string;
+    [key: string]: unknown;
+  }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
 }));
 
+jest.mock("react-dom", () => ({
+  ...jest.requireActual("react-dom"),
+  useFormStatus: () => ({
+    pending: false,
+  }),
+}));
+
+function submitForm(button: HTMLElement) {
+  const form = button.closest("form");
+  if (!form) {
+    throw new Error("Submit button is not inside a form");
+  }
+
+  fireEvent.submit(form);
+}
+
+function expectSubmittedFormData(
+  action: jest.Mock,
+  expected: Record<string, string>,
+) {
+  expect(action).toHaveBeenCalledTimes(1);
+  const [submittedFormData] = action.mock.calls[0] as [FormData];
+  expect(Object.fromEntries(submittedFormData.entries())).toEqual(expected);
+}
+
 describe("Register Page", () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+  it("renders the form with email and password input and submit button", async () => {
+    render(<RegisterPageView action={jest.fn()} />);
 
-  it("renders the form with email and password input and submit button", () => {
-    render(<Page />);
-
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(await screen.findByLabelText(/email/i)).toBeInTheDocument();
+    expect(await screen.findByLabelText(/password/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /sign up/i }),
+      await screen.findByRole("button", { name: /sign up/i }),
     ).toBeInTheDocument();
   });
 
-  it("displays success message on successful form submission", async () => {
-    // Mock a successful register
-    (register as jest.Mock).mockResolvedValue({});
+  it("submits the entered registration values to the page action", async () => {
+    const action = jest.fn();
+    render(<RegisterPageView action={action} />);
 
-    render(<Page />);
+    fireEvent.change(await screen.findByLabelText(/email/i), {
+      target: { value: "testuser@example.com" },
+    });
+    fireEvent.change(await screen.findByLabelText(/password/i), {
+      target: { value: "@1231231%a" },
+    });
+    submitForm(await screen.findByRole("button", { name: /sign up/i }));
 
-    const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole("button", { name: /sign up/i });
-
-    fireEvent.change(emailInput, { target: { value: "testuser@example.com" } });
-    fireEvent.change(passwordInput, { target: { value: "@1231231%a" } });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      const formData = new FormData();
-      formData.set("email", "testuser@example.com");
-      formData.set("password", "@1231231%a");
-      expect(register).toHaveBeenCalledWith(undefined, formData);
+    expectSubmittedFormData(action, {
+      email: "testuser@example.com",
+      password: "@1231231%a",
     });
   });
 
-  it("displays server validation error if register fails", async () => {
-    (register as jest.Mock).mockResolvedValue({
-      server_validation_error: "User already exists",
-    });
+  it("displays the server validation error message", async () => {
+    render(
+      <RegisterPageView
+        action={jest.fn()}
+        state={{ server_validation_error: "User already exists" }}
+      />,
+    );
 
-    render(<Page />);
-
-    const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole("button", { name: /sign up/i });
-
-    fireEvent.change(emailInput, { target: { value: "already@already.com" } });
-    fireEvent.change(passwordInput, { target: { value: "@1231231%a" } });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText("User already exists")).toBeInTheDocument();
-    });
+    expect(await screen.findByText("User already exists")).toBeInTheDocument();
   });
 
-  it("displays server error for unexpected errors", async () => {
-    (register as jest.Mock).mockResolvedValue({
-      server_error: "An unexpected error occurred. Please try again later.",
-    });
+  it("displays the server error message", async () => {
+    render(
+      <RegisterPageView
+        action={jest.fn()}
+        state={{
+          server_error: "An unexpected error occurred. Please try again later.",
+        }}
+      />,
+    );
 
-    render(<Page />);
-
-    const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole("button", { name: /sign up/i });
-
-    fireEvent.change(emailInput, { target: { value: "test@test.com" } });
-    fireEvent.change(passwordInput, { target: { value: "@1231231%a" } });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(
-          "An unexpected error occurred. Please try again later.",
-        ),
-      ).toBeInTheDocument();
-    });
-
-    const formData = new FormData();
-    formData.set("email", "test@test.com");
-    formData.set("password", "@1231231%a");
-    expect(register).toHaveBeenCalledWith(undefined, formData);
+    expect(
+      await screen.findByText(
+        "An unexpected error occurred. Please try again later.",
+      ),
+    ).toBeInTheDocument();
   });
 
-  it("displays validation errors if password and email are invalid", async () => {
-    // Mock a successful password register
-    (register as jest.Mock).mockResolvedValue({
-      errors: {
-        email: ["Invalid email address"],
-        password: [
-          "Password should contain at least one uppercase letter.",
-          "Password should contain at least one special character.",
-        ],
-      },
-    });
+  it("displays field validation errors from the page state", async () => {
+    render(
+      <RegisterPageView
+        action={jest.fn()}
+        state={{
+          errors: {
+            email: ["Invalid email address"],
+            password: [
+              "Password should contain at least one uppercase letter.",
+              "Password should contain at least one special character.",
+            ],
+          },
+        }}
+      />,
+    );
 
-    render(<Page />);
-
-    const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole("button", { name: /sign up/i });
-
-    fireEvent.change(emailInput, { target: { value: "email@email.com" } });
-    fireEvent.change(passwordInput, { target: { value: "invalid_password" } });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(
-          "Password should contain at least one uppercase letter.",
-        ),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(
-          "Password should contain at least one special character.",
-        ),
-      ).toBeInTheDocument();
-      expect(screen.getByText("Invalid email address")).toBeInTheDocument();
-    });
-
-    const formData = new FormData();
-    formData.set("email", "email@email.com");
-    formData.set("password", "invalid_password");
-    expect(register).toHaveBeenCalledWith(undefined, formData);
+    expect(await screen.findByText("Invalid email address")).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        "Password should contain at least one uppercase letter.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        "Password should contain at least one special character.",
+      ),
+    ).toBeInTheDocument();
   });
 });

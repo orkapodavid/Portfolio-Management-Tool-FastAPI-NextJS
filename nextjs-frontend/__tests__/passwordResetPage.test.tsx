@@ -1,72 +1,94 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import type { ReactNode } from "react";
 
-import Page from "@/app/password-recovery/page";
-import { passwordReset } from "@/components/actions/password-reset-action";
+import { PasswordRecoveryPageView } from "../app/password-recovery/password-recovery-page-view";
 
-jest.mock("../components/actions/password-reset-action", () => ({
-  passwordReset: jest.fn(),
+jest.mock("next/link", () => ({
+  __esModule: true,
+  default: ({
+    children,
+    href,
+    ...props
+  }: {
+    children: ReactNode;
+    href: string;
+    [key: string]: unknown;
+  }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
 }));
 
+jest.mock("react-dom", () => ({
+  ...jest.requireActual("react-dom"),
+  useFormStatus: () => ({
+    pending: false,
+  }),
+}));
+
+function submitForm(button: HTMLElement) {
+  const form = button.closest("form");
+  if (!form) {
+    throw new Error("Submit button is not inside a form");
+  }
+
+  fireEvent.submit(form);
+}
+
+function expectSubmittedFormData(
+  action: jest.Mock,
+  expected: Record<string, string>,
+) {
+  expect(action).toHaveBeenCalledTimes(1);
+  const [submittedFormData] = action.mock.calls[0] as [FormData];
+  expect(Object.fromEntries(submittedFormData.entries())).toEqual(expected);
+}
+
 describe("Password Reset Page", () => {
-  afterEach(() => {
-    jest.clearAllMocks();
+  it("renders the form with email input and submit button", async () => {
+    render(<PasswordRecoveryPageView action={jest.fn()} />);
+
+    expect(await screen.findByLabelText(/email/i)).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: /send/i }),
+    ).toBeInTheDocument();
   });
 
-  it("renders the form with email input and submit button", () => {
-    render(<Page />);
+  it("submits the entered email to the page action", async () => {
+    const action = jest.fn();
+    render(<PasswordRecoveryPageView action={action} />);
 
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /send/i })).toBeInTheDocument();
+    fireEvent.change(await screen.findByLabelText(/email/i), {
+      target: { value: "testuser@example.com" },
+    });
+    submitForm(await screen.findByRole("button", { name: /send/i }));
+
+    expectSubmittedFormData(action, {
+      email: "testuser@example.com",
+    });
   });
 
-  it("displays success message on successful form submission", async () => {
-    // Mock a successful password reset
-    (passwordReset as jest.Mock).mockResolvedValue({
-      message: "Password reset instructions sent to your email.",
-    });
+  it("displays success and error state messages", async () => {
+    const { rerender } = render(
+      <PasswordRecoveryPageView
+        action={jest.fn()}
+        state={{ message: "Password reset instructions sent to your email." }}
+      />,
+    );
 
-    render(<Page />);
+    expect(
+      await screen.findByText("Password reset instructions sent to your email."),
+    ).toBeInTheDocument();
 
-    const emailInput = screen.getByLabelText(/email/i);
-    const submitButton = screen.getByRole("button", { name: /send/i });
+    rerender(
+      <PasswordRecoveryPageView
+        action={jest.fn()}
+        state={{ server_validation_error: "User not found" }}
+      />,
+    );
 
-    fireEvent.change(emailInput, { target: { value: "testuser@example.com" } });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText("Password reset instructions sent to your email."),
-      ).toBeInTheDocument();
-    });
-
-    const formData = new FormData();
-    formData.set("email", "testuser@example.com");
-    expect(passwordReset).toHaveBeenCalledWith(undefined, formData);
-  });
-
-  it("displays error message if password reset fails", async () => {
-    // Mock a failed password reset
-    (passwordReset as jest.Mock).mockResolvedValue({
-      server_validation_error: "User not found",
-    });
-
-    render(<Page />);
-
-    const emailInput = screen.getByLabelText(/email/i);
-    const submitButton = screen.getByRole("button", { name: /send/i });
-
-    fireEvent.change(emailInput, {
-      target: { value: "invaliduser@example.com" },
-    });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText("User not found")).toBeInTheDocument();
-    });
-
-    const formData = new FormData();
-    formData.set("email", "invaliduser@example.com");
-    expect(passwordReset).toHaveBeenCalledWith(undefined, formData);
+    expect(await screen.findByText("User not found")).toBeInTheDocument();
   });
 });

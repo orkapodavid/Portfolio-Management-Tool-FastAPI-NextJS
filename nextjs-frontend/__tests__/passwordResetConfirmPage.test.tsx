@@ -1,115 +1,137 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
-import Page from "@/app/password-recovery/confirm/page";
-import { passwordResetConfirm } from "@/components/actions/password-reset-action";
-import { useSearchParams, notFound } from "next/navigation";
+import PasswordResetConfirmPage from "../app/password-recovery/confirm/page";
+import { ResetPasswordConfirmPageView } from "../app/password-recovery/confirm/reset-password-confirm-page-view";
+
+const mockNotFound = jest.fn();
+const mockUseSearchParamsGet = jest.fn();
+const mockUseActionState = jest.fn();
+const mockUseEffect = jest.fn((callback: () => void) => callback());
 
 jest.mock("next/navigation", () => ({
-  ...jest.requireActual("next/navigation"),
-  useSearchParams: jest.fn(),
-  notFound: jest.fn(),
+  notFound: () => mockNotFound(),
+  useRouter: () => ({
+    replace: jest.fn(),
+  }),
+  useSearchParams: () => ({
+    get: mockUseSearchParamsGet,
+  }),
 }));
 
-jest.mock("../components/actions/password-reset-action", () => ({
-  passwordResetConfirm: jest.fn(),
+jest.mock("react", () => ({
+  ...jest.requireActual("react"),
+  useActionState: (...args: unknown[]) => mockUseActionState(...args),
+  useEffect: (callback: () => void) => mockUseEffect(callback),
 }));
+
+jest.mock("react-dom", () => ({
+  ...jest.requireActual("react-dom"),
+  useFormStatus: () => ({
+    pending: false,
+  }),
+}));
+
+function submitForm(button: HTMLElement) {
+  const form = button.closest("form");
+  if (!form) {
+    throw new Error("Submit button is not inside a form");
+  }
+
+  fireEvent.submit(form);
+}
+
+function expectSubmittedFormData(
+  action: jest.Mock,
+  expected: Record<string, string>,
+) {
+  expect(action).toHaveBeenCalledTimes(1);
+  const [submittedFormData] = action.mock.calls[0] as [FormData];
+  expect(Object.fromEntries(submittedFormData.entries())).toEqual(expected);
+}
 
 describe("Password Reset Confirm Page", () => {
-  afterEach(() => {
-    jest.clearAllMocks();
+  beforeEach(() => {
+    mockNotFound.mockReset();
+    mockUseSearchParamsGet.mockReset();
+    mockUseActionState.mockReset();
+    mockUseEffect.mockClear();
+    mockUseActionState.mockReturnValue([undefined, jest.fn()]);
   });
 
-  it("renders the form with password and confirm password input and submit button", () => {
-    (useSearchParams as jest.Mock).mockImplementation(() => ({
-      get: (key: string) => (key === "token" ? "mock-token" : null),
-    }));
+  it("renders the form with password fields, submit button, and reset token", async () => {
+    render(
+      <ResetPasswordConfirmPageView action={jest.fn()} token="mock-token" />,
+    );
 
-    render(<Page />);
-
-    expect(screen.getByLabelText("Password")).toBeInTheDocument();
-    expect(screen.getByLabelText("Password Confirm")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /send/i })).toBeInTheDocument();
+    expect(await screen.findByLabelText("Password")).toBeInTheDocument();
+    expect(await screen.findByLabelText("Password Confirm")).toBeInTheDocument();
+    expect(await screen.findByDisplayValue("mock-token")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: /send/i }),
+    ).toBeInTheDocument();
   });
 
-  it("renders the 404 page in case there is not a token", () => {
-    (useSearchParams as jest.Mock).mockImplementation(() => ({
-      get: (key: string) => (key === "token" ? "" : undefined),
-    }));
+  it("submits the new password values and token to the page action", async () => {
+    const action = jest.fn();
+    render(<ResetPasswordConfirmPageView action={action} token="mock-token" />);
 
-    render(<Page />);
-
-    expect(notFound).toHaveBeenCalled();
-  });
-
-  it("displays error message if password reset fails", async () => {
-    (useSearchParams as jest.Mock).mockImplementation(() => ({
-      get: (key: string) => (key === "token" ? "invalid-mock-token" : null),
-    }));
-
-    // Mock a successful password reset
-    (passwordResetConfirm as jest.Mock).mockResolvedValue({
-      server_validation_error: "Invalid Token",
+    fireEvent.change(await screen.findByLabelText("Password"), {
+      target: { value: "P12345678#" },
     });
+    fireEvent.change(await screen.findByLabelText("Password Confirm"), {
+      target: { value: "P12345678#" },
+    });
+    submitForm(await screen.findByRole("button", { name: /send/i }));
 
-    render(<Page />);
+    expectSubmittedFormData(action, {
+      password: "P12345678#",
+      passwordConfirm: "P12345678#",
+      resetToken: "mock-token",
+    });
+  });
 
-    const password = screen.getByLabelText("Password");
-    const passwordConfirm = screen.getByLabelText("Password Confirm");
+  it("displays the server validation error message", async () => {
+    render(
+      <ResetPasswordConfirmPageView
+        action={jest.fn()}
+        token="invalid-mock-token"
+        state={{ server_validation_error: "Invalid Token" }}
+      />,
+    );
 
-    const submitButton = screen.getByRole("button", { name: /send/i });
+    expect(await screen.findByText("Invalid Token")).toBeInTheDocument();
+  });
 
-    fireEvent.change(password, { target: { value: "P12345678#" } });
-    fireEvent.change(passwordConfirm, { target: { value: "P12345678#" } });
-    fireEvent.click(submitButton);
+  it("displays field validation errors from the page state", async () => {
+    render(
+      <ResetPasswordConfirmPageView
+        action={jest.fn()}
+        token="mock-token"
+        state={{
+          errors: {
+            password: ["Password should contain at least one uppercase letter."],
+            passwordConfirm: ["Passwords must match."],
+          },
+        }}
+      />,
+    );
+
+    expect(
+      await screen.findByText(
+        "Password should contain at least one uppercase letter.",
+      ),
+    ).toBeInTheDocument();
+    expect(await screen.findByText("Passwords must match.")).toBeInTheDocument();
+  });
+
+  it("calls notFound from the route module when the reset token is missing", async () => {
+    mockUseSearchParamsGet.mockReturnValue(null);
+
+    render(<PasswordResetConfirmPage />);
 
     await waitFor(() => {
-      expect(screen.getByText("Invalid Token")).toBeInTheDocument();
+      expect(mockNotFound).toHaveBeenCalledTimes(1);
     });
-
-    const formData = new FormData();
-    formData.set("password", "P12345678#");
-    formData.set("passwordConfirm", "P12345678#");
-    formData.set("resetToken", "invalid-mock-token");
-    expect(passwordResetConfirm).toHaveBeenCalledWith(undefined, formData);
-  });
-  it("displays validation errors if password is invalid and don't match", async () => {
-    (useSearchParams as jest.Mock).mockImplementation(() => ({
-      get: (key: string) => (key === "token" ? "mock-token" : null),
-    }));
-
-    // Mock a successful password reset
-    (passwordResetConfirm as jest.Mock).mockResolvedValue({
-      errors: {
-        password: ["Password should contain at least one uppercase letter."],
-        passwordConfirm: ["Passwords must match."],
-      },
-    });
-
-    render(<Page />);
-
-    const password = screen.getByLabelText("Password");
-    const passwordConfirm = screen.getByLabelText("Password Confirm");
-
-    const submitButton = screen.getByRole("button", { name: /send/i });
-
-    fireEvent.change(password, { target: { value: "12345678#" } });
-    fireEvent.change(passwordConfirm, { target: { value: "45678#" } });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(
-          "Password should contain at least one uppercase letter.",
-        ),
-      ).toBeInTheDocument();
-      expect(screen.getByText("Passwords must match.")).toBeInTheDocument();
-    });
-
-    const formData = new FormData();
-    formData.set("password", "12345678#");
-    formData.set("passwordConfirm", "45678#");
-    formData.set("resetToken", "mock-token");
-    expect(passwordResetConfirm).toHaveBeenCalledWith(undefined, formData);
   });
 });

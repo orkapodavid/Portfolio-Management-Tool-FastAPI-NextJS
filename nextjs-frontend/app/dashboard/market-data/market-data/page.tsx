@@ -1,5 +1,6 @@
-"use client";
-
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { getMarketData } from "@/app/clientService";
 import { DataTable } from "@/components/layout/data-table";
 
 const columns = [
@@ -14,15 +15,110 @@ const columns = [
   { key: "market_status", header: "Status", align: "center" as const },
 ];
 
-const mockData = [
-  { id: 1, ticker: "AAPL", last_price: "182.50", bid: "182.45", ask: "182.55", vwap_price: "182.25", last_volume: "54.2M", listed_shares: "1,000,000", chg_1d_pct: "+0.5%", implied_vol_pct: "25.0%", market_status: "Open" },
-  { id: 2, ticker: "MSFT", last_price: "415.30", bid: "415.25", ask: "415.35", vwap_price: "415.10", last_volume: "32.1M", listed_shares: "1,000,000", chg_1d_pct: "+1.2%", implied_vol_pct: "22.5%", market_status: "Open" },
-  { id: 3, ticker: "GOOGL", last_price: "142.80", bid: "142.75", ask: "142.85", vwap_price: "142.60", last_volume: "28.4M", listed_shares: "1,000,000", chg_1d_pct: "-0.3%", implied_vol_pct: "28.0%", market_status: "Open" },
-  { id: 4, ticker: "AMZN", last_price: "178.90", bid: "178.85", ask: "178.95", vwap_price: "178.70", last_volume: "41.8M", listed_shares: "1,000,000", chg_1d_pct: "+0.8%", implied_vol_pct: "30.0%", market_status: "Open" },
-  { id: 5, ticker: "TSLA", last_price: "245.60", bid: "245.50", ask: "245.70", vwap_price: "245.30", last_volume: "98.2M", listed_shares: "1,000,000", chg_1d_pct: "-2.1%", implied_vol_pct: "45.0%", market_status: "Open" },
-  { id: 6, ticker: "NVDA", last_price: "875.40", bid: "875.30", ask: "875.50", vwap_price: "874.90", last_volume: "45.6M", listed_shares: "1,000,000", chg_1d_pct: "+3.5%", implied_vol_pct: "35.0%", market_status: "Open" },
-];
+type MarketDataRow = {
+  id: number;
+  ticker: string;
+  last_price: string;
+  bid: string;
+  ask: string;
+  vwap_price: string;
+  last_volume: string;
+  chg_1d_pct: string;
+  implied_vol_pct: string;
+  market_status: string;
+};
 
-export default function MarketDataPage() {
-  return <DataTable columns={columns} data={mockData} />;
+const toStringValue = (value: unknown) =>
+  typeof value === "string" || typeof value === "number" ? String(value) : "";
+
+const toNumberValue = (value: unknown) =>
+  typeof value === "number" ? value : Number(value) || 0;
+
+const getErrorStatus = (error: unknown) => {
+  if (typeof error !== "object" || error === null || !("response" in error)) {
+    return undefined;
+  }
+
+  const { response } = error as { response?: { status?: number } };
+  return response?.status;
+};
+
+const getErrorMessage = (error: unknown) => {
+  if (typeof error !== "object" || error === null) {
+    return "Failed to load market data.";
+  }
+
+  if ("message" in error && typeof error.message === "string") {
+    return error.message;
+  }
+
+  if ("error" in error && typeof error.error === "object" && error.error) {
+    const apiError = error.error as { detail?: unknown };
+    if (typeof apiError.detail === "string") {
+      return apiError.detail;
+    }
+  }
+
+  return "Failed to load market data.";
+};
+
+const mapMarketDataRows = (payload: unknown): MarketDataRow[] => {
+  if (!Array.isArray(payload)) {
+    return [];
+  }
+
+  return payload.map((entry, index) => {
+    const row = entry as Record<string, unknown>;
+
+    return {
+      id: toNumberValue(row.id ?? index),
+      ticker: toStringValue(row.ticker),
+      last_price: toStringValue(row.last_price),
+      bid: toStringValue(row.bid),
+      ask: toStringValue(row.ask),
+      vwap_price: toStringValue(row.vwap_price),
+      last_volume: toStringValue(row.last_volume),
+      chg_1d_pct: toStringValue(row.chg_1d_pct),
+      implied_vol_pct: toStringValue(row.implied_vol_pct),
+      market_status: toStringValue(row.market_status),
+    };
+  });
+};
+
+async function loadMarketData(): Promise<MarketDataRow[]> {
+  const token = (await cookies()).get("accessToken")?.value;
+
+  if (!token) {
+    redirect("/login");
+  }
+
+  const { data, error } = await getMarketData({
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (error) {
+    const status = getErrorStatus(error);
+
+    if (status === 401 || status === 403) {
+      redirect("/login");
+    }
+
+    throw new Error(getErrorMessage(error));
+  }
+
+  return mapMarketDataRows(data);
+}
+
+export default async function MarketDataPage() {
+  const marketData = await loadMarketData();
+
+  return (
+    <DataTable
+      columns={columns}
+      data={marketData}
+      emptyMessage="Market data is unavailable."
+    />
+  );
 }

@@ -1,93 +1,143 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
+import type { ReactNode } from "react";
 
-import Page from "@/app/login/page";
-import { login } from "@/components/actions/login-action";
+import LoginPage from "../app/login/page";
+import { LoginPageView } from "../app/login/login-page-view";
 
-jest.mock("../components/actions/login-action", () => ({
-  login: jest.fn(),
+const mockReplace = jest.fn();
+const mockUseActionState = jest.fn();
+const mockUseEffect = jest.fn((callback: () => void) => callback());
+
+jest.mock("next/link", () => ({
+  __esModule: true,
+  default: ({
+    children,
+    href,
+    ...props
+  }: {
+    children: ReactNode;
+    href: string;
+    [key: string]: unknown;
+  }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
 }));
 
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({
+    replace: mockReplace,
+  }),
+}));
+
+jest.mock("react", () => ({
+  ...jest.requireActual("react"),
+  useActionState: (...args: unknown[]) => mockUseActionState(...args),
+  useEffect: (callback: () => void) => mockUseEffect(callback),
+}));
+
+jest.mock("react-dom", () => ({
+  ...jest.requireActual("react-dom"),
+  useFormStatus: () => ({
+    pending: false,
+  }),
+}));
+
+function submitForm(button: HTMLElement) {
+  const form = button.closest("form");
+  if (!form) {
+    throw new Error("Submit button is not inside a form");
+  }
+
+  fireEvent.submit(form);
+}
+
+function expectSubmittedFormData(
+  action: jest.Mock,
+  expected: Record<string, string>,
+) {
+  expect(action).toHaveBeenCalledTimes(1);
+  const [submittedFormData] = action.mock.calls[0] as [FormData];
+  expect(Object.fromEntries(submittedFormData.entries())).toEqual(expected);
+}
+
 describe("Login Page", () => {
-  afterEach(() => {
-    jest.clearAllMocks();
+  beforeEach(() => {
+    mockReplace.mockReset();
+    mockUseActionState.mockReset();
+    mockUseEffect.mockClear();
+    mockUseActionState.mockReturnValue([undefined, jest.fn()]);
   });
 
-  it("renders the form with username and password input and submit button", () => {
-    render(<Page />);
+  it("renders the form with username and password input and submit button", async () => {
+    render(<LoginPageView action={jest.fn()} />);
 
-    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(await screen.findByLabelText(/username/i)).toBeInTheDocument();
+    expect(await screen.findByLabelText(/password/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /sign in/i }),
+      await screen.findByRole("button", { name: /sign in/i }),
     ).toBeInTheDocument();
   });
 
-  it("calls login in successful form submission", async () => {
-    (login as jest.Mock).mockResolvedValue({});
+  it("submits the entered credentials to the page action", async () => {
+    const action = jest.fn();
+    render(<LoginPageView action={action} />);
 
-    render(<Page />);
-
-    const usernameInput = screen.getByLabelText(/username/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole("button", { name: /sign in/i });
-
-    fireEvent.change(usernameInput, {
+    fireEvent.change(await screen.findByLabelText(/username/i), {
       target: { value: "testuser@example.com" },
     });
-    fireEvent.change(passwordInput, { target: { value: "#123176a@" } });
-    fireEvent.click(submitButton);
+    fireEvent.change(await screen.findByLabelText(/password/i), {
+      target: { value: "#123176a@" },
+    });
+    submitForm(await screen.findByRole("button", { name: /sign in/i }));
 
-    await waitFor(() => {
-      const formData = new FormData();
-      formData.set("username", "testuser@example.com");
-      formData.set("password", "#123176a@");
-      expect(login).toHaveBeenCalledWith(undefined, formData);
+    expectSubmittedFormData(action, {
+      username: "testuser@example.com",
+      password: "#123176a@",
     });
   });
 
-  it("displays error message if login fails", async () => {
-    // Mock a failed login
-    (login as jest.Mock).mockResolvedValue({
-      server_validation_error: "LOGIN_BAD_CREDENTIALS",
-    });
+  it("displays the server validation error message", async () => {
+    render(
+      <LoginPageView
+        action={jest.fn()}
+        state={{ server_validation_error: "LOGIN_BAD_CREDENTIALS" }}
+      />,
+    );
 
-    render(<Page />);
-
-    const usernameInput = screen.getByLabelText(/username/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole("button", { name: /sign in/i });
-
-    fireEvent.change(usernameInput, { target: { value: "wrong@example.com" } });
-    fireEvent.change(passwordInput, { target: { value: "wrongpass" } });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText("LOGIN_BAD_CREDENTIALS")).toBeInTheDocument();
-    });
+    expect(await screen.findByText("LOGIN_BAD_CREDENTIALS")).toBeInTheDocument();
   });
 
-  it("displays server error for unexpected errors", async () => {
-    (login as jest.Mock).mockResolvedValue({
-      server_error: "An unexpected error occurred. Please try again later.",
-    });
+  it("displays the server error message", async () => {
+    render(
+      <LoginPageView
+        action={jest.fn()}
+        state={{
+          server_error: "An unexpected error occurred. Please try again later.",
+        }}
+      />,
+    );
 
-    render(<Page />);
+    expect(
+      await screen.findByText(
+        "An unexpected error occurred. Please try again later.",
+      ),
+    ).toBeInTheDocument();
+  });
 
-    const usernameInput = screen.getByLabelText(/username/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole("button", { name: /sign in/i });
+  it("redirects through the route module when the action state requests navigation", async () => {
+    const dispatch = jest.fn();
+    mockUseActionState.mockReturnValue([
+      { redirectTo: "/dashboard" },
+      dispatch,
+    ]);
 
-    fireEvent.change(usernameInput, { target: { value: "test@test.com" } });
-    fireEvent.change(passwordInput, { target: { value: "password123" } });
-    fireEvent.click(submitButton);
+    render(<LoginPage />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText(
-          "An unexpected error occurred. Please try again later.",
-        ),
-      ).toBeInTheDocument();
+      expect(mockReplace).toHaveBeenCalledWith("/dashboard");
     });
   });
 });

@@ -11,6 +11,7 @@ export {
   itemCreateItem as createItem,
   itemDeleteItem as deleteItem,
   itemReadItem as readItem,
+  marketDataGetMarketData as getMarketData,
   usersUsersCurrentUser as usersCurrentUser,
 } from "./openapi-client";
 
