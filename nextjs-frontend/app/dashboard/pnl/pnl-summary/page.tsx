@@ -1,25 +1,94 @@
 "use client";
 
-import { DataTable } from "@/components/layout/data-table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { pnlGetPnlSummary } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { dateColumn, textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type PnlSummaryRow = {
+  trade_date: string;
+  underlying: string;
+  currency: string;
+  price: string;
+  price_t_1: string;
+  price_change: string;
+  fx_rate: string;
+  fx_rate_t_1: string;
+  fx_rate_change: string;
+  dtl: string;
+  last_volume: string;
+  adv_3m: string;
+};
 
 const columns = [
-  { key: "underlying", header: "Underlying" },
-  { key: "currency", header: "CCY" },
-  { key: "price", header: "Price", align: "right" as const },
-  { key: "price_t_1", header: "Prev Close", align: "right" as const },
-  { key: "price_change", header: "Chg%", align: "right" as const },
-  { key: "fx_rate", header: "FX Rate", align: "right" as const },
-  { key: "last_volume", header: "Volume", align: "right" as const },
+  dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
+  textColumn({ field: "underlying", header: "Underlying", pinned: "left", minWidth: 100 }),
+  textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
+  textColumn({ field: "price", header: "Price", minWidth: 90, align: "right" }),
+  textColumn({ field: "price_t_1", header: "Price (T-1)", minWidth: 100, align: "right" }),
+  textColumn({ field: "price_change", header: "Price Change", minWidth: 110, align: "right" }),
+  textColumn({ field: "fx_rate", header: "FX Rate", minWidth: 90, align: "right" }),
+  textColumn({ field: "fx_rate_t_1", header: "FX Rate (T-1)", minWidth: 110, align: "right" }),
+  textColumn({ field: "fx_rate_change", header: "FX Rate Change", minWidth: 120, align: "right" }),
+  textColumn({ field: "dtl", header: "DTL", minWidth: 80 }),
+  textColumn({ field: "last_volume", header: "Last Volume", minWidth: 100, align: "right" }),
+  textColumn({ field: "adv_3m", header: "ADV 3M", minWidth: 90, align: "right" }),
 ];
 
-const mockData = [
-  { id: 1, underlying: "Toyota Motor", currency: "JPY", price: "2,876.50", price_t_1: "2,845.00", price_change: "+1.11%", fx_rate: "149.8500", last_volume: "5,234,567" },
-  { id: 2, underlying: "Sony Group", currency: "JPY", price: "14,234.00", price_t_1: "14,123.00", price_change: "+0.79%", fx_rate: "149.8500", last_volume: "2,345,678" },
-  { id: 3, underlying: "Nintendo", currency: "JPY", price: "8,567.00", price_t_1: "8,456.00", price_change: "+1.31%", fx_rate: "149.8500", last_volume: "3,456,789" },
-  { id: 4, underlying: "SoftBank Group", currency: "JPY", price: "9,123.00", price_t_1: "9,345.00", price_change: "-2.37%", fx_rate: "149.8500", last_volume: "6,789,012" },
-  { id: 5, underlying: "ASML Holdings", currency: "EUR", price: "678.90", price_t_1: "672.50", price_change: "+0.95%", fx_rate: "0.9234", last_volume: "1,234,567" },
-];
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
-export default function PnLSummaryPage() {
-  return <DataTable columns={columns} data={mockData} />;
+export default function PnlSummaryPage() {
+  const router = useRouter();
+  const [rows, setRows] = useState<PnlSummaryRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await pnlGetPnlSummary({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load P&L summary.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as PnlSummaryRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <DataGrid<PnlSummaryRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No P&L summary entries available."
+      searchPlaceholder="Search P&L summary…"
+    />
+  );
 }
