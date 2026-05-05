@@ -1,25 +1,85 @@
 "use client";
 
-import { DataTable } from "@/components/layout/data-table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { marketDataGetMarketHours } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type MarketHoursRow = {
+  id: number;
+  market: string;
+  ticker: string;
+  session: string;
+  local_time: string;
+  session_period: string;
+  is_open: string;
+  timezone: string;
+};
 
 const columns = [
-  { key: "market", header: "Market" },
-  { key: "session", header: "Session" },
-  { key: "local_time", header: "Local Time" },
-  { key: "timezone", header: "TZ" },
-  { key: "is_open", header: "Open", align: "center" as const },
+  textColumn({ field: "market", header: "Market", pinned: "left", minWidth: 100 }),
+  textColumn({ field: "ticker", header: "Ticker", minWidth: 100 }),
+  textColumn({ field: "session", header: "Session", minWidth: 100 }),
+  textColumn({ field: "local_time", header: "Local Time", minWidth: 110 }),
+  textColumn({ field: "session_period", header: "Session Period", minWidth: 120 }),
+  textColumn({ field: "is_open", header: "Is Open?", minWidth: 100 }),
+  textColumn({ field: "timezone", header: "Timezone", minWidth: 100 }),
 ];
 
-const mockData = [
-  { id: 1, market: "NYSE", session: "Regular", local_time: "09:30-16:00", timezone: "EST", is_open: "Yes" },
-  { id: 2, market: "NASDAQ", session: "Regular", local_time: "09:30-16:00", timezone: "EST", is_open: "Yes" },
-  { id: 3, market: "TSE", session: "Morning", local_time: "09:00-11:30", timezone: "JST", is_open: "Closed" },
-  { id: 4, market: "TSE", session: "Afternoon", local_time: "12:30-15:00", timezone: "JST", is_open: "Closed" },
-  { id: 5, market: "HKEX", session: "Morning", local_time: "09:30-12:00", timezone: "HKT", is_open: "Closed" },
-  { id: 6, market: "HKEX", session: "Afternoon", local_time: "13:00-16:00", timezone: "HKT", is_open: "Closed" },
-  { id: 7, market: "LSE", session: "Regular", local_time: "08:00-16:30", timezone: "GMT", is_open: "Yes" },
-];
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
 export default function MarketHoursPage() {
-  return <DataTable columns={columns} data={mockData} />;
+  const router = useRouter();
+  const [rows, setRows] = useState<MarketHoursRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await marketDataGetMarketHours({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load market hours.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as MarketHoursRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <DataGrid<MarketHoursRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No market hours data available."
+      searchPlaceholder="Search markets…"
+    />
+  );
 }
