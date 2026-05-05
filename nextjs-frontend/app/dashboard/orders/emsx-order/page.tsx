@@ -1,27 +1,93 @@
 "use client";
 
-import { DataTable } from "@/components/layout/data-table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { ordersGetOrders } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type OrderRow = {
+  id: number;
+  sequence: number;
+  underlying: string;
+  ticker: string;
+  broker: string;
+  pos_loc: string;
+  side: string;
+  status: string;
+  emsx_amount: string;
+  emsx_routed: string;
+  emsx_working: string;
+  emsx_filled: string;
+};
 
 const columns = [
-  { key: "sequence", header: "Seq#" },
-  { key: "ticker", header: "Ticker" },
-  { key: "underlying", header: "Underlying" },
-  { key: "side", header: "Side" },
-  { key: "status", header: "Status", align: "center" as const },
-  { key: "order_amount", header: "Order Amt", align: "right" as const },
-  { key: "filled_amount", header: "Filled Amt", align: "right" as const },
-  { key: "limit_price", header: "Limit", align: "right" as const },
-  { key: "avg_fill_price", header: "Avg Fill", align: "right" as const },
-  { key: "broker", header: "Broker" },
+  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({ field: "sequence", header: "Sequence", minWidth: 90, align: "right" }),
+  textColumn({ field: "underlying", header: "Underlying", minWidth: 110 }),
+  textColumn({ field: "broker", header: "Broker", minWidth: 90 }),
+  textColumn({ field: "pos_loc", header: "Pos Loc", minWidth: 80 }),
+  textColumn({ field: "side", header: "Side", minWidth: 80 }),
+  textColumn({ field: "status", header: "Status", minWidth: 100 }),
+  textColumn({ field: "emsx_amount", header: "EMSX Amount", minWidth: 120, align: "right" }),
+  textColumn({ field: "emsx_routed", header: "EMSX Routed", minWidth: 110, align: "right" }),
+  textColumn({ field: "emsx_working", header: "EMSX Working", minWidth: 120, align: "right" }),
+  textColumn({ field: "emsx_filled", header: "EMSX Filled", minWidth: 110, align: "right" }),
 ];
 
-const mockData = [
-  { id: 1, sequence: "001", ticker: "7203.T", underlying: "Toyota Motor", side: "Buy", status: "Working", order_amount: "10,000", filled_amount: "5,000", limit_price: "2,880.00", avg_fill_price: "2,876.50", broker: "MS" },
-  { id: 2, sequence: "002", ticker: "AAPL", underlying: "Apple Inc.", side: "Sell", status: "Filled", order_amount: "5,000", filled_amount: "5,000", limit_price: "182.00", avg_fill_price: "182.35", broker: "GS" },
-  { id: 3, sequence: "003", ticker: "NVDA", underlying: "NVIDIA Corp.", side: "Buy", status: "Partially Filled", order_amount: "3,000", filled_amount: "1,500", limit_price: "875.00", avg_fill_price: "875.20", broker: "JPM" },
-  { id: 4, sequence: "004", ticker: "9984.T", underlying: "SoftBank Group", side: "Sell", status: "New", order_amount: "20,000", filled_amount: "0", limit_price: "9,150.00", avg_fill_price: "-", broker: "MS" },
-];
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
-export default function EMSXOrderPage() {
-  return <DataTable columns={columns} data={mockData} />;
+export default function EmsxOrderPage() {
+  const router = useRouter();
+  const [rows, setRows] = useState<OrderRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await ordersGetOrders({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load EMSX orders.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as OrderRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <DataGrid<OrderRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No EMSX orders available."
+      searchPlaceholder="Search orders…"
+    />
+  );
 }
