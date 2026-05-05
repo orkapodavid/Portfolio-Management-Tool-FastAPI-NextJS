@@ -1,20 +1,95 @@
 "use client";
 
-import { DataTable } from "@/components/layout/data-table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { portfolioToolsGetResetDates } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { dateColumn, textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type ResetDateRow = {
+  id: number;
+  underlying: string;
+  ticker: string;
+  company_name: string;
+  sec_type: string;
+  currency: string;
+  trade_date: string;
+  first_reset: string;
+  expiry: string;
+  latest_reset: string;
+  reset_date: string;
+  reset_up_down: string;
+  market_price: string;
+};
 
 const columns = [
-  { key: "ticker", header: "Ticker" },
-  { key: "company_name", header: "Company" },
-  { key: "reset_date", header: "Reset Date" },
-  { key: "reset_type", header: "Type" },
-  { key: "notional", header: "Notional", align: "right" as const },
+  textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
+  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 130 }),
+  textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
+  textColumn({ field: "sec_type", header: "Sec Type", minWidth: 90 }),
+  textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
+  dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
+  dateColumn({ field: "first_reset", header: "First Reset", minWidth: 110 }),
+  dateColumn({ field: "expiry", header: "Expiry", minWidth: 100 }),
+  dateColumn({ field: "latest_reset", header: "Latest Reset", minWidth: 110 }),
+  dateColumn({ field: "reset_date", header: "Reset Date", minWidth: 100 }),
+  textColumn({ field: "reset_up_down", header: "Up / Down", minWidth: 100 }),
+  textColumn({ field: "market_price", header: "Market Price", minWidth: 110, align: "right" }),
 ];
 
-const mockData = [
-  { id: 1, ticker: "9984.T CB", company_name: "SoftBank Group", reset_date: "2026-04-15", reset_type: "Quarterly", notional: "$5,500,000" },
-  { id: 2, ticker: "HSBA.L CB", company_name: "HSBC Holdings", reset_date: "2026-07-01", reset_type: "Semi-Annual", notional: "$7,500,000" },
-];
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
 export default function ResetDatesPage() {
-  return <DataTable columns={columns} data={mockData} />;
+  const router = useRouter();
+  const [rows, setRows] = useState<ResetDateRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await portfolioToolsGetResetDates({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load reset dates.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as ResetDateRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <DataGrid<ResetDateRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No reset dates available."
+      searchPlaceholder="Search reset dates…"
+    />
+  );
 }
