@@ -3,87 +3,124 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { MODULES } from "@/lib/constants";
+import { COLORS, LAYOUT, MODULES } from "@/lib/constants";
 import { logout } from "@/components/actions/logout-action";
 import {
-  BarChart3,
-  Briefcase,
-  TrendingUp,
-  Shield,
-  GitCompare,
-  FileCheck,
-  Wrench,
-  Search,
-  Calendar,
-  Settings,
-  ArrowUpDown,
+  Activity,
+  BarChart2,
   Bell,
+  Briefcase,
+  Calendar,
+  DollarSign,
+  FileCheck2,
+  Layers,
+  Scale,
+  Settings,
+  ShieldAlert,
+  ShoppingCart,
   User,
+  Wrench,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ElementType> = {
-  BarChart3,
+  BarChart2,
   Briefcase,
-  TrendingUp,
-  Shield,
-  GitCompare,
-  FileCheck,
+  DollarSign,
+  ShieldAlert,
+  FileCheck2,
+  Scale,
   Wrench,
-  Search,
+  Layers,
   Calendar,
   Settings,
-  ArrowUpDown,
+  ShoppingCart,
 };
 
 export function TopNavigation() {
   const pathname = usePathname();
   const router = useRouter();
 
-  const activeModule = MODULES.find((m) =>
+  const activeModuleId = MODULES.find((m) =>
     pathname.startsWith(`/dashboard/${m.id}`)
-  );
+  )?.id;
 
   const handleLogout = async () => {
     const result = await logout();
-
     if (result?.redirectTo) {
       router.replace(result.redirectTo);
     }
   };
 
   return (
-    <nav className="h-10 bg-[#1e1e2e] border-b border-[#313244] flex items-center px-2 gap-0.5 shrink-0">
+    <nav
+      className="w-full shadow-md z-[60] shrink-0 flex items-center"
+      style={{
+        height: LAYOUT.NAV_HEIGHT,
+        backgroundColor: COLORS.NAV_BG,
+      }}
+    >
       <Link
         href="/dashboard/market-data/market-data"
-        className="text-sm font-semibold text-blue-400 px-3 py-1 mr-2"
+        className="flex items-center gap-2 mr-2 px-2 border-r border-gray-700 h-full shrink-0"
       >
-        PMT
+        <Activity size={16} className="text-blue-400" />
+        <span className="text-[10px] font-black text-white tracking-widest">
+          PMT
+        </span>
       </Link>
 
-      {MODULES.map((mod) => {
-        const Icon = iconMap[mod.icon];
-        const isActive = activeModule?.id === mod.id;
+      <div className="hidden md:flex items-center h-full overflow-x-auto no-scrollbar gap-0 ml-2">
+        {MODULES.map((mod) => {
+          const Icon = iconMap[mod.icon];
+          const isActive = activeModuleId === mod.id;
+          const firstSubtab = mod.subtabs[0]?.id ?? "";
+          return (
+            <Link
+              key={mod.id}
+              href={`/dashboard/${mod.id}/${firstSubtab}`}
+              className={cn(
+                "h-full flex items-center px-2 border-b-2 relative",
+                isActive
+                  ? "border-blue-500 bg-white/10"
+                  : "border-transparent hover:bg-white/5"
+              )}
+            >
+              <div className="flex flex-row items-center gap-1.5 relative">
+                {Icon && (
+                  <Icon
+                    size={LAYOUT.ICON_NAV_SIZE}
+                    className={cn(isActive ? "text-white" : "text-gray-400")}
+                  />
+                )}
+                <span
+                  className={cn(
+                    "text-[9px] uppercase",
+                    isActive
+                      ? "font-bold text-white"
+                      : "font-medium text-gray-400 hover:text-gray-200"
+                  )}
+                >
+                  {mod.label}
+                </span>
+                {isActive && (
+                  <div className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-blue-500 animate-pulse" />
+                )}
+              </div>
+            </Link>
+          );
+        })}
+      </div>
 
-        return (
-          <Link
-            key={mod.id}
-            href={`/dashboard/${mod.id}/${mod.subtabs[0].id}`}
-            className={cn(
-              "flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-medium transition-colors",
-              isActive
-                ? "bg-[#313244] text-white"
-                : "text-[#a6adc8] hover:text-white hover:bg-[#313244]/50"
-            )}
-          >
-            {Icon && <Icon className="w-3.5 h-3.5" />}
-            <span>{mod.label}</span>
-          </Link>
-        );
-      })}
-
-      <div className="ml-auto flex items-center gap-2">
-        <button className="p-1.5 text-[#a6adc8] hover:text-white rounded">
-          <Bell className="w-4 h-4" />
+      <div className="ml-auto flex items-center gap-1 px-2 border-l border-gray-700 h-full shrink-0">
+        <button
+          type="button"
+          aria-label="Notifications"
+          className="group p-1 rounded-md hover:bg-white/10 transition-all duration-200 relative"
+        >
+          <Bell
+            size={16}
+            className="text-gray-400 group-hover:text-white"
+          />
         </button>
         <button
           type="button"
@@ -91,9 +128,9 @@ export function TopNavigation() {
           onClick={() => {
             void handleLogout();
           }}
-          className="p-1.5 text-[#a6adc8] hover:text-white rounded"
+          className="p-1 rounded-md hover:bg-white/10 transition-all duration-200"
         >
-          <User className="w-4 h-4" />
+          <User size={16} className="text-gray-400 hover:text-white" />
         </button>
       </div>
     </nav>

@@ -1,22 +1,34 @@
 // PMT Design System Constants
 
 export const COLORS = {
-  NAV_BG: "#1e1e2e",
+  NAV_BG: "#333333",
   NAV_TEXT: "#cdd6f4",
-  SIDEBAR_BG: "#181825",
+  SIDEBAR_BG: "#F9F9F9",
   POSITIVE_GREEN: "#00A651",
   NEGATIVE_RED: "#C00000",
   ALERT_AMBER: "#FFC000",
-  BORDER_GREY: "#313244",
+  BORDER_GREY: "#CCCCCC",
+  ROW_HIGHLIGHT: "#FFF2CC",
+  FINANCIAL_GREY: "#F0F0F0",
   SURFACE: "#1e1e2e",
   SURFACE_ALT: "#181825",
+} as const;
+
+export const LAYOUT = {
+  NAV_HEIGHT: "40px",
+  KPI_HEIGHT: "28px",
+  CONTROL_BAR_HEIGHT: "36px",
+  SUBTAB_HEIGHT: "28px",
+  TABLE_ROW_HEIGHT: "28px",
+  ICON_NAV_SIZE: 14,
+  ICON_KPI_SIZE: 8,
 } as const;
 
 export const MODULES = [
   {
     id: "market-data",
     label: "Market Data",
-    icon: "BarChart3",
+    icon: "BarChart2",
     subtabs: [
       { id: "market-data", label: "Market Data" },
       { id: "fx-data", label: "FX Data" },
@@ -41,7 +53,7 @@ export const MODULES = [
   {
     id: "pnl",
     label: "P&L",
-    icon: "TrendingUp",
+    icon: "DollarSign",
     subtabs: [
       { id: "pnl-change", label: "P&L Change" },
       { id: "pnl-summary", label: "P&L Summary" },
@@ -52,7 +64,7 @@ export const MODULES = [
   {
     id: "risk",
     label: "Risk",
-    icon: "Shield",
+    icon: "ShieldAlert",
     subtabs: [
       { id: "delta-change", label: "Delta Change" },
       { id: "risk-measures", label: "Risk Measures" },
@@ -62,7 +74,7 @@ export const MODULES = [
   {
     id: "recon",
     label: "Recon",
-    icon: "GitCompare",
+    icon: "FileCheck2",
     subtabs: [
       { id: "pps-recon", label: "PPS Recon" },
       { id: "settlement-recon", label: "Settlement Recon" },
@@ -74,7 +86,7 @@ export const MODULES = [
   {
     id: "compliance",
     label: "Compliance",
-    icon: "FileCheck",
+    icon: "Scale",
     subtabs: [
       { id: "restricted-list", label: "Restricted List" },
       { id: "undertakings", label: "Undertakings" },
@@ -83,7 +95,7 @@ export const MODULES = [
   },
   {
     id: "portfolio-tools",
-    label: "Tools",
+    label: "Portfolio Tools",
     icon: "Wrench",
     subtabs: [
       { id: "pay-to-hold", label: "Pay to Hold" },
@@ -97,7 +109,7 @@ export const MODULES = [
   {
     id: "instruments",
     label: "Instruments",
-    icon: "Search",
+    icon: "Layers",
     subtabs: [
       { id: "ticker-data", label: "Ticker Data" },
       { id: "stock-screener", label: "Stock Screener" },
@@ -126,7 +138,7 @@ export const MODULES = [
   {
     id: "orders",
     label: "Orders",
-    icon: "ArrowUpDown",
+    icon: "ShoppingCart",
     subtabs: [
       { id: "emsx-order", label: "EMSX Order" },
       { id: "emsx-route", label: "EMSX Route" },
