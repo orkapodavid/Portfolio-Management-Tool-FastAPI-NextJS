@@ -15,8 +15,11 @@ RUN sh /uv-installer.sh && rm /uv-installer.sh
 # Ensure the installed binary is on the `PATH`
 ENV PATH="/root/.local/bin/:$PATH"
 
+# Copy local dependency (pmt_core_pkg) so uv can resolve it at build time
+COPY pmt_core_pkg /pmt_core_pkg
+
 # Copy dependency files first to leverage Docker caching
-COPY pyproject.toml uv.lock ./
+COPY fastapi_backend/pyproject.toml fastapi_backend/uv.lock ./
 
 # Install dependencies using uv
 RUN uv sync --frozen
@@ -24,7 +27,7 @@ RUN uv sync --frozen
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Copy the rest of the application code
-COPY . .
+COPY fastapi_backend/ .
 
 # Expose the application port
 EXPOSE 8000
