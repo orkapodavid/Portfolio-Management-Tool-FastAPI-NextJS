@@ -1,21 +1,97 @@
 "use client";
 
-import { DataTable } from "@/components/layout/data-table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { portfolioToolsGetPayToHold } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { dateColumn, textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type PayToHoldRow = {
+  id: number;
+  trade_date: string;
+  ticker: string;
+  currency: string;
+  counter_party: string;
+  side: string;
+  sl_rate: string;
+  pth_amount_sod: string;
+  pth_amount: string;
+  emsx_order: string;
+  emsx_remark: string;
+  emsx_working: string;
+  emsx_order_col: string;
+  emsx_filled: string;
+};
 
 const columns = [
-  { key: "ticker", header: "Ticker" },
-  { key: "company_name", header: "Company" },
-  { key: "position", header: "Position", align: "right" as const },
-  { key: "daily_cost", header: "Daily Cost", align: "right" as const },
-  { key: "mtd_cost", header: "MTD Cost", align: "right" as const },
-  { key: "ytd_cost", header: "YTD Cost", align: "right" as const },
+  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
+  textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
+  textColumn({ field: "counter_party", header: "Counter Party", minWidth: 110 }),
+  textColumn({ field: "side", header: "Side", minWidth: 80 }),
+  textColumn({ field: "sl_rate", header: "SL Rate", minWidth: 90, align: "right" }),
+  textColumn({ field: "pth_amount_sod", header: "PTH Amount SOD", minWidth: 130, align: "right" }),
+  textColumn({ field: "pth_amount", header: "PTH Amount", minWidth: 110, align: "right" }),
+  textColumn({ field: "emsx_order", header: "EMSX Order", minWidth: 100 }),
+  textColumn({ field: "emsx_remark", header: "EMSX Remark", minWidth: 110 }),
+  textColumn({ field: "emsx_working", header: "EMSX Working", minWidth: 110 }),
+  textColumn({ field: "emsx_order_col", header: "EMSX Order Col", minWidth: 120 }),
+  textColumn({ field: "emsx_filled", header: "EMSX Filled", minWidth: 100 }),
 ];
 
-const mockData = [
-  { id: 1, ticker: "7203.T", company_name: "Toyota Motor", position: "50,000", daily_cost: "-$1,250", mtd_cost: "-$26,250", ytd_cost: "-$87,500" },
-  { id: 2, ticker: "AAPL", company_name: "Apple Inc.", position: "25,000", daily_cost: "-$625", mtd_cost: "-$13,125", ytd_cost: "-$43,750" },
-];
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
 export default function PayToHoldPage() {
-  return <DataTable columns={columns} data={mockData} />;
+  const router = useRouter();
+  const [rows, setRows] = useState<PayToHoldRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await portfolioToolsGetPayToHold({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load pay-to-hold.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as PayToHoldRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <DataGrid<PayToHoldRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No pay-to-hold entries available."
+      searchPlaceholder="Search pay-to-hold…"
+    />
+  );
 }
