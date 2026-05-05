@@ -2877,6 +2877,30 @@
         ]
       }
     },
+    "/api/performance/portfolio-holdings": {
+      "get": {
+        "tags": [
+          "performance"
+        ],
+        "summary": "Get Portfolio Holdings",
+        "operationId": "performance-get_portfolio_holdings",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/api/notifications/": {
       "get": {
         "tags": [

@@ -1894,6 +1894,20 @@ export type PerformanceGetTopMoversResponses = {
   200: unknown;
 };
 
+export type PerformanceGetPortfolioHoldingsData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/performance/portfolio-holdings";
+};
+
+export type PerformanceGetPortfolioHoldingsResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
 export type NotificationsGetNotificationsData = {
   body?: never;
   path?: never;

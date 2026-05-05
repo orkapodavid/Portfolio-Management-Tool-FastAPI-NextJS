@@ -11,7 +11,10 @@ import {
   itemDeleteItem,
   itemReadItem,
   marketDataGetMarketData,
+  marketDataGetTopMovers,
   notificationsGetNotifications,
+  performanceGetKpiData,
+  performanceGetPortfolioHoldings,
   usersUsersCurrentUser,
 } from "./openapi-client";
 
@@ -64,3 +67,15 @@ export const usersCurrentUser = (
 export const getNotifications = (
   options?: Parameters<typeof notificationsGetNotifications>[0],
 ) => withConfiguredClient(() => notificationsGetNotifications(options));
+
+export const getKpiData = (
+  options?: Parameters<typeof performanceGetKpiData>[0],
+) => withConfiguredClient(() => performanceGetKpiData(options));
+
+export const getPortfolioHoldings = (
+  options?: Parameters<typeof performanceGetPortfolioHoldings>[0],
+) => withConfiguredClient(() => performanceGetPortfolioHoldings(options));
+
+export const getTopMovers = (
+  options?: Parameters<typeof marketDataGetTopMovers>[0],
+) => withConfiguredClient(() => marketDataGetTopMovers(options));

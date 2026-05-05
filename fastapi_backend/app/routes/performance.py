@@ -21,3 +21,10 @@ async def get_top_movers(
     user: User = Depends(current_active_user),
 ):
     return await performance_service.get_top_movers()
+
+
+@router.get("/portfolio-holdings")
+async def get_portfolio_holdings(
+    user: User = Depends(current_active_user),
+):
+    return await performance_service.get_portfolio_holdings()

@@ -178,6 +178,8 @@ import type {
   PerformanceGetKpiDataResponses,
   PerformanceGetTopMoversData,
   PerformanceGetTopMoversResponses,
+  PerformanceGetPortfolioHoldingsData,
+  PerformanceGetPortfolioHoldingsResponses,
   NotificationsGetNotificationsData,
   NotificationsGetNotificationsResponses,
   NotificationsGetNotificationsErrors,
@@ -1726,6 +1728,31 @@ export const performanceGetTopMovers = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/api/performance/top-movers",
+    ...options,
+  });
+};
+
+/**
+ * Get Portfolio Holdings
+ */
+export const performanceGetPortfolioHoldings = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<PerformanceGetPortfolioHoldingsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PerformanceGetPortfolioHoldingsResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/performance/portfolio-holdings",
     ...options,
   });
 };
