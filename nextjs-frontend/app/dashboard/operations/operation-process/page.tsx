@@ -1,23 +1,77 @@
 "use client";
 
-import { DataTable } from "@/components/layout/data-table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { operationsGetOperationProcesses } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type OperationProcessRow = {
+  id: number;
+  process: string;
+  status: string;
+  last_run_time: string;
+};
 
 const columns = [
-  { key: "process_name", header: "Process" },
-  { key: "category", header: "Category" },
-  { key: "frequency", header: "Frequency" },
-  { key: "last_run", header: "Last Run" },
-  { key: "next_run", header: "Next Run" },
-  { key: "status", header: "Status", align: "center" as const },
+  textColumn({ field: "process", header: "Process", pinned: "left", minWidth: 150 }),
+  textColumn({ field: "status", header: "Status", minWidth: 100 }),
+  textColumn({ field: "last_run_time", header: "Last Run Time", minWidth: 150 }),
 ];
 
-const mockData = [
-  { id: 1, process_name: "Position Data Load", category: "Data", frequency: "Daily", last_run: "2026-03-21 07:00", next_run: "2026-03-22 07:00", status: "Active" },
-  { id: 2, process_name: "FX Rate Update", category: "Market Data", frequency: "Hourly", last_run: "2026-03-21 14:00", next_run: "2026-03-21 15:00", status: "Active" },
-  { id: 3, process_name: "NAV Calculation", category: "Operations", frequency: "Daily", last_run: "2026-03-20 17:00", next_run: "2026-03-21 17:00", status: "Scheduled" },
-  { id: 4, process_name: "Risk Report Generation", category: "Risk", frequency: "Daily", last_run: "2026-03-20 18:00", next_run: "2026-03-21 18:00", status: "Scheduled" },
-];
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
 export default function OperationProcessPage() {
-  return <DataTable columns={columns} data={mockData} />;
+  const router = useRouter();
+  const [rows, setRows] = useState<OperationProcessRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await operationsGetOperationProcesses({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load operation processes.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as OperationProcessRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <DataGrid<OperationProcessRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No operation processes available."
+      searchPlaceholder="Search processes…"
+    />
+  );
 }
