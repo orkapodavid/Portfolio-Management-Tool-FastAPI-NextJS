@@ -1,6 +1,54 @@
 # Portfolio Management Tool - Continuation Log
 
-## Current Status (2026-04-20)
+## Current Status (2026-05-05 — Section D convergence pass)
+
+### What landed this session
+
+**Tauri stack (5 commits, A–E in §9):** backend desktop runtime + health endpoint, DB normalization for postgres/sqlite, frontend client-side auth refactor with `<DashboardAuthGate>`, the `src-tauri/` Rust shell, and the handoff brief + market-data live migration. Then rebased to absorb origin's `1f1f293` baseURL fix.
+
+**Lint cleanup (1 commit):** flat-config fix so `.mjs` scripts run with node globals; `src-tauri/{target,gen}/**` now ignored. `pnpm lint` reports **0 errors / 0 warnings**.
+
+**Section B — layout chrome (5 commits):** top-nav (NAV_BG #333333, blue underline + animate-pulse, lucide icon swap, 9px uppercase labels), subtab-nav (white bg, 28px, 9px uppercase tracking-tighter), notification sidebar (`/api/notifications/` backend, `NotificationsProvider` context, 4-tab filter, mark-read/dismiss, the bell badge wired up), performance header (KPI sparklines, portfolio summary cards, expandable Top Movers grid backed by 5 categories of `/api/market-data/top-movers`).
+
+**Section C — AG Grid foundation (1 commit):** `ag-grid-community`+`ag-grid-react` v35.0.1 (matches the reflex `reflex_ag_grid` pin), `components/grid/data-grid.tsx` wrapper with themeQuartz + toolbar (refresh + search) + error/empty states, `components/grid/columns.ts` typed helpers (textColumn, numberColumn, currencyColumn, percentColumn, integerColumn, dateColumn). `__tests__/dataGrid.test.tsx` brings jest to 10 suites / 34 tests.
+
+**Section D — page convergences (44 commits):** 42 grid pages migrated off mock data onto the live FastAPI client, plus 2 risk pricer scaffolds. The 6 grid-based "new" pages from §6 (monthly-exercise-limit, deal-indication, po-settlement, short-ecl, instrument-data, instrument-term) were scaffolded as Construction-icon placeholders that name the reflex grid + the missing FastAPI endpoint (§8). Subtab order/labels in `lib/constants.ts` now match the reflex reference (Reference Data label, full Portfolio Tools name, expanded subtab lists).
+
+### Verification matrix (post-convergence)
+
+| Check | Result |
+|---|---|
+| `pnpm exec tsc --noEmit` | ✅ clean |
+| `pnpm exec jest --runInBand` | ✅ 10 suites / 34 tests / ~0.7s |
+| `pnpm lint` | ✅ 0 errors / 0 warnings |
+| `pnpm build` (web) | ✅ PASS — 52 dashboard routes prerender as `○ Static` |
+| `TAURI_BUILD=1 … pnpm build` | ✅ PASS — `out/` populated |
+| Backend pytest | ✅ **32 passed in 0.42s** (was 26; +3 notifications, +3 performance) |
+| `grep mockData …/dashboard \| wc -l` | ✅ **0** |
+| `cargo check src-tauri/Cargo.toml` | ✅ PASS — 23 crates compiled |
+| Branch | `feat/nextjs-fastapi-rebuild` fully pushed to origin |
+
+### Open issues / what's NOT done
+
+1. **Pricer · Warrant / Pricer · Bond placeholder.** The reflex reference at `components/risk/pricer_{warrant,bond}_view.py` ships a 21-field Terms / Simulations / Outputs / chart layout. Scaffolded as Construction-icon placeholders; the form-based ports are queued.
+2. **6 missing-endpoint scaffolds.** `monthly-exercise-limit`, `deal-indication`, `po-settlement`, `short-ecl`, `instrument-data`, `instrument-term` exist as routes + subtabs but render placeholders. §8 of the brief lists the FastAPI endpoints to add (`pmt_core.repositories.*` doesn't yet have a `risk` repository for the pricer pages — that's the larger blocker).
+3. **§11 exit criterion #12 — parity screenshots.** Not yet captured. Reflex (`localhost:3001/pmt/`) and Next.js (`localhost:3000`) are both up; the brief calls for one screenshot per module saved under `docs/parity-screenshots/`. Skipped because it requires a logged-in playwright session and cosmetic differences are expected for the placeholder pages.
+4. **`compliance/beneficial-ownership` field mismatch.** The reflex grid expects `nosh_reported / nosh_bbg / nosh_proforma / stock_shares / warrant_shares / bond_shares / total_shares`; the FastAPI stub currently returns the shared restricted-list / undertakings shape. Cells render empty until `pmt_core.repositories.compliance` emits the expected fields.
+5. **Backend pytest count question (§17.1).** Brief notes a previous `116/116` count vs today's 32. I did not restore route-level tests beyond the new ones I added (`test_notifications.py`, `test_performance.py`); leaving that for the user to decide.
+
+### Local dev DB workaround
+
+`fastapi_backend/.env` ships with a postgres URL. For convergence work the dev backend was switched to sqlite:
+```
+cd fastapi_backend
+DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pmt-dev.sqlite3 ./.venv/bin/alembic upgrade head
+DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pmt-dev.sqlite3 ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```
+Health check then returns `{"status":"ok","runtime":"server","database_backend":"sqlite"}`. `pmt_core` returns mock data so sqlite vs postgres only affects the user/items tables, not dashboard data. Test creds are at `~/.pmt-test-account` (gitignored at home).
+
+---
+
+## Previous Status (2026-04-20)
 
 ### Tauri dev watcher verification
 - Reviewed the `readdirp is not a function` diagnosis and confirmed the root cause was pnpm virtual-store corruption caused by an accidental npm-style install path. The repaired tree is healthy again:
