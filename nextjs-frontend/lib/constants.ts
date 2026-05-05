@@ -69,6 +69,8 @@ export const MODULES = [
       { id: "delta-change", label: "Delta Change" },
       { id: "risk-measures", label: "Risk Measures" },
       { id: "risk-inputs", label: "Risk Inputs" },
+      { id: "pricer-warrant", label: "Pricer · Warrant" },
+      { id: "pricer-bond", label: "Pricer · Bond" },
     ],
   },
   {
