@@ -32,10 +32,10 @@ export const MODULES = [
     subtabs: [
       { id: "market-data", label: "Market Data" },
       { id: "fx-data", label: "FX Data" },
+      { id: "ticker-data", label: "Reference Data" },
       { id: "historical-data", label: "Historical Data" },
       { id: "trading-calendar", label: "Trading Calendar" },
       { id: "market-hours", label: "Market Hours" },
-      { id: "ticker-data", label: "Ticker Data" },
     ],
   },
   {
