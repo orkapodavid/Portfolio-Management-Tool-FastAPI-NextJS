@@ -1,21 +1,87 @@
 "use client";
 
-import { DataTable } from "@/components/layout/data-table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { instrumentsGetSpecialTerms } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { dateColumn, textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type SpecialTermRow = {
+  id: number;
+  deal_num: string;
+  ticker: string;
+  company_name: string;
+  sec_type: string;
+  pos_loc: string;
+  account: string;
+  effective_date: string;
+  position: string;
+};
 
 const columns = [
-  { key: "ticker", header: "Ticker" },
-  { key: "company_name", header: "Company" },
-  { key: "term_type", header: "Term Type" },
-  { key: "description", header: "Description" },
-  { key: "effective_date", header: "Effective Date" },
-  { key: "expiry_date", header: "Expiry Date" },
+  textColumn({ field: "deal_num", header: "Deal Num", pinned: "left", minWidth: 90 }),
+  textColumn({ field: "ticker", header: "Ticker", minWidth: 100 }),
+  textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
+  textColumn({ field: "sec_type", header: "Sec Type", minWidth: 90 }),
+  textColumn({ field: "pos_loc", header: "Position Location", minWidth: 130 }),
+  textColumn({ field: "account", header: "Account", minWidth: 100 }),
+  dateColumn({ field: "effective_date", header: "Effective Date", minWidth: 110 }),
+  textColumn({ field: "position", header: "Position", minWidth: 90, align: "right" }),
 ];
 
-const mockData = [
-  { id: 1, ticker: "9984.T CB", company_name: "SoftBank Group", term_type: "Put Option", description: "Holder put at 100%", effective_date: "2026-06-01", expiry_date: "2028-06-01" },
-  { id: 2, ticker: "HSBA.L CB", company_name: "HSBC Holdings", term_type: "Conversion", description: "Conversion at 120% of initial price", effective_date: "2026-01-01", expiry_date: "2029-12-31" },
-];
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
 export default function SpecialTermsPage() {
-  return <DataTable columns={columns} data={mockData} />;
+  const router = useRouter();
+  const [rows, setRows] = useState<SpecialTermRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await instrumentsGetSpecialTerms({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load special terms.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as SpecialTermRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <DataGrid<SpecialTermRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No special terms available."
+      searchPlaceholder="Search special terms…"
+    />
+  );
 }
