@@ -9,6 +9,7 @@ from app.routes.health import router as health_router
 from app.routes.instruments import router as instruments_router
 from app.routes.items import router as items_router
 from app.routes.market_data import router as market_data_router
+from app.routes.notifications import router as notifications_router
 from app.routes.operations import router as operations_router
 from app.routes.orders import router as orders_router
 from app.routes.performance import router as performance_router
@@ -80,5 +81,6 @@ app.include_router(events_router, prefix="/api/events")
 app.include_router(operations_router, prefix="/api/operations")
 app.include_router(orders_router, prefix="/api/orders")
 app.include_router(performance_router, prefix="/api/performance")
+app.include_router(notifications_router, prefix="/api/notifications")
 
 add_pagination(app)

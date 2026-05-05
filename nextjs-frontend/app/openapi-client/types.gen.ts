@@ -668,6 +668,26 @@ export type UsersUsersPatchUserResponses = {
 export type UsersUsersPatchUserResponse =
   UsersUsersPatchUserResponses[keyof UsersUsersPatchUserResponses];
 
+export type HealthHealthData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/health";
+};
+
+export type HealthHealthResponses = {
+  /**
+   * Response Health-Health
+   * Successful Response
+   */
+  200: {
+    [key: string]: string;
+  };
+};
+
+export type HealthHealthResponse =
+  HealthHealthResponses[keyof HealthHealthResponses];
+
 export type ItemReadItemData = {
   body?: never;
   path?: never;
@@ -1874,6 +1894,45 @@ export type PerformanceGetTopMoversResponses = {
   200: unknown;
 };
 
+export type NotificationsGetNotificationsData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Category
+     * Filter by category: Alerts, Portfolio, News, System
+     */
+    category?: string | null;
+    /**
+     * Unread Only
+     * Only return unread notifications
+     */
+    unread_only?: boolean;
+    /**
+     * Limit
+     */
+    limit?: number | null;
+  };
+  url: "/api/notifications/";
+};
+
+export type NotificationsGetNotificationsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type NotificationsGetNotificationsError =
+  NotificationsGetNotificationsErrors[keyof NotificationsGetNotificationsErrors];
+
+export type NotificationsGetNotificationsResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
 export type ClientOptions = {
-  baseURL: `${string}://${string}` | (string & {});
+  baseURL: `${string}://openapi.json` | (string & {});
 };

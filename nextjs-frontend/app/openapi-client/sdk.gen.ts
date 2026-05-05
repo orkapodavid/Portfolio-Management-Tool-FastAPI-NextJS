@@ -43,6 +43,8 @@ import type {
   UsersUsersPatchUserData,
   UsersUsersPatchUserResponses,
   UsersUsersPatchUserErrors,
+  HealthHealthData,
+  HealthHealthResponses,
   ItemReadItemData,
   ItemReadItemResponses,
   ItemReadItemErrors,
@@ -176,6 +178,9 @@ import type {
   PerformanceGetKpiDataResponses,
   PerformanceGetTopMoversData,
   PerformanceGetTopMoversResponses,
+  NotificationsGetNotificationsData,
+  NotificationsGetNotificationsResponses,
+  NotificationsGetNotificationsErrors,
 } from "./types.gen";
 import { client } from "./client.gen";
 
@@ -467,6 +472,23 @@ export const usersUsersPatchUser = <ThrowOnError extends boolean = false>(
       "Content-Type": "application/json",
       ...options.headers,
     },
+  });
+};
+
+/**
+ * Health
+ */
+export const healthHealth = <ThrowOnError extends boolean = false>(
+  options?: Options<HealthHealthData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    HealthHealthResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    url: "/api/health",
+    ...options,
   });
 };
 
@@ -1704,6 +1726,31 @@ export const performanceGetTopMovers = <ThrowOnError extends boolean = false>(
       },
     ],
     url: "/api/performance/top-movers",
+    ...options,
+  });
+};
+
+/**
+ * Get Notifications
+ */
+export const notificationsGetNotifications = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<NotificationsGetNotificationsData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    NotificationsGetNotificationsResponses,
+    NotificationsGetNotificationsErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/notifications/",
     ...options,
   });
 };
