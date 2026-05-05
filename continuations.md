@@ -1,6 +1,55 @@
 # Portfolio Management Tool - Continuation Log
 
-## Current Status (2026-05-05 — Section D convergence pass)
+## Current Status (2026-05-05 — Auth-bypass flag for parity work)
+
+### What landed this session
+
+**Backend (1 commit):** `Settings.AUTH_DISABLED` (alias `PMT_AUTH_DISABLED`, default `False`). `current_active_user` now wraps `fastapi_users.current_user(active=True, optional=True)` — when the flag is on it returns a synthetic `User` (id `00000000-0000-0000-0000-0000000000a1`, email `noauth@local`) without consulting the DB; when off, it preserves the existing 401 path. Single point of change — none of the 13 route files touched. New `tests/routes/test_auth_bypass.py` with monkeypatch on `settings.AUTH_DISABLED` brings pytest from **32 → 33 passed**. `fastapi_backend/.env.example` carries a commented `# PMT_AUTH_DISABLED=true` hint.
+
+**Frontend (1 commit):** `NEXT_PUBLIC_AUTH_DISABLED` (default `0`) wired in three places. `getAuthToken()` returns the placeholder string `"no-auth"` when the flag is `1`, so the 50 dashboard pages keep their `if (!token) router.replace("/login")` code path but never redirect. `<DashboardAuthGate>` short-circuits its `useEffect` and renders children immediately, skipping the `/users/me` validation. `TopNavigation` hides the `User`/logout icon so the no-token shell can't accidentally call `logout()`. New `__tests__/authBypass.test.tsx` brings jest from **34 → 35 passed**.
+
+### Verification matrix
+
+| Check | Result |
+|---|---|
+| `pnpm exec tsc --noEmit` | ✅ clean |
+| `pnpm exec jest --runInBand` | ✅ **11 suites / 35 tests** |
+| `pnpm lint` | ✅ 0 errors / 0 warnings |
+| `pnpm build` (web) | ✅ PASS — 52 dashboard routes prerender as `○ Static` |
+| `TAURI_BUILD=1 NEXT_PUBLIC_DESKTOP_TARGET=1 NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 pnpm build` | ✅ PASS |
+| Backend pytest (sqlite override) | ✅ **33 passed in 0.45s** |
+| Live `curl -i :18476/api/positions/` (no flag, no token) | ✅ **401 Unauthorized** |
+| Live `curl :18476/api/positions/` (`PMT_AUTH_DISABLED=true`, no token) | ✅ 200 + JSON list |
+| Live `curl :18476/api/notifications/` (`PMT_AUTH_DISABLED=true`, no token) | ✅ 200 + JSON list |
+| Live `curl -H 'Authorization: Bearer no-auth' …/api/positions/` (flag on) | ✅ 200 + JSON list |
+
+### Parity workflow with the bypass
+
+```bash
+# Terminal 1 — backend with auth bypass + sqlite override
+cd fastapi_backend
+DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pmt-dev.sqlite3 \
+  PMT_AUTH_DISABLED=true \
+  ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+
+# Terminal 2 — Next.js with auth bypass
+cd nextjs-frontend
+NEXT_PUBLIC_AUTH_DISABLED=1 pnpm dev   # → http://localhost:3000
+
+# Terminal 3 — Reflex reference
+cd /Users/orbot/Developer/work/Portfolio-Management-Tool-reflex
+uv run reflex run                       # → http://localhost:3001/pmt/
+```
+
+Both env vars must default off again before any release build. The flag is wired only at the two integration points (`current_active_user` on the backend, `<DashboardAuthGate>` + `getAuthToken()` on the frontend) so flipping it back to `0` / removing it restores the old behavior with no further edits.
+
+### What this unblocks
+
+§11 exit criterion #12 — playwright side-by-side captures of the 11 modules into `docs/parity-screenshots/<module>/<page>-{reflex,nextjs}.png`. The 6 missing-endpoint scaffolds (`monthly-exercise-limit`, `deal-indication`, `po-settlement`, `short-ecl`, `instrument-data`, `instrument-term`) and the two pricer placeholder pages (`risk/pricer-warrant`, `risk/pricer-bond`) will not match the reflex grids and should be flagged in `docs/parity-screenshots/README.md` as expected deltas.
+
+---
+
+## Previous Status (2026-05-05 — Section D convergence pass)
 
 ### What landed this session
 
