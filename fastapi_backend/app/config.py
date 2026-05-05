@@ -58,6 +58,14 @@ class Settings(BaseSettings):
     # PMT Settings
     MOCK_DATA: bool = True  # Use mock data from pmt_core
 
+    # Dev-only escape hatch for parity work against the Reflex reference. When true,
+    # protected /api/* routes return a synthetic user instead of going through
+    # fastapi-users. Default False; never enable in production.
+    AUTH_DISABLED: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("PMT_AUTH_DISABLED", "AUTH_DISABLED"),
+    )
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origin_values(cls, value: object) -> Set[str]:

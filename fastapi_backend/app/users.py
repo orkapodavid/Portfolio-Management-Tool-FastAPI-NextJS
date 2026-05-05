@@ -2,8 +2,9 @@ import uuid
 import re
 
 from typing import Optional
+from uuid import UUID
 
-from fastapi import Depends, Request, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse, Response
 from fastapi_users import (
     BaseUserManager,
@@ -112,4 +113,29 @@ auth_backend = AuthenticationBackend(
 
 fastapi_users = FastAPIUsers[User, uuid.UUID](get_user_manager, [auth_backend])
 
-current_active_user = fastapi_users.current_user(active=True)
+# Underlying fastapi-users dep that returns User | None instead of raising 401.
+# Wrapping it lets `current_active_user` short-circuit when AUTH_DISABLED is on.
+_optional_current_user = fastapi_users.current_user(active=True, optional=True)
+
+_NOAUTH_USER_ID = UUID("00000000-0000-0000-0000-0000000000a1")
+
+
+def _build_noauth_user() -> User:
+    return User(
+        id=_NOAUTH_USER_ID,
+        email="noauth@local",
+        hashed_password="",
+        is_active=True,
+        is_superuser=False,
+        is_verified=True,
+    )
+
+
+async def current_active_user(
+    user: Optional[User] = Depends(_optional_current_user),
+) -> User:
+    if settings.AUTH_DISABLED:
+        return _build_noauth_user()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    return user
