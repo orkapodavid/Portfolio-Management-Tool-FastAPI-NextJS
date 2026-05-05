@@ -1,23 +1,89 @@
 "use client";
 
-import { DataTable } from "@/components/layout/data-table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { complianceGetRestrictedList } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type RestrictedListRow = {
+  id: number;
+  ticker: string;
+  company_name: string;
+  in_emsx: string | null;
+  compliance_type: string;
+  firm_block: string | null;
+  compliance_start: string | null;
+  nda_end: string | null;
+  mnpi_end: string | null;
+  wc_end: string | null;
+};
 
 const columns = [
-  { key: "ticker", header: "Ticker" },
-  { key: "company_name", header: "Company" },
-  { key: "compliance_type", header: "Type" },
-  { key: "firm_block", header: "Firm Block" },
-  { key: "compliance_start", header: "Start Date" },
-  { key: "nda_end", header: "NDA End" },
-  { key: "in_emsx", header: "EMSX", align: "center" as const },
+  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
+  textColumn({ field: "in_emsx", header: "In EMSX?", minWidth: 80 }),
+  textColumn({ field: "compliance_type", header: "Compliance Type", minWidth: 120 }),
+  textColumn({ field: "firm_block", header: "Firm Block", minWidth: 100 }),
+  textColumn({ field: "compliance_start", header: "Compliance Start", minWidth: 120 }),
+  textColumn({ field: "nda_end", header: "NDA End", minWidth: 90 }),
+  textColumn({ field: "mnpi_end", header: "MNPI End", minWidth: 90 }),
+  textColumn({ field: "wc_end", header: "WC End", minWidth: 90 }),
 ];
 
-const mockData = [
-  { id: 1, ticker: "ABC.T", company_name: "ABC Corp", compliance_type: "Restricted", firm_block: "Yes", compliance_start: "2026-01-15", nda_end: "2026-06-30", in_emsx: "Blocked" },
-  { id: 2, ticker: "XYZ.HK", company_name: "XYZ Holdings", compliance_type: "MNPI", firm_block: "No", compliance_start: "2026-02-01", nda_end: "2026-04-30", in_emsx: "Active" },
-  { id: 3, ticker: "DEF.L", company_name: "DEF Industries", compliance_type: "Wall Cross", firm_block: "Yes", compliance_start: "2026-03-01", nda_end: "-", in_emsx: "Blocked" },
-];
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
 export default function RestrictedListPage() {
-  return <DataTable columns={columns} data={mockData} />;
+  const router = useRouter();
+  const [rows, setRows] = useState<RestrictedListRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await complianceGetRestrictedList({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load restricted list.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as RestrictedListRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <DataGrid<RestrictedListRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No restricted list entries available."
+      searchPlaceholder="Search restricted list…"
+    />
+  );
 }
