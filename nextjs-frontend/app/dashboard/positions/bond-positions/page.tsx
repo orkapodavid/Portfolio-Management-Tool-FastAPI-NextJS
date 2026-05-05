@@ -1,22 +1,93 @@
 "use client";
 
-import { DataTable } from "@/components/layout/data-table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { positionsGetBondPositions } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { dateColumn, textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type BondPositionRow = {
+  id: number;
+  ticker: string;
+  trade_date: string;
+  deal_num: string;
+  detail_id: string;
+  underlying: string;
+  company_name: string;
+  sec_id: string;
+  sec_type: string;
+  subtype: string;
+  currency: string;
+  account_id: string;
+};
 
 const columns = [
-  { key: "ticker", header: "Ticker" },
-  { key: "company_name", header: "Company" },
-  { key: "currency", header: "CCY" },
-  { key: "position", header: "Position", align: "right" as const },
-  { key: "market_value", header: "Mkt Value", align: "right" as const },
-  { key: "notional", header: "Notional", align: "right" as const },
-  { key: "account_id", header: "Account" },
+  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
+  textColumn({ field: "deal_num", header: "Deal Num", minWidth: 90 }),
+  textColumn({ field: "detail_id", header: "Detail ID", minWidth: 90 }),
+  textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
+  textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
+  textColumn({ field: "sec_id", header: "SecID", minWidth: 90 }),
+  textColumn({ field: "sec_type", header: "Sec Type", minWidth: 90 }),
+  textColumn({ field: "subtype", header: "Subtype", minWidth: 90 }),
+  textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
+  textColumn({ field: "account_id", header: "Account ID", minWidth: 100 }),
 ];
 
-const mockData = [
-  { id: 1, ticker: "HSBA.L CB", company_name: "HSBC Holdings", currency: "GBP", position: "10,000", market_value: "$7,456,000", notional: "$7,500,000", account_id: "ACC003" },
-  { id: 2, ticker: "9984.T CB", company_name: "SoftBank Group", currency: "JPY", position: "20,000", market_value: "$4,567,890", notional: "$4,600,000", account_id: "ACC002" },
-];
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
 export default function BondPositionsPage() {
-  return <DataTable columns={columns} data={mockData} />;
+  const router = useRouter();
+  const [rows, setRows] = useState<BondPositionRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await positionsGetBondPositions({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load bond positions.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as BondPositionRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <DataGrid<BondPositionRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No bond positions available."
+      searchPlaceholder="Search bonds…"
+    />
+  );
 }
