@@ -1,21 +1,103 @@
 "use client";
 
-import { DataTable } from "@/components/layout/data-table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { reconciliationGetFailedTrades } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { dateColumn, textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type FailedTradeRow = {
+  id: number;
+  ticker: string;
+  report_date: string;
+  trade_date: string;
+  value_date: string;
+  settlement_date: string;
+  portfolio_code: string;
+  instrument_ref: string;
+  instrument_name: string;
+  company_name: string;
+  isin: string;
+  sedol: string;
+  broker: string;
+  glass_reference: string;
+  trade_reference: string;
+  deal_type: string;
+  q: string;
+};
 
 const columns = [
-  { key: "ticker", header: "Ticker" },
-  { key: "trade_date", header: "Trade Date" },
-  { key: "settlement_date", header: "Settle Date" },
-  { key: "amount", header: "Amount", align: "right" as const },
-  { key: "reason", header: "Reason" },
-  { key: "status", header: "Status", align: "center" as const },
+  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  dateColumn({ field: "report_date", header: "Report Date", minWidth: 100 }),
+  dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
+  dateColumn({ field: "value_date", header: "Value Date", minWidth: 100 }),
+  dateColumn({ field: "settlement_date", header: "Settlement Date", minWidth: 110 }),
+  textColumn({ field: "portfolio_code", header: "Portfolio Code", minWidth: 110 }),
+  textColumn({ field: "instrument_ref", header: "Instrument Ref", minWidth: 110 }),
+  textColumn({ field: "instrument_name", header: "Instrument Name", minWidth: 130 }),
+  textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
+  textColumn({ field: "isin", header: "ISIN", minWidth: 110 }),
+  textColumn({ field: "sedol", header: "SEDOL", minWidth: 90 }),
+  textColumn({ field: "broker", header: "Broker", minWidth: 100 }),
+  textColumn({ field: "glass_reference", header: "Glass Reference", minWidth: 120 }),
+  textColumn({ field: "trade_reference", header: "Trade Reference", minWidth: 120 }),
+  textColumn({ field: "deal_type", header: "Deal Type", minWidth: 90 }),
+  textColumn({ field: "q", header: "Q", minWidth: 60, align: "right" }),
 ];
 
-const mockData = [
-  { id: 1, ticker: "9984.T", trade_date: "2026-03-19", settlement_date: "2026-03-21", amount: "$5,432,100", reason: "Insufficient shares", status: "Failed" },
-  { id: 2, ticker: "HSBA.L", trade_date: "2026-03-18", settlement_date: "2026-03-20", amount: "$7,456,000", reason: "Counterparty mismatch", status: "Pending" },
-];
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
 export default function FailedTradesPage() {
-  return <DataTable columns={columns} data={mockData} />;
+  const router = useRouter();
+  const [rows, setRows] = useState<FailedTradeRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await reconciliationGetFailedTrades({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load failed trades.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as FailedTradeRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <DataGrid<FailedTradeRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No failed trades available."
+      searchPlaceholder="Search failed trades…"
+    />
+  );
 }
