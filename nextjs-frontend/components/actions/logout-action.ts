@@ -1,27 +1,26 @@
-"use server";
-
-import { cookies } from "next/headers";
 import { authJwtLogout } from "@/app/clientService";
-import { redirect } from "next/navigation";
+import { clearAuthToken, getAuthToken } from "@/lib/auth/token-storage";
+import { getApiError, getErrorMessage } from "@/lib/utils";
 
 export async function logout() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("accessToken")?.value;
+  const token = getAuthToken();
 
   if (!token) {
     return { message: "No access token found" };
   }
 
-  const { error } = await authJwtLogout({
+  const response = await authJwtLogout({
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 
+  const error = getApiError(response);
+
   if (error) {
-    return { message: error };
+    return { message: getErrorMessage({ detail: error }) };
   }
 
-  cookieStore.delete("accessToken");
-  redirect(`/login`);
+  clearAuthToken();
+  return { redirectTo: "/login" };
 }

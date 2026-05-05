@@ -3,21 +3,25 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { addItem } from "@/components/actions/items-action";
-import { useActionState, useEffect } from "react";
+import type { CreateItemState } from "@/components/actions/items-action";
+import { useState } from "react";
 import { SubmitButton } from "@/components/ui/submitButton";
 import { useRouter } from "next/navigation";
 
-const initialState = { message: "" };
+const initialState: CreateItemState = { message: "" };
 
 export default function CreateItemPage() {
   const router = useRouter();
-  const [state, dispatch] = useActionState(addItem, initialState);
+  const [state, setState] = useState<CreateItemState>(initialState);
 
-  useEffect(() => {
-    if (state.redirectTo) {
-      router.replace(state.redirectTo);
+  const handleSubmit = async (formData: FormData) => {
+    const nextState = await addItem(state, formData);
+    setState(nextState);
+
+    if (nextState.redirectTo) {
+      router.replace(nextState.redirectTo);
     }
-  }, [router, state]);
+  };
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
@@ -32,7 +36,7 @@ export default function CreateItemPage() {
         </header>
 
         <form
-          action={dispatch}
+          action={handleSubmit}
           className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 space-y-6"
         >
           <div className="space-y-6">

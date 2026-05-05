@@ -5,12 +5,6 @@ jest.mock("../app/clientService", () => ({
   resetForgotPassword: jest.fn(),
 }));
 
-jest.mock("../lib/clientConfig", () => ({
-  client: {
-    setConfig: jest.fn(),
-  },
-}));
-
 describe("passwordReset action", () => {
   afterEach(() => {
     jest.clearAllMocks();

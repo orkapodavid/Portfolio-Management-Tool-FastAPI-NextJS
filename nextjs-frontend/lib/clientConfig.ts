@@ -1,11 +1,35 @@
 import { client } from "@/app/openapi-client/client.gen";
+import { getRuntimeConfig } from "@/lib/runtime-config";
 
-const configureClient = () => {
-  const baseURL = process.env.API_BASE_URL;
+let configuredBaseUrl: string | null = null;
+let configurePromise: Promise<string> | null = null;
+
+async function configureClient() {
+  const { apiBaseUrl } = await getRuntimeConfig();
+
+  if (configuredBaseUrl === apiBaseUrl) {
+    return apiBaseUrl;
+  }
 
   client.setConfig({
-    baseURL: baseURL,
+    baseURL: apiBaseUrl,
   });
-};
 
-configureClient();
+  configuredBaseUrl = apiBaseUrl;
+  return apiBaseUrl;
+}
+
+export async function ensureClientConfigured() {
+  if (!configurePromise) {
+    configurePromise = configureClient().finally(() => {
+      configurePromise = null;
+    });
+  }
+
+  return configurePromise;
+}
+
+export function resetClientConfigForTests() {
+  configuredBaseUrl = null;
+  configurePromise = null;
+}

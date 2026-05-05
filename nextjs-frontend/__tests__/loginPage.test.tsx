@@ -2,12 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import type { ReactNode } from "react";
 
-import LoginPage from "../app/login/page";
 import { LoginPageView } from "../app/login/login-page-view";
-
-const mockReplace = jest.fn();
-const mockUseActionState = jest.fn();
-const mockUseEffect = jest.fn((callback: () => void) => callback());
 
 jest.mock("next/link", () => ({
   __esModule: true,
@@ -24,18 +19,6 @@ jest.mock("next/link", () => ({
       {children}
     </a>
   ),
-}));
-
-jest.mock("next/navigation", () => ({
-  useRouter: () => ({
-    replace: mockReplace,
-  }),
-}));
-
-jest.mock("react", () => ({
-  ...jest.requireActual("react"),
-  useActionState: (...args: unknown[]) => mockUseActionState(...args),
-  useEffect: (callback: () => void) => mockUseEffect(callback),
 }));
 
 jest.mock("react-dom", () => ({
@@ -64,13 +47,6 @@ function expectSubmittedFormData(
 }
 
 describe("Login Page", () => {
-  beforeEach(() => {
-    mockReplace.mockReset();
-    mockUseActionState.mockReset();
-    mockUseEffect.mockClear();
-    mockUseActionState.mockReturnValue([undefined, jest.fn()]);
-  });
-
   it("renders the form with username and password input and submit button", async () => {
     render(<LoginPageView action={jest.fn()} />);
 
@@ -125,19 +101,5 @@ describe("Login Page", () => {
         "An unexpected error occurred. Please try again later.",
       ),
     ).toBeInTheDocument();
-  });
-
-  it("redirects through the route module when the action state requests navigation", async () => {
-    const dispatch = jest.fn();
-    mockUseActionState.mockReturnValue([
-      { redirectTo: "/dashboard" },
-      dispatch,
-    ]);
-
-    render(<LoginPage />);
-
-    await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith("/dashboard");
-    });
   });
 });

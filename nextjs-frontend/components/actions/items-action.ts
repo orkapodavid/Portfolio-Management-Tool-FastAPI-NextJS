@@ -1,19 +1,26 @@
-"use server";
-
-import { cookies } from "next/headers";
 import { readItem, deleteItem, createItem } from "@/app/clientService";
-import { revalidatePath } from "next/cache";
 import { itemSchema } from "@/lib/definitions";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError, getErrorMessage } from "@/lib/utils";
+
+export type CreateItemState = {
+  message?: string;
+  redirectTo?: string;
+  errors?: {
+    name?: string[];
+    description?: string[];
+    quantity?: string[];
+  };
+};
 
 export async function fetchItems(page: number = 1, size: number = 10) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("accessToken")?.value;
+  const token = getAuthToken();
 
   if (!token) {
     return { message: "No access token found" };
   }
 
-  const { data, error } = await readItem({
+  const response = await readItem({
     query: {
       page: page,
       size: size,
@@ -23,22 +30,23 @@ export async function fetchItems(page: number = 1, size: number = 10) {
     },
   });
 
+  const error = getApiError(response);
+
   if (error) {
-    return { message: error };
+    return { message: getErrorMessage({ detail: error }) };
   }
 
-  return data;
+  return getApiData(response);
 }
 
 export async function removeItem(id: string) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("accessToken")?.value;
+  const token = getAuthToken();
 
   if (!token) {
     return { message: "No access token found" };
   }
 
-  const { error } = await deleteItem({
+  const response = await deleteItem({
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -47,18 +55,20 @@ export async function removeItem(id: string) {
     },
   });
 
+  const error = getApiError(response);
+
   if (error) {
-    return { message: error };
+    return { message: getErrorMessage({ detail: error }) };
   }
-  revalidatePath("/dashboard");
+
+  return { success: true };
 }
 
 export async function addItem(prevState: {}, formData: FormData) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("accessToken")?.value;
+  const token = getAuthToken();
 
   if (!token) {
-    return { message: "No access token found" };
+    return { message: "No access token found", redirectTo: "/login" };
   }
 
   const validatedFields = itemSchema.safeParse({
@@ -83,9 +93,12 @@ export async function addItem(prevState: {}, formData: FormData) {
       quantity,
     },
   };
-  const { error } = await createItem(input);
+  const response = await createItem(input);
+  const error = getApiError(response);
+
   if (error) {
-    return { message: `${error.detail}` };
+    return { message: getErrorMessage({ detail: error }) };
   }
+
   return { redirectTo: "/dashboard" };
 }

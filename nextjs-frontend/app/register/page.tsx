@@ -1,19 +1,30 @@
 "use client";
 
 import { register } from "@/components/actions/register-action";
-import { useActionState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RegisterPageView } from "./register-page-view";
+import type { RegisterPageState } from "./register-page-view";
+import { hasAuthToken } from "@/lib/auth/token-storage";
 
 export default function Page() {
   const router = useRouter();
-  const [state, dispatch] = useActionState(register, undefined);
+  const [state, setState] = useState<RegisterPageState>();
 
   useEffect(() => {
-    if (state?.redirectTo) {
-      router.replace(state.redirectTo);
+    if (hasAuthToken()) {
+      router.replace("/dashboard/market-data/market-data");
     }
-  }, [router, state?.redirectTo]);
+  }, [router]);
 
-  return <RegisterPageView action={dispatch} state={state} />;
+  const handleSubmit = async (formData: FormData) => {
+    const nextState = await register(undefined, formData);
+    setState(nextState);
+
+    if (nextState?.redirectTo) {
+      router.replace(nextState.redirectTo);
+    }
+  };
+
+  return <RegisterPageView action={handleSubmit} state={state} />;
 }

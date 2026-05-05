@@ -1,9 +1,7 @@
-"use server";
-
 import { registerRegister } from "@/app/clientService";
 
 import { registerSchema } from "@/lib/definitions";
-import { getErrorMessage } from "@/lib/utils";
+import { getApiError, getErrorMessage } from "@/lib/utils";
 
 export async function register(prevState: unknown, formData: FormData) {
   const validatedFields = registerSchema.safeParse({
@@ -26,7 +24,9 @@ export async function register(prevState: unknown, formData: FormData) {
     },
   };
   try {
-    const { error } = await registerRegister(input);
+    const response = await registerRegister(input);
+    const error = getApiError(response);
+
     if (error) {
       return { server_validation_error: getErrorMessage(error) };
     }

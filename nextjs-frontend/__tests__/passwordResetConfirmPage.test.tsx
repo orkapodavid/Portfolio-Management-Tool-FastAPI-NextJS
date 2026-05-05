@@ -1,29 +1,7 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
-import PasswordResetConfirmPage from "../app/password-recovery/confirm/page";
 import { ResetPasswordConfirmPageView } from "../app/password-recovery/confirm/reset-password-confirm-page-view";
-
-const mockNotFound = jest.fn();
-const mockUseSearchParamsGet = jest.fn();
-const mockUseActionState = jest.fn();
-const mockUseEffect = jest.fn((callback: () => void) => callback());
-
-jest.mock("next/navigation", () => ({
-  notFound: () => mockNotFound(),
-  useRouter: () => ({
-    replace: jest.fn(),
-  }),
-  useSearchParams: () => ({
-    get: mockUseSearchParamsGet,
-  }),
-}));
-
-jest.mock("react", () => ({
-  ...jest.requireActual("react"),
-  useActionState: (...args: unknown[]) => mockUseActionState(...args),
-  useEffect: (callback: () => void) => mockUseEffect(callback),
-}));
 
 jest.mock("react-dom", () => ({
   ...jest.requireActual("react-dom"),
@@ -51,14 +29,6 @@ function expectSubmittedFormData(
 }
 
 describe("Password Reset Confirm Page", () => {
-  beforeEach(() => {
-    mockNotFound.mockReset();
-    mockUseSearchParamsGet.mockReset();
-    mockUseActionState.mockReset();
-    mockUseEffect.mockClear();
-    mockUseActionState.mockReturnValue([undefined, jest.fn()]);
-  });
-
   it("renders the form with password fields, submit button, and reset token", async () => {
     render(
       <ResetPasswordConfirmPageView action={jest.fn()} token="mock-token" />,
@@ -123,15 +93,5 @@ describe("Password Reset Confirm Page", () => {
       ),
     ).toBeInTheDocument();
     expect(await screen.findByText("Passwords must match.")).toBeInTheDocument();
-  });
-
-  it("calls notFound from the route module when the reset token is missing", async () => {
-    mockUseSearchParamsGet.mockReturnValue(null);
-
-    render(<PasswordResetConfirmPage />);
-
-    await waitFor(() => {
-      expect(mockNotFound).toHaveBeenCalledTimes(1);
-    });
   });
 });

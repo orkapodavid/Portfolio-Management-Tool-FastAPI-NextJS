@@ -1,10 +1,7 @@
-"use server";
-
-import { cookies } from "next/headers";
-
 import { authJwtLogin } from "@/app/clientService";
 import { loginSchema } from "@/lib/definitions";
-import { getErrorMessage } from "@/lib/utils";
+import { getApiData, getApiError, getErrorMessage } from "@/lib/utils";
+import { setAuthToken } from "@/lib/auth/token-storage";
 
 export async function login(prevState: unknown, formData: FormData) {
   const validatedFields = loginSchema.safeParse({
@@ -28,11 +25,22 @@ export async function login(prevState: unknown, formData: FormData) {
   };
 
   try {
-    const { data, error } = await authJwtLogin(input);
+    const response = await authJwtLogin(input);
+    const error = getApiError(response);
+
     if (error) {
       return { server_validation_error: getErrorMessage(error) };
     }
-    (await cookies()).set("accessToken", data.access_token);
+
+    const data = getApiData<{ access_token: string }>(response);
+
+    if (!data?.access_token) {
+      return {
+        server_error: "Login succeeded without an access token response.",
+      };
+    }
+
+    setAuthToken(data.access_token);
   } catch (err) {
     console.error("Login error:", err);
     return {

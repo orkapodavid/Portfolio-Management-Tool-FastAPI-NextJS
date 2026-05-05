@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { MODULES } from "@/lib/constants";
+import { logout } from "@/components/actions/logout-action";
 import {
   BarChart3,
   Briefcase,
@@ -36,10 +37,19 @@ const iconMap: Record<string, React.ElementType> = {
 
 export function TopNavigation() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const activeModule = MODULES.find((m) =>
     pathname.startsWith(`/dashboard/${m.id}`)
   );
+
+  const handleLogout = async () => {
+    const result = await logout();
+
+    if (result?.redirectTo) {
+      router.replace(result.redirectTo);
+    }
+  };
 
   return (
     <nav className="h-10 bg-[#1e1e2e] border-b border-[#313244] flex items-center px-2 gap-0.5 shrink-0">
@@ -75,7 +85,14 @@ export function TopNavigation() {
         <button className="p-1.5 text-[#a6adc8] hover:text-white rounded">
           <Bell className="w-4 h-4" />
         </button>
-        <button className="p-1.5 text-[#a6adc8] hover:text-white rounded">
+        <button
+          type="button"
+          title="Log out"
+          onClick={() => {
+            void handleLogout();
+          }}
+          className="p-1.5 text-[#a6adc8] hover:text-white rounded"
+        >
           <User className="w-4 h-4" />
         </button>
       </div>

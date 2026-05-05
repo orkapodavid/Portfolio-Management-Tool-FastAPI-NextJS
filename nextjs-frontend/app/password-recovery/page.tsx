@@ -1,11 +1,17 @@
 "use client";
 
 import { passwordReset } from "@/components/actions/password-reset-action";
-import { useActionState } from "react";
+import { useState } from "react";
 import { PasswordRecoveryPageView } from "./password-recovery-page-view";
+import type { PasswordRecoveryState } from "./password-recovery-page-view";
 
 export default function Page() {
-  const [state, dispatch] = useActionState(passwordReset, undefined);
+  const [state, setState] = useState<PasswordRecoveryState>();
 
-  return <PasswordRecoveryPageView action={dispatch} state={state} />;
+  const handleSubmit = async (formData: FormData) => {
+    const nextState = await passwordReset(undefined, formData);
+    setState(nextState);
+  };
+
+  return <PasswordRecoveryPageView action={handleSubmit} state={state} />;
 }

@@ -1,8 +1,6 @@
-"use server";
-
 import { resetForgotPassword, resetResetPassword } from "@/app/clientService";
 import { passwordResetConfirmSchema } from "@/lib/definitions";
-import { getErrorMessage } from "@/lib/utils";
+import { getApiError, getErrorMessage } from "@/lib/utils";
 
 export async function passwordReset(prevState: unknown, formData: FormData) {
   const input = {
@@ -12,7 +10,9 @@ export async function passwordReset(prevState: unknown, formData: FormData) {
   };
 
   try {
-    const { error } = await resetForgotPassword(input);
+    const response = await resetForgotPassword(input);
+    const error = getApiError(response);
+
     if (error) {
       return { server_validation_error: getErrorMessage(error) };
     }
@@ -49,7 +49,9 @@ export async function passwordResetConfirm(
     },
   };
   try {
-    const { error } = await resetResetPassword(input);
+    const response = await resetResetPassword(input);
+    const error = getApiError(response);
+
     if (error) {
       return { server_validation_error: getErrorMessage(error) };
     }

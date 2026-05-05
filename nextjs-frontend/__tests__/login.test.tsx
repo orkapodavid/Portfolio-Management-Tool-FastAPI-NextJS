@@ -1,18 +1,13 @@
 import { login } from "@/components/actions/login-action";
 import { authJwtLogin } from "@/app/clientService";
-import { cookies } from "next/headers";
+import { setAuthToken } from "@/lib/auth/token-storage";
 
 jest.mock("../app/clientService", () => ({
   authJwtLogin: jest.fn(),
 }));
 
-jest.mock("next/headers", () => {
-  const mockSet = jest.fn();
-  return { cookies: jest.fn().mockResolvedValue({ set: mockSet }) };
-});
-
-jest.mock("next/navigation", () => ({
-  redirect: jest.fn(),
+jest.mock("../lib/auth/token-storage", () => ({
+  setAuthToken: jest.fn(),
 }));
 
 describe("login action", () => {
@@ -20,8 +15,6 @@ describe("login action", () => {
     const formData = new FormData();
     formData.set("username", "a@a.com");
     formData.set("password", "Q12341414#");
-
-    const mockSet = (await cookies()).set;
 
     // Mock a successful login
     (authJwtLogin as jest.Mock).mockResolvedValue({
@@ -37,8 +30,7 @@ describe("login action", () => {
       },
     });
 
-    expect(cookies).toHaveBeenCalled();
-    expect(mockSet).toHaveBeenCalledWith("accessToken", "1245token");
+    expect(setAuthToken).toHaveBeenCalledWith("1245token");
   });
 
   it("should should return an error if the server validation fails", async () => {
@@ -66,7 +58,7 @@ describe("login action", () => {
       server_validation_error: "LOGIN_BAD_CREDENTIALS",
     });
 
-    expect(cookies).not.toHaveBeenCalled();
+    expect(setAuthToken).not.toHaveBeenCalled();
   });
 
   it("should should return an error if either the password or username is not sent", async () => {
@@ -85,7 +77,7 @@ describe("login action", () => {
       },
     });
 
-    expect(cookies).not.toHaveBeenCalled();
+    expect(setAuthToken).not.toHaveBeenCalled();
   });
 
   it("should handle unexpected errors and return server error message", async () => {

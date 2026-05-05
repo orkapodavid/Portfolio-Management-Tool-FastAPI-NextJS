@@ -1,14 +1,15 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useState } from "react";
 import { notFound, useRouter, useSearchParams } from "next/navigation";
 import { passwordResetConfirm } from "@/components/actions/password-reset-action";
 import { Suspense } from "react";
 import { ResetPasswordConfirmPageView } from "./reset-password-confirm-page-view";
+import type { ResetPasswordConfirmState } from "./reset-password-confirm-page-view";
 
 function ResetPasswordForm() {
   const router = useRouter();
-  const [state, dispatch] = useActionState(passwordResetConfirm, undefined);
+  const [state, setState] = useState<ResetPasswordConfirmState>();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
@@ -17,15 +18,18 @@ function ResetPasswordForm() {
     return null;
   }
 
-  useEffect(() => {
-    if (state?.redirectTo) {
-      router.replace(state.redirectTo);
+  const handleSubmit = async (formData: FormData) => {
+    const nextState = await passwordResetConfirm(undefined, formData);
+    setState(nextState);
+
+    if (nextState?.redirectTo) {
+      router.replace(nextState.redirectTo);
     }
-  }, [router, state?.redirectTo]);
+  };
 
   return (
     <ResetPasswordConfirmPageView
-      action={dispatch}
+      action={handleSubmit}
       state={state}
       token={token}
     />
