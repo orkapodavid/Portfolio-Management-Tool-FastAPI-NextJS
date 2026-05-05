@@ -1,28 +1,93 @@
 "use client";
 
-import { DataTable } from "@/components/layout/data-table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { marketDataGetTradingCalendar } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { dateColumn, textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type CalendarRow = {
+  id: number;
+  trade_date: string;
+  day_of_week: string;
+  usa: string;
+  hkg: string;
+  jpn: string;
+  aus: string;
+  nzl: string;
+  kor: string;
+  chn: string;
+  twn: string;
+  ind: string;
+};
 
 const columns = [
-  { key: "trade_date", header: "Date" },
-  { key: "day_of_week", header: "Day" },
-  { key: "usa", header: "USA", align: "center" as const },
-  { key: "hkg", header: "HKG", align: "center" as const },
-  { key: "jpn", header: "JPN", align: "center" as const },
-  { key: "aus", header: "AUS", align: "center" as const },
-  { key: "kor", header: "KOR", align: "center" as const },
-  { key: "chn", header: "CHN", align: "center" as const },
-  { key: "twn", header: "TWN", align: "center" as const },
-  { key: "ind", header: "IND", align: "center" as const },
+  dateColumn({ field: "trade_date", header: "Trade Date", pinned: "left", minWidth: 110 }),
+  textColumn({ field: "day_of_week", header: "Day of Week", minWidth: 110 }),
+  textColumn({ field: "usa", header: "USA", minWidth: 80, align: "center" }),
+  textColumn({ field: "hkg", header: "HKG", minWidth: 80, align: "center" }),
+  textColumn({ field: "jpn", header: "JPN", minWidth: 80, align: "center" }),
+  textColumn({ field: "aus", header: "AUS", minWidth: 80, align: "center" }),
+  textColumn({ field: "nzl", header: "NZL", minWidth: 80, align: "center" }),
+  textColumn({ field: "kor", header: "KOR", minWidth: 80, align: "center" }),
+  textColumn({ field: "chn", header: "CHN", minWidth: 80, align: "center" }),
+  textColumn({ field: "twn", header: "TWN", minWidth: 80, align: "center" }),
+  textColumn({ field: "ind", header: "IND", minWidth: 80, align: "center" }),
 ];
 
-const mockData = [
-  { id: 1, trade_date: "2026-03-23", day_of_week: "Monday", usa: "Open", hkg: "Open", jpn: "Open", aus: "Open", kor: "Open", chn: "Open", twn: "Open", ind: "Open" },
-  { id: 2, trade_date: "2026-03-22", day_of_week: "Sunday", usa: "Closed", hkg: "Closed", jpn: "Closed", aus: "Closed", kor: "Closed", chn: "Closed", twn: "Closed", ind: "Closed" },
-  { id: 3, trade_date: "2026-03-21", day_of_week: "Saturday", usa: "Closed", hkg: "Closed", jpn: "Closed", aus: "Closed", kor: "Closed", chn: "Closed", twn: "Closed", ind: "Closed" },
-  { id: 4, trade_date: "2026-03-20", day_of_week: "Friday", usa: "Open", hkg: "Open", jpn: "Open", aus: "Open", kor: "Open", chn: "Open", twn: "Open", ind: "Open" },
-  { id: 5, trade_date: "2026-03-19", day_of_week: "Thursday", usa: "Open", hkg: "Open", jpn: "Open", aus: "Open", kor: "Open", chn: "Open", twn: "Open", ind: "Open" },
-];
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
 export default function TradingCalendarPage() {
-  return <DataTable columns={columns} data={mockData} />;
+  const router = useRouter();
+  const [rows, setRows] = useState<CalendarRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await marketDataGetTradingCalendar({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load trading calendar.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as CalendarRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <DataGrid<CalendarRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No trading calendar entries available."
+      searchPlaceholder="Search dates…"
+    />
+  );
 }
