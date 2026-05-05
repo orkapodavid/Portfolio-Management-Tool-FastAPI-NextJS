@@ -11,6 +11,7 @@ import {
   itemDeleteItem,
   itemReadItem,
   marketDataGetMarketData,
+  notificationsGetNotifications,
   usersUsersCurrentUser,
 } from "./openapi-client";
 
@@ -59,3 +60,7 @@ export const getMarketData = (
 export const usersCurrentUser = (
   options?: Parameters<typeof usersUsersCurrentUser>[0],
 ) => withConfiguredClient(() => usersUsersCurrentUser(options));
+
+export const getNotifications = (
+  options?: Parameters<typeof notificationsGetNotifications>[0],
+) => withConfiguredClient(() => notificationsGetNotifications(options));

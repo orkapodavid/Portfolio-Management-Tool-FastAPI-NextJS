@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { COLORS, LAYOUT, MODULES } from "@/lib/constants";
 import { logout } from "@/components/actions/logout-action";
+import { useNotifications } from "@/lib/notifications-context";
 import {
   Activity,
   BarChart2,
@@ -39,6 +40,7 @@ const iconMap: Record<string, React.ElementType> = {
 export function TopNavigation() {
   const pathname = usePathname();
   const router = useRouter();
+  const { isOpen, toggleOpen, unreadCount } = useNotifications();
 
   const activeModuleId = MODULES.find((m) =>
     pathname.startsWith(`/dashboard/${m.id}`)
@@ -115,12 +117,30 @@ export function TopNavigation() {
         <button
           type="button"
           aria-label="Notifications"
-          className="group p-1 rounded-md hover:bg-white/10 transition-all duration-200 relative"
+          onClick={toggleOpen}
+          className={cn(
+            "group p-1 rounded-md transition-all duration-200 relative",
+            isOpen
+              ? "bg-white/20 text-white"
+              : "hover:bg-white/10"
+          )}
         >
-          <Bell
-            size={16}
-            className="text-gray-400 group-hover:text-white"
-          />
+          <div className="relative">
+            <Bell
+              size={16}
+              className={cn(
+                isOpen ? "text-white" : "text-gray-400 group-hover:text-white"
+              )}
+            />
+            {unreadCount > 0 && (
+              <span
+                className="absolute -top-1 -right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500 text-[7px] font-black text-white animate-pulse"
+                style={{ boxShadow: `0 0 0 1px ${COLORS.NAV_BG}` }}
+              >
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </div>
         </button>
         <button
           type="button"
