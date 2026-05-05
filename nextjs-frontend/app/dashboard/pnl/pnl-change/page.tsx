@@ -1,27 +1,91 @@
 "use client";
 
-import { DataTable } from "@/components/layout/data-table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { pnlGetPnlChanges } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { dateColumn, textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type PnlChangeRow = {
+  id: number;
+  trade_date: string;
+  underlying: string;
+  ticker: string;
+  pnl_ytd: string;
+  pnl_chg_1d: string;
+  pnl_chg_1w: string;
+  pnl_chg_1m: string;
+  pnl_chg_pct_1d: string;
+  pnl_chg_pct_1w: string;
+  pnl_chg_pct_1m: string;
+};
 
 const columns = [
-  { key: "underlying", header: "Underlying" },
-  { key: "ticker", header: "Ticker" },
-  { key: "pnl_ytd", header: "YTD P&L", align: "right" as const },
-  { key: "pnl_chg_1d", header: "1D Chg", align: "right" as const },
-  { key: "pnl_chg_1w", header: "1W Chg", align: "right" as const },
-  { key: "pnl_chg_1m", header: "1M Chg", align: "right" as const },
-  { key: "pnl_chg_pct_1d", header: "1D%", align: "right" as const },
-  { key: "pnl_chg_pct_1w", header: "1W%", align: "right" as const },
-  { key: "pnl_chg_pct_1m", header: "1M%", align: "right" as const },
+  dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
+  textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
+  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({ field: "pnl_ytd", header: "PnL YTD", minWidth: 100, align: "right" }),
+  textColumn({ field: "pnl_chg_1d", header: "PnL Chg 1D", minWidth: 100, align: "right" }),
+  textColumn({ field: "pnl_chg_1w", header: "PnL Chg 1W", minWidth: 100, align: "right" }),
+  textColumn({ field: "pnl_chg_1m", header: "PnL Chg 1M", minWidth: 100, align: "right" }),
+  textColumn({ field: "pnl_chg_pct_1d", header: "PnL Chg% 1D", minWidth: 100, align: "right" }),
+  textColumn({ field: "pnl_chg_pct_1w", header: "PnL Chg% 1W", minWidth: 100, align: "right" }),
+  textColumn({ field: "pnl_chg_pct_1m", header: "PnL Chg% 1M", minWidth: 100, align: "right" }),
 ];
 
-const mockData = [
-  { id: 1, underlying: "Toyota Motor", ticker: "7203.T", pnl_ytd: "$1,234,567", pnl_chg_1d: "+$12,345", pnl_chg_1w: "+$45,678", pnl_chg_1m: "+$123,456", pnl_chg_pct_1d: "+1.2%", pnl_chg_pct_1w: "+3.5%", pnl_chg_pct_1m: "+8.7%" },
-  { id: 2, underlying: "Sony Group", ticker: "6758.T", pnl_ytd: "$987,654", pnl_chg_1d: "-$8,765", pnl_chg_1w: "+$23,456", pnl_chg_1m: "+$67,890", pnl_chg_pct_1d: "-0.9%", pnl_chg_pct_1w: "+2.1%", pnl_chg_pct_1m: "+5.4%" },
-  { id: 3, underlying: "Nintendo", ticker: "7974.T", pnl_ytd: "$2,345,678", pnl_chg_1d: "+$34,567", pnl_chg_1w: "+$78,901", pnl_chg_1m: "+$234,567", pnl_chg_pct_1d: "+2.3%", pnl_chg_pct_1w: "+4.8%", pnl_chg_pct_1m: "+12.1%" },
-  { id: 4, underlying: "SoftBank Group", ticker: "9984.T", pnl_ytd: "($456,789)", pnl_chg_1d: "-$45,678", pnl_chg_1w: "-$89,012", pnl_chg_1m: "($156,789)", pnl_chg_pct_1d: "-3.2%", pnl_chg_pct_1w: "-5.6%", pnl_chg_pct_1m: "-9.8%" },
-  { id: 5, underlying: "Keyence", ticker: "6861.T", pnl_ytd: "$3,456,789", pnl_chg_1d: "+$56,789", pnl_chg_1w: "+$123,456", pnl_chg_1m: "+$345,678", pnl_chg_pct_1d: "+1.8%", pnl_chg_pct_1w: "+5.2%", pnl_chg_pct_1m: "+15.3%" },
-];
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
-export default function PnLChangePage() {
-  return <DataTable columns={columns} data={mockData} />;
+export default function PnlChangePage() {
+  const router = useRouter();
+  const [rows, setRows] = useState<PnlChangeRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await pnlGetPnlChanges({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load P&L changes.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as PnlChangeRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <DataGrid<PnlChangeRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No P&L change data available."
+      searchPlaceholder="Search P&L changes…"
+    />
+  );
 }
