@@ -1,23 +1,25 @@
 from fastapi import FastAPI
-from fastapi_pagination import add_pagination
-from .schemas import UserCreate, UserRead, UserUpdate
-from .users import auth_backend, fastapi_users, AUTH_URL_PATH
 from fastapi.middleware.cors import CORSMiddleware
-from .utils import simple_generate_unique_route_id
-from app.routes.items import router as items_router
-from app.routes.positions import router as positions_router
-from app.routes.pnl import router as pnl_router
-from app.routes.market_data import router as market_data_router
-from app.routes.risk import router as risk_router
+from fastapi_pagination import add_pagination
+
+from app.config import settings
 from app.routes.compliance import router as compliance_router
-from app.routes.reconciliation import router as reconciliation_router
-from app.routes.portfolio_tools import router as portfolio_tools_router
-from app.routes.instruments import router as instruments_router
 from app.routes.events import router as events_router
+from app.routes.health import router as health_router
+from app.routes.instruments import router as instruments_router
+from app.routes.items import router as items_router
+from app.routes.market_data import router as market_data_router
 from app.routes.operations import router as operations_router
 from app.routes.orders import router as orders_router
 from app.routes.performance import router as performance_router
-from app.config import settings
+from app.routes.pnl import router as pnl_router
+from app.routes.portfolio_tools import router as portfolio_tools_router
+from app.routes.positions import router as positions_router
+from app.routes.reconciliation import router as reconciliation_router
+from app.routes.risk import router as risk_router
+from app.schemas import UserCreate, UserRead, UserUpdate
+from app.users import AUTH_URL_PATH, auth_backend, fastapi_users
+from app.utils import simple_generate_unique_route_id
 
 app = FastAPI(
     title="Portfolio Management Tool API",
@@ -64,6 +66,7 @@ app.include_router(
 )
 
 # PMT module routes
+app.include_router(health_router)
 app.include_router(items_router, prefix="/items")
 app.include_router(positions_router, prefix="/api/positions")
 app.include_router(pnl_router, prefix="/api/pnl")

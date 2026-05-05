@@ -1,6 +1,13 @@
-from typing import Set
+from pathlib import Path
+from typing import Literal, Set
 
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from .runtime import parse_cors_origins
+
+
+BACKEND_ROOT = Path(__file__).resolve().parents[1]
 
 
 class Settings(BaseSettings):
@@ -35,14 +42,31 @@ class Settings(BaseSettings):
     # Frontend
     FRONTEND_URL: str = "http://localhost:3000"
 
+    # Runtime
+    RUNTIME_MODE: Literal["server", "desktop"] = Field(
+        default="server",
+        validation_alias=AliasChoices("PMT_RUNTIME_MODE", "PMT_RUNTIME"),
+    )
+    APP_DATA_DIR: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("PMT_APP_DATA_DIR", "PMT_DESKTOP_APP_DATA_DIR"),
+    )
+
     # CORS
     CORS_ORIGINS: Set[str]
 
     # PMT Settings
     MOCK_DATA: bool = True  # Use mock data from pmt_core
 
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origin_values(cls, value: object) -> Set[str]:
+        return parse_cors_origins(value)
+
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+        env_file=str(BACKEND_ROOT / ".env"),
+        env_file_encoding="utf-8",
+        extra="ignore",
     )
 
 
