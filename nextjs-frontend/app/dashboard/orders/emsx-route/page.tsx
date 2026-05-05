@@ -1,25 +1,85 @@
 "use client";
 
-import { DataTable } from "@/components/layout/data-table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { ordersGetOrderRoutes } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { numberColumn, textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type RouteRow = {
+  id: number;
+  order_id: number;
+  route_id: string;
+  broker: string;
+  quantity: number;
+  filled_quantity: number;
+  avg_price: string;
+  status: string;
+};
 
 const columns = [
-  { key: "sequence", header: "Seq#" },
-  { key: "ticker", header: "Ticker" },
-  { key: "broker", header: "Broker" },
-  { key: "route_amount", header: "Route Amt", align: "right" as const },
-  { key: "filled_amount", header: "Filled", align: "right" as const },
-  { key: "working_amount", header: "Working", align: "right" as const },
-  { key: "status", header: "Status", align: "center" as const },
-  { key: "last_update", header: "Last Update" },
+  textColumn({ field: "route_id", header: "Route ID", pinned: "left", minWidth: 110 }),
+  numberColumn({ field: "order_id", header: "Order ID", minWidth: 90, decimals: 0 }),
+  textColumn({ field: "broker", header: "Broker", minWidth: 90 }),
+  numberColumn({ field: "quantity", header: "Quantity", minWidth: 100, decimals: 0 }),
+  numberColumn({ field: "filled_quantity", header: "Filled Quantity", minWidth: 130, decimals: 0 }),
+  textColumn({ field: "avg_price", header: "Avg Price", minWidth: 100, align: "right" }),
+  textColumn({ field: "status", header: "Status", minWidth: 100 }),
 ];
 
-const mockData = [
-  { id: 1, sequence: "001-R1", ticker: "7203.T", broker: "MS-DMA", route_amount: "5,000", filled_amount: "5,000", working_amount: "0", status: "Filled", last_update: "14:23:45" },
-  { id: 2, sequence: "001-R2", ticker: "7203.T", broker: "MS-ALGO", route_amount: "5,000", filled_amount: "0", working_amount: "5,000", status: "Working", last_update: "14:25:12" },
-  { id: 3, sequence: "003-R1", ticker: "NVDA", broker: "JPM-DMA", route_amount: "1,500", filled_amount: "1,500", working_amount: "0", status: "Filled", last_update: "13:45:30" },
-  { id: 4, sequence: "003-R2", ticker: "NVDA", broker: "JPM-ALGO", route_amount: "1,500", filled_amount: "0", working_amount: "1,500", status: "Working", last_update: "14:10:00" },
-];
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
-export default function EMSXRoutePage() {
-  return <DataTable columns={columns} data={mockData} />;
+export default function EmsxRoutePage() {
+  const router = useRouter();
+  const [rows, setRows] = useState<RouteRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await ordersGetOrderRoutes({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load EMSX routes.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as RouteRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <DataGrid<RouteRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No EMSX routes available."
+      searchPlaceholder="Search routes…"
+    />
+  );
 }
