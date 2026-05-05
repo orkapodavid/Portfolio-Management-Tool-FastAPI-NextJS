@@ -93,6 +93,7 @@ export const MODULES = [
       { id: "restricted-list", label: "Restricted List" },
       { id: "undertakings", label: "Undertakings" },
       { id: "beneficial-ownership", label: "Beneficial Ownership" },
+      { id: "monthly-exercise-limit", label: "Monthly Exercise Limit" },
     ],
   },
   {
@@ -106,6 +107,9 @@ export const MODULES = [
       { id: "coming-resets", label: "Coming Resets" },
       { id: "cb-installments", label: "CB Installments" },
       { id: "excess-amount", label: "Excess Amount" },
+      { id: "deal-indication", label: "Deal Indication" },
+      { id: "po-settlement", label: "PO Settlement" },
+      { id: "short-ecl", label: "Short ECL" },
     ],
   },
   {
@@ -116,6 +120,8 @@ export const MODULES = [
       { id: "ticker-data", label: "Ticker Data" },
       { id: "stock-screener", label: "Stock Screener" },
       { id: "special-terms", label: "Special Terms" },
+      { id: "instrument-data", label: "Instrument Data" },
+      { id: "instrument-term", label: "Instrument Term" },
     ],
   },
   {
