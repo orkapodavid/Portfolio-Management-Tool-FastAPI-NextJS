@@ -1,3 +1,4 @@
+/* eslint-env node */
 import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { buildSidecarBinary } from './build-sidecar.mjs';

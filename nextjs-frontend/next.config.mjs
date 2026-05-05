@@ -1,3 +1,4 @@
+/* eslint-env node */
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 
 const isTauriBuild = process.env.TAURI_BUILD === '1';

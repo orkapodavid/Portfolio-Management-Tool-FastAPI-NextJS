@@ -13,6 +13,8 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
       "app/openapi-client/**",
+      "src-tauri/target/**",
+      "src-tauri/gen/**",
     ],
   },
   js.configs.recommended,
@@ -35,6 +37,15 @@ const eslintConfig = [
         ...globals.node,
       },
       sourceType: "commonjs",
+    },
+  },
+  // Node-side ESM scripts (next.config.mjs, src-tauri build scripts)
+  {
+    files: ["*.mjs", "src-tauri/scripts/**/*.mjs"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
     },
   },
   prettier,
