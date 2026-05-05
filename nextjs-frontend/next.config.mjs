@@ -1,7 +1,17 @@
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 
+const isTauriBuild = process.env.TAURI_BUILD === '1';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  ...(isTauriBuild
+    ? {
+        output: 'export',
+        images: {
+          unoptimized: true,
+        },
+      }
+    : {}),
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.plugins.push(

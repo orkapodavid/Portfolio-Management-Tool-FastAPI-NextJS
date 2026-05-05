@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
+    "dev:tauri": "node src-tauri/scripts/run-next-with-tauri-env.mjs dev",
     "build": "next build --webpack",
+    "build:tauri": "node src-tauri/scripts/run-next-with-tauri-env.mjs build",
+    "tauri:sidecar": "node src-tauri/scripts/build-sidecar.mjs",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -12,12 +15,16 @@
     "test": "jest",
     "coverage": "jest --coverage",
     "prettier": "prettier --write '**/*.{js,jsx,ts,tsx,json,css,html}'",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@hey-api/client-axios": "^0.9.1",
     "@hey-api/client-fetch": "^0.13.1",
+    "@tauri-apps/api": "^2.10.1",
     "axios": "^1.7.9",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-avatar": "^1.1.1",
@@ -51,6 +58,7 @@
     "@types/node": "^20",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
+    "@tauri-apps/cli": "^2.10.1",
     "@typescript-eslint/eslint-plugin": "^8.20.0",
     "autoprefixer": "^10.4.20",
     "chokidar": "^4.0.1",
