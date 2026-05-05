@@ -1,21 +1,87 @@
 "use client";
 
-import { DataTable } from "@/components/layout/data-table";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { portfolioToolsGetStockBorrow } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { dateColumn, textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type StockBorrowRow = {
+  id: number;
+  trade_date: string;
+  ticker: string;
+  company_name: string;
+  jpm_req: string;
+  jpm_firm: string;
+  borrow_rate: string;
+  bofa_req: string;
+  bofa_firm: string;
+};
 
 const columns = [
-  { key: "ticker", header: "Ticker" },
-  { key: "company_name", header: "Company" },
-  { key: "borrow_qty", header: "Borrow Qty", align: "right" as const },
-  { key: "rate", header: "Rate", align: "right" as const },
-  { key: "start_date", header: "Start Date" },
-  { key: "status", header: "Status", align: "center" as const },
+  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
+  textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
+  textColumn({ field: "jpm_req", header: "JPM Req", minWidth: 100, align: "right" }),
+  textColumn({ field: "jpm_firm", header: "JPM Firm", minWidth: 100 }),
+  textColumn({ field: "borrow_rate", header: "Borrow Rate", minWidth: 110, align: "right" }),
+  textColumn({ field: "bofa_req", header: "BofA Req", minWidth: 100, align: "right" }),
+  textColumn({ field: "bofa_firm", header: "BofA Firm", minWidth: 100 }),
 ];
 
-const mockData = [
-  { id: 1, ticker: "TSLA", company_name: "Tesla Inc.", borrow_qty: "10,000", rate: "0.50%", start_date: "2026-01-15", status: "Active" },
-  { id: 2, ticker: "GME", company_name: "GameStop", borrow_qty: "5,000", rate: "12.50%", start_date: "2026-02-01", status: "Active" },
-];
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
 export default function StockBorrowPage() {
-  return <DataTable columns={columns} data={mockData} />;
+  const router = useRouter();
+  const [rows, setRows] = useState<StockBorrowRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await portfolioToolsGetStockBorrow({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load stock borrow.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as StockBorrowRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  return (
+    <DataGrid<StockBorrowRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No stock borrow entries available."
+      searchPlaceholder="Search stock borrow…"
+    />
+  );
 }
