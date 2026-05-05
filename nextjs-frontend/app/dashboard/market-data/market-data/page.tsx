@@ -1,7 +1,11 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getMarketData } from "@/app/clientService";
 import { DataTable } from "@/components/layout/data-table";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
 
 const columns = [
   { key: "ticker", header: "Ticker" },
@@ -85,34 +89,74 @@ const mapMarketDataRows = (payload: unknown): MarketDataRow[] => {
   });
 };
 
-async function loadMarketData(): Promise<MarketDataRow[]> {
-  const token = (await cookies()).get("accessToken")?.value;
+export default function MarketDataPage() {
+  const router = useRouter();
+  const [marketData, setMarketData] = useState<MarketDataRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (!token) {
-    redirect("/login");
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadMarketData = async () => {
+      const token = getAuthToken();
+
+      if (!token) {
+        router.replace("/login");
+        return;
+      }
+
+      const response = await getMarketData({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const error = getApiError(response);
+
+      if (cancelled) {
+        return;
+      }
+
+      if (error) {
+        const status = getErrorStatus(error);
+
+        if (status === 401 || status === 403) {
+          router.replace("/login");
+          return;
+        }
+
+        setErrorMessage(getErrorMessage(error));
+        setIsLoading(false);
+        return;
+      }
+
+      setMarketData(mapMarketDataRows(getApiData(response)));
+      setErrorMessage(null);
+      setIsLoading(false);
+    };
+
+    void loadMarketData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[20rem] items-center justify-center text-sm text-[#a6adc8]">
+        Loading market data...
+      </div>
+    );
   }
 
-  const { data, error } = await getMarketData({
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (error) {
-    const status = getErrorStatus(error);
-
-    if (status === 401 || status === 403) {
-      redirect("/login");
-    }
-
-    throw new Error(getErrorMessage(error));
+  if (errorMessage) {
+    return (
+      <div className="rounded border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200">
+        {errorMessage}
+      </div>
+    );
   }
-
-  return mapMarketDataRows(data);
-}
-
-export default async function MarketDataPage() {
-  const marketData = await loadMarketData();
 
   return (
     <DataTable

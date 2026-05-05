@@ -169,3 +169,4 @@ ag-grid-demo/backend/.venv/
 
 # Playwright CLI
 .playwright-cli/
+.omx/

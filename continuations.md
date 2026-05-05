@@ -1,5 +1,63 @@
 # Portfolio Management Tool - Continuation Log
 
+## Current Status (2026-04-20)
+
+### Tauri dev watcher verification
+- Reviewed the `readdirp is not a function` diagnosis and confirmed the root cause was pnpm virtual-store corruption caused by an accidental npm-style install path. The repaired tree is healthy again:
+  - `nextjs-frontend/node_modules` is back to `706M`
+  - embedded transitive `chokidar` entries under `.pnpm/*/node_modules/chokidar` are symlinks again instead of copied directories
+- Re-ran `Module._resolveFilename` instrumentation against `pnpm exec next dev --webpack` and confirmed:
+  - parent: `.../.pnpm/chokidar@3.6.0/node_modules/chokidar/index.js`
+  - resolved `readdirp`: `.../.pnpm/readdirp@3.6.0/node_modules/readdirp/index.js`
+  - loaded export: `typeof function`
+- That means the current runtime no longer falls through to the hoisted `.pnpm/node_modules/readdirp@4.x` path.
+
+### Verification rerun results
+- `pnpm --dir nextjs-frontend build`: PASS
+- `TAURI_BUILD=1 NEXT_PUBLIC_DESKTOP_TARGET=1 NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 pnpm --dir nextjs-frontend build`: PASS
+- `pnpm --dir nextjs-frontend tauri dev`: PASS
+  - no `readdirp` matches in the full log
+  - `curl http://127.0.0.1:18475/api/health` returned `{"status":"ok","runtime":"desktop","database_backend":"sqlite"}`
+- `pnpm --dir nextjs-frontend tauri build --debug`: PASS
+  - completed static export, Rust compile, `.app` bundling, and DMG packaging
+  - produced both:
+    - `nextjs-frontend/src-tauri/target/debug/bundle/macos/Portfolio Management Tool.app`
+    - `nextjs-frontend/src-tauri/target/debug/bundle/dmg/Portfolio Management Tool_0.0.8_aarch64.dmg`
+- `pnpm --dir nextjs-frontend install --frozen-lockfile`: PASS, reported `Already up to date`
+- Additional adjacency checks:
+  - `pnpm --dir nextjs-frontend test`: PASS, `9/9` suites and `32/32` tests
+  - `pnpm --dir nextjs-frontend lint`: FAIL, but unrelated to `readdirp`
+
+### Important findings from this pass
+- `nextjs-frontend/watcher.js` is not dead code.
+  - `nextjs-frontend/start.sh` runs `node watcher.js`
+  - `nextjs-frontend/Dockerfile` uses `start.sh`
+  - a smoke test with `OPENAPI_OUTPUT_FILE` set confirmed the watcher fires on file change and invokes `pnpm run generate-client`
+- No `preinstall` hard-block for npm was added in this pass.
+  - Reason: the actual fix was already in place by removing `nextjs-frontend/package-lock.json` and restoring the pnpm virtual store with `pnpm install --frozen-lockfile`
+  - Keep `pnpm-lock.yaml` as the only frontend lockfile
+- Deleted the temporary investigation artifacts from `/tmp`:
+  - `/tmp/trace-readdirp.mjs`
+  - `/tmp/trace-readdirp2.cjs`
+  - `/tmp/patch-readdirp.cjs`
+  - `/tmp/unpatch-readdirp.cjs`
+  - `/tmp/tauri-dev.log`
+
+### Repo/doc changes made during this verification pass
+- Updated `docs/plans/tauri-implementation-plan.md` to reflect the newly observed behavior:
+  - `pnpm --dir nextjs-frontend tauri build --debug` now completes DMG packaging in this environment
+  - the old note about stalling at `bundle_dmg.sh` is obsolete
+- This continuation update is the only additional file edited in the repo during the save-log step.
+
+### Residual issues to remember
+- Frontend lint is currently red for reasons unrelated to the watcher fix:
+  - unused `waitFor` import in `nextjs-frontend/__tests__/loginPage.test.tsx`
+  - `no-undef` for Node globals in `nextjs-frontend/next.config.mjs`
+  - `no-undef` for Node globals in `nextjs-frontend/src-tauri/scripts/build-sidecar.mjs`
+  - `no-undef` for Node globals in `nextjs-frontend/src-tauri/scripts/run-next-with-tauri-env.mjs`
+  - linting of generated `nextjs-frontend/src-tauri/target/**` artifacts after Tauri build
+- Do not restore `nextjs-frontend/package-lock.json` unless there is hard evidence the repo has intentionally reverted from pnpm. Current evidence still says it was a stale footgun.
+
 ## Current Status (2026-03-22)
 
 ### PMT backend
