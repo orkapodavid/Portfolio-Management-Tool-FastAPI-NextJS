@@ -1,168 +1,112 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+
 import { getMarketData } from "@/app/clientService";
-import { DataTable } from "@/components/layout/data-table";
+import { DataGrid } from "@/components/grid/data-grid";
+import {
+  numberColumn,
+  percentColumn,
+  textColumn,
+} from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
 import { getApiData, getApiError } from "@/lib/utils";
-
-const columns = [
-  { key: "ticker", header: "Ticker" },
-  { key: "last_price", header: "Last Price", align: "right" as const },
-  { key: "bid", header: "Bid", align: "right" as const },
-  { key: "ask", header: "Ask", align: "right" as const },
-  { key: "vwap_price", header: "VWAP", align: "right" as const },
-  { key: "last_volume", header: "Volume", align: "right" as const },
-  { key: "chg_1d_pct", header: "Chg 1D%", align: "right" as const },
-  { key: "implied_vol_pct", header: "Impl Vol%", align: "right" as const },
-  { key: "market_status", header: "Status", align: "center" as const },
-];
 
 type MarketDataRow = {
   id: number;
   ticker: string;
+  listed_shares: string;
+  last_volume: string;
   last_price: string;
+  vwap_price: string;
   bid: string;
   ask: string;
-  vwap_price: string;
-  last_volume: string;
   chg_1d_pct: string;
   implied_vol_pct: string;
   market_status: string;
+  created_by: string;
 };
 
-const toStringValue = (value: unknown) =>
-  typeof value === "string" || typeof value === "number" ? String(value) : "";
+const columns = [
+  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  numberColumn({ field: "listed_shares", header: "Listed Shares (mm)", minWidth: 130 }),
+  numberColumn({ field: "last_volume", header: "Last Volume", minWidth: 110 }),
+  numberColumn({ field: "last_price", header: "Last Price", minWidth: 100 }),
+  numberColumn({ field: "vwap_price", header: "vWAP Price", minWidth: 100 }),
+  numberColumn({ field: "bid", header: "Bid", minWidth: 80 }),
+  numberColumn({ field: "ask", header: "Ask", minWidth: 80 }),
+  percentColumn({ field: "chg_1d_pct", header: "1D Change %", minWidth: 110 }),
+  percentColumn({ field: "implied_vol_pct", header: "Implied Vol %", minWidth: 110, colorBySign: false }),
+  textColumn({ field: "market_status", header: "Market Status", minWidth: 120 }),
+  textColumn({ field: "created_by", header: "Created by", minWidth: 100 }),
+];
 
-const toNumberValue = (value: unknown) =>
-  typeof value === "number" ? value : Number(value) || 0;
-
-const getErrorStatus = (error: unknown) => {
+const getErrorStatus = (error: unknown): number | undefined => {
   if (typeof error !== "object" || error === null || !("response" in error)) {
     return undefined;
   }
-
   const { response } = error as { response?: { status?: number } };
   return response?.status;
 };
 
-const getErrorMessage = (error: unknown) => {
-  if (typeof error !== "object" || error === null) {
-    return "Failed to load market data.";
+const extractMessage = (error: unknown): string => {
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const { message } = error as { message?: unknown };
+    if (typeof message === "string") return message;
   }
-
-  if ("message" in error && typeof error.message === "string") {
-    return error.message;
-  }
-
-  if ("error" in error && typeof error.error === "object" && error.error) {
-    const apiError = error.error as { detail?: unknown };
-    if (typeof apiError.detail === "string") {
-      return apiError.detail;
-    }
-  }
-
   return "Failed to load market data.";
-};
-
-const mapMarketDataRows = (payload: unknown): MarketDataRow[] => {
-  if (!Array.isArray(payload)) {
-    return [];
-  }
-
-  return payload.map((entry, index) => {
-    const row = entry as Record<string, unknown>;
-
-    return {
-      id: toNumberValue(row.id ?? index),
-      ticker: toStringValue(row.ticker),
-      last_price: toStringValue(row.last_price),
-      bid: toStringValue(row.bid),
-      ask: toStringValue(row.ask),
-      vwap_price: toStringValue(row.vwap_price),
-      last_volume: toStringValue(row.last_volume),
-      chg_1d_pct: toStringValue(row.chg_1d_pct),
-      implied_vol_pct: toStringValue(row.implied_vol_pct),
-      market_status: toStringValue(row.market_status),
-    };
-  });
 };
 
 export default function MarketDataPage() {
   const router = useRouter();
-  const [marketData, setMarketData] = useState<MarketDataRow[]>([]);
+  const [rows, setRows] = useState<MarketDataRow[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    let cancelled = false;
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
 
-    const loadMarketData = async () => {
-      const token = getAuthToken();
+    const response = await getMarketData({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
 
-      if (!token) {
+    if (error) {
+      const status = getErrorStatus(error);
+      if (status === 401 || status === 403) {
         router.replace("/login");
         return;
       }
-
-      const response = await getMarketData({
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const error = getApiError(response);
-
-      if (cancelled) {
-        return;
-      }
-
-      if (error) {
-        const status = getErrorStatus(error);
-
-        if (status === 401 || status === 403) {
-          router.replace("/login");
-          return;
-        }
-
-        setErrorMessage(getErrorMessage(error));
-        setIsLoading(false);
-        return;
-      }
-
-      setMarketData(mapMarketDataRows(getApiData(response)));
-      setErrorMessage(null);
+      setErrorMessage(extractMessage(error));
       setIsLoading(false);
-    };
+      return;
+    }
 
-    void loadMarketData();
-
-    return () => {
-      cancelled = true;
-    };
+    setRows((getApiData(response) as MarketDataRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
   }, [router]);
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-[20rem] items-center justify-center text-sm text-[#a6adc8]">
-        Loading market data...
-      </div>
-    );
-  }
-
-  if (errorMessage) {
-    return (
-      <div className="rounded border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-200">
-        {errorMessage}
-      </div>
-    );
-  }
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   return (
-    <DataTable
+    <DataGrid<MarketDataRow>
       columns={columns}
-      data={marketData}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      rowIdKey="ticker"
       emptyMessage="Market data is unavailable."
+      searchPlaceholder="Search market data…"
     />
   );
 }
