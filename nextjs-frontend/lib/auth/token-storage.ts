@@ -2,6 +2,11 @@ import { isDesktopTarget } from "@/lib/runtime-config";
 
 const ACCESS_TOKEN_KEY = "accessToken";
 const ACCESS_TOKEN_MAX_AGE_SECONDS = 60 * 60;
+const NOAUTH_PLACEHOLDER_TOKEN = "no-auth";
+
+function isAuthDisabled(): boolean {
+  return process.env.NEXT_PUBLIC_AUTH_DISABLED === "1";
+}
 
 function readCookie(name: string): string | null {
   if (typeof document === "undefined") {
@@ -58,6 +63,10 @@ function removeCookie(name: string) {
 }
 
 export function getAuthToken(): string | null {
+  if (isAuthDisabled()) {
+    return NOAUTH_PLACEHOLDER_TOKEN;
+  }
+
   if (typeof window === "undefined") {
     return null;
   }

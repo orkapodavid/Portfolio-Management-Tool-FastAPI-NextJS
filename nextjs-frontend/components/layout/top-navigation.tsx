@@ -142,16 +142,18 @@ export function TopNavigation() {
             )}
           </div>
         </button>
-        <button
-          type="button"
-          title="Log out"
-          onClick={() => {
-            void handleLogout();
-          }}
-          className="p-1 rounded-md hover:bg-white/10 transition-all duration-200"
-        >
-          <User size={16} className="text-gray-400 hover:text-white" />
-        </button>
+        {process.env.NEXT_PUBLIC_AUTH_DISABLED !== "1" && (
+          <button
+            type="button"
+            title="Log out"
+            onClick={() => {
+              void handleLogout();
+            }}
+            className="p-1 rounded-md hover:bg-white/10 transition-all duration-200"
+          >
+            <User size={16} className="text-gray-400 hover:text-white" />
+          </button>
+        )}
       </div>
     </nav>
   );

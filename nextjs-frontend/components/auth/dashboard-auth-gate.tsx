@@ -15,6 +15,11 @@ export function DashboardAuthGate({ children }: DashboardAuthGateProps) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    if (process.env.NEXT_PUBLIC_AUTH_DISABLED === "1") {
+      setIsReady(true);
+      return;
+    }
+
     let cancelled = false;
 
     const validateSession = async () => {
