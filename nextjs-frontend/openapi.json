@@ -2004,6 +2004,100 @@
         }
       }
     },
+    "/api/risk/pricer/warrant": {
+      "post": {
+        "tags": [
+          "risk"
+        ],
+        "summary": "Price Warrant",
+        "description": "Run the warrant pricer with the 21 Term + 7 Simulation inputs.\n\nMirrors the Reflex `pricer_warrant_view` calculate handler. The chart\nseries is the 2D payoff curve (Spot vs Value/Delta/Gamma) computed\nby `WarrantPricer.generate_payoff_curve`.",
+        "operationId": "risk-price_warrant",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WarrantPricerInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WarrantPricerOutput"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/risk/pricer/bond": {
+      "post": {
+        "tags": [
+          "risk"
+        ],
+        "summary": "Price Bond",
+        "description": "Run the convertible-bond pricer with the full Term + Simulation set.\n\nMirrors the Reflex `pricer_bond_view` calculate handler. The chart\nseries is the 2D yield-vs-maturity (or other axis pair) curve.",
+        "operationId": "risk-price_bond",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BondPricerInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BondPricerOutput"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/api/compliance/restricted-list": {
       "get": {
         "tags": [
@@ -3265,6 +3359,200 @@
         ],
         "title": "Body_auth-verify:verify"
       },
+      "BondCurve": {
+        "properties": {
+          "x_values": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "X Values"
+          },
+          "y_values": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Y Values"
+          },
+          "x_label": {
+            "type": "string",
+            "title": "X Label"
+          },
+          "y_label": {
+            "type": "string",
+            "title": "Y Label"
+          }
+        },
+        "type": "object",
+        "required": [
+          "x_values",
+          "y_values",
+          "x_label",
+          "y_label"
+        ],
+        "title": "BondCurve"
+      },
+      "BondPricerInput": {
+        "properties": {
+          "spot_price": {
+            "type": "number",
+            "title": "Spot Price"
+          },
+          "strike_price": {
+            "type": "number",
+            "title": "Strike Price"
+          },
+          "notional": {
+            "type": "number",
+            "title": "Notional",
+            "default": 100
+          },
+          "coupon_rate": {
+            "type": "number",
+            "title": "Coupon Rate",
+            "default": 0
+          },
+          "redemption_rate": {
+            "type": "number",
+            "title": "Redemption Rate",
+            "default": 1
+          },
+          "volatility": {
+            "type": "number",
+            "title": "Volatility",
+            "default": 0.3
+          },
+          "interest_rate": {
+            "type": "number",
+            "title": "Interest Rate",
+            "default": 0.005
+          },
+          "borrow_rate_bps": {
+            "type": "integer",
+            "title": "Borrow Rate Bps",
+            "default": 0
+          },
+          "credit_spread_bps": {
+            "type": "integer",
+            "title": "Credit Spread Bps",
+            "default": 0
+          },
+          "time_to_maturity_years": {
+            "type": "number",
+            "title": "Time To Maturity Years",
+            "default": 1
+          },
+          "min_exe_disc": {
+            "type": "number",
+            "title": "Min Exe Disc",
+            "default": 0
+          },
+          "exec_redeemed": {
+            "type": "integer",
+            "title": "Exec Redeemed",
+            "default": 0
+          },
+          "seed": {
+            "type": "integer",
+            "title": "Seed",
+            "default": 0
+          },
+          "trial_num": {
+            "type": "integer",
+            "title": "Trial Num",
+            "default": 5
+          },
+          "simulation_num": {
+            "type": "integer",
+            "title": "Simulation Num",
+            "default": 100
+          },
+          "jump_lambda": {
+            "type": "number",
+            "title": "Jump Lambda",
+            "default": 0
+          },
+          "jump_mean": {
+            "type": "number",
+            "title": "Jump Mean",
+            "default": 0
+          },
+          "jump_std_dev": {
+            "type": "number",
+            "title": "Jump Std Dev",
+            "default": 0.2
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency",
+            "default": "JPY"
+          },
+          "x_axis": {
+            "type": "string",
+            "title": "X Axis",
+            "default": "Maturity"
+          },
+          "y_axis": {
+            "type": "string",
+            "title": "Y Axis",
+            "default": "Yield"
+          }
+        },
+        "type": "object",
+        "required": [
+          "spot_price",
+          "strike_price"
+        ],
+        "title": "BondPricerInput"
+      },
+      "BondPricerOutput": {
+        "properties": {
+          "fair_value": {
+            "type": "number",
+            "title": "Fair Value"
+          },
+          "delta": {
+            "type": "number",
+            "title": "Delta"
+          },
+          "expected_discount": {
+            "type": "number",
+            "title": "Expected Discount"
+          },
+          "bond_delta": {
+            "type": "number",
+            "title": "Bond Delta"
+          },
+          "bond_floor": {
+            "type": "number",
+            "title": "Bond Floor"
+          },
+          "bond_parity": {
+            "type": "number",
+            "title": "Bond Parity"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "yield_curve": {
+            "$ref": "#/components/schemas/BondCurve"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fair_value",
+          "delta",
+          "expected_discount",
+          "bond_delta",
+          "bond_floor",
+          "bond_parity",
+          "currency",
+          "yield_curve"
+        ],
+        "title": "BondPricerOutput"
+      },
       "ErrorModel": {
         "properties": {
           "detail": {
@@ -3448,6 +3736,36 @@
           "size"
         ],
         "title": "Page[ItemRead]"
+      },
+      "PayoffCurve": {
+        "properties": {
+          "x_values": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "X Values"
+          },
+          "y_values": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Y Values"
+          },
+          "y_type": {
+            "type": "string",
+            "title": "Y Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "x_values",
+          "y_values",
+          "y_type"
+        ],
+        "title": "PayoffCurve",
+        "description": "2D curve series for the pricer chart (Spot vs Value/Delta/Gamma)."
       },
       "UserCreate": {
         "properties": {
@@ -3633,6 +3951,134 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "WarrantPricerInput": {
+        "properties": {
+          "spot_price": {
+            "type": "number",
+            "title": "Spot Price",
+            "description": "Current spot price of the underlying"
+          },
+          "strike_price": {
+            "type": "number",
+            "title": "Strike Price",
+            "description": "Strike price of the warrant"
+          },
+          "volatility": {
+            "type": "number",
+            "title": "Volatility",
+            "default": 0.3
+          },
+          "interest_rate": {
+            "type": "number",
+            "title": "Interest Rate",
+            "default": 0.005
+          },
+          "borrow_rate_bps": {
+            "type": "integer",
+            "title": "Borrow Rate Bps",
+            "default": 0
+          },
+          "time_to_maturity_years": {
+            "type": "number",
+            "title": "Time To Maturity Years",
+            "default": 1
+          },
+          "min_exe_disc": {
+            "type": "number",
+            "title": "Min Exe Disc",
+            "default": 0
+          },
+          "reset_lookback_days": {
+            "type": "integer",
+            "title": "Reset Lookback Days",
+            "default": 10
+          },
+          "reset_multiplier": {
+            "type": "number",
+            "title": "Reset Multiplier",
+            "default": 0.9
+          },
+          "seed": {
+            "type": "integer",
+            "title": "Seed",
+            "default": 0
+          },
+          "trial_num": {
+            "type": "integer",
+            "title": "Trial Num",
+            "default": 5
+          },
+          "simulation_num": {
+            "type": "integer",
+            "title": "Simulation Num",
+            "default": 100
+          },
+          "jump_lambda": {
+            "type": "number",
+            "title": "Jump Lambda",
+            "default": 0
+          },
+          "jump_mean": {
+            "type": "number",
+            "title": "Jump Mean",
+            "default": 0
+          },
+          "jump_std_dev": {
+            "type": "number",
+            "title": "Jump Std Dev",
+            "default": 0.2
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency",
+            "default": "JPY"
+          },
+          "y_axis": {
+            "type": "string",
+            "title": "Y Axis",
+            "description": "Chart Y-axis metric (Value, Delta, Gamma)",
+            "default": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "spot_price",
+          "strike_price"
+        ],
+        "title": "WarrantPricerInput"
+      },
+      "WarrantPricerOutput": {
+        "properties": {
+          "fair_value": {
+            "type": "number",
+            "title": "Fair Value"
+          },
+          "delta": {
+            "type": "number",
+            "title": "Delta"
+          },
+          "expected_discount": {
+            "type": "number",
+            "title": "Expected Discount"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "payoff_curve": {
+            "$ref": "#/components/schemas/PayoffCurve"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fair_value",
+          "delta",
+          "expected_discount",
+          "currency",
+          "payoff_curve"
+        ],
+        "title": "WarrantPricerOutput"
       },
       "login": {
         "properties": {

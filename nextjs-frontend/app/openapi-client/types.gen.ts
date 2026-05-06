@@ -59,6 +59,153 @@ export type BodyAuthVerifyVerify = {
 };
 
 /**
+ * BondCurve
+ */
+export type BondCurve = {
+  /**
+   * X Values
+   */
+  x_values: Array<number>;
+  /**
+   * Y Values
+   */
+  y_values: Array<number>;
+  /**
+   * X Label
+   */
+  x_label: string;
+  /**
+   * Y Label
+   */
+  y_label: string;
+};
+
+/**
+ * BondPricerInput
+ */
+export type BondPricerInput = {
+  /**
+   * Spot Price
+   */
+  spot_price: number;
+  /**
+   * Strike Price
+   */
+  strike_price: number;
+  /**
+   * Notional
+   */
+  notional?: number;
+  /**
+   * Coupon Rate
+   */
+  coupon_rate?: number;
+  /**
+   * Redemption Rate
+   */
+  redemption_rate?: number;
+  /**
+   * Volatility
+   */
+  volatility?: number;
+  /**
+   * Interest Rate
+   */
+  interest_rate?: number;
+  /**
+   * Borrow Rate Bps
+   */
+  borrow_rate_bps?: number;
+  /**
+   * Credit Spread Bps
+   */
+  credit_spread_bps?: number;
+  /**
+   * Time To Maturity Years
+   */
+  time_to_maturity_years?: number;
+  /**
+   * Min Exe Disc
+   */
+  min_exe_disc?: number;
+  /**
+   * Exec Redeemed
+   */
+  exec_redeemed?: number;
+  /**
+   * Seed
+   */
+  seed?: number;
+  /**
+   * Trial Num
+   */
+  trial_num?: number;
+  /**
+   * Simulation Num
+   */
+  simulation_num?: number;
+  /**
+   * Jump Lambda
+   */
+  jump_lambda?: number;
+  /**
+   * Jump Mean
+   */
+  jump_mean?: number;
+  /**
+   * Jump Std Dev
+   */
+  jump_std_dev?: number;
+  /**
+   * Currency
+   */
+  currency?: string;
+  /**
+   * X Axis
+   */
+  x_axis?: string;
+  /**
+   * Y Axis
+   */
+  y_axis?: string;
+};
+
+/**
+ * BondPricerOutput
+ */
+export type BondPricerOutput = {
+  /**
+   * Fair Value
+   */
+  fair_value: number;
+  /**
+   * Delta
+   */
+  delta: number;
+  /**
+   * Expected Discount
+   */
+  expected_discount: number;
+  /**
+   * Bond Delta
+   */
+  bond_delta: number;
+  /**
+   * Bond Floor
+   */
+  bond_floor: number;
+  /**
+   * Bond Parity
+   */
+  bond_parity: number;
+  /**
+   * Currency
+   */
+  currency: string;
+  yield_curve: BondCurve;
+};
+
+/**
  * ErrorModel
  */
 export type ErrorModel = {
@@ -150,6 +297,25 @@ export type PageItemRead = {
    * Pages
    */
   pages?: number | null;
+};
+
+/**
+ * PayoffCurve
+ * 2D curve series for the pricer chart (Spot vs Value/Delta/Gamma).
+ */
+export type PayoffCurve = {
+  /**
+   * X Values
+   */
+  x_values: Array<number>;
+  /**
+   * Y Values
+   */
+  y_values: Array<number>;
+  /**
+   * Y Type
+   */
+  y_type: string;
 };
 
 /**
@@ -246,6 +412,106 @@ export type ValidationError = {
    * Error Type
    */
   type: string;
+};
+
+/**
+ * WarrantPricerInput
+ */
+export type WarrantPricerInput = {
+  /**
+   * Spot Price
+   * Current spot price of the underlying
+   */
+  spot_price: number;
+  /**
+   * Strike Price
+   * Strike price of the warrant
+   */
+  strike_price: number;
+  /**
+   * Volatility
+   */
+  volatility?: number;
+  /**
+   * Interest Rate
+   */
+  interest_rate?: number;
+  /**
+   * Borrow Rate Bps
+   */
+  borrow_rate_bps?: number;
+  /**
+   * Time To Maturity Years
+   */
+  time_to_maturity_years?: number;
+  /**
+   * Min Exe Disc
+   */
+  min_exe_disc?: number;
+  /**
+   * Reset Lookback Days
+   */
+  reset_lookback_days?: number;
+  /**
+   * Reset Multiplier
+   */
+  reset_multiplier?: number;
+  /**
+   * Seed
+   */
+  seed?: number;
+  /**
+   * Trial Num
+   */
+  trial_num?: number;
+  /**
+   * Simulation Num
+   */
+  simulation_num?: number;
+  /**
+   * Jump Lambda
+   */
+  jump_lambda?: number;
+  /**
+   * Jump Mean
+   */
+  jump_mean?: number;
+  /**
+   * Jump Std Dev
+   */
+  jump_std_dev?: number;
+  /**
+   * Currency
+   */
+  currency?: string;
+  /**
+   * Y Axis
+   * Chart Y-axis metric (Value, Delta, Gamma)
+   */
+  y_axis?: string;
+};
+
+/**
+ * WarrantPricerOutput
+ */
+export type WarrantPricerOutput = {
+  /**
+   * Fair Value
+   */
+  fair_value: number;
+  /**
+   * Delta
+   */
+  delta: number;
+  /**
+   * Expected Discount
+   */
+  expected_discount: number;
+  /**
+   * Currency
+   */
+  currency: string;
+  payoff_curve: PayoffCurve;
 };
 
 /**
@@ -1401,6 +1667,59 @@ export type RiskGetRiskInputsResponses = {
    */
   200: unknown;
 };
+
+export type RiskPriceWarrantData = {
+  body: WarrantPricerInput;
+  path?: never;
+  query?: never;
+  url: "/api/risk/pricer/warrant";
+};
+
+export type RiskPriceWarrantErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type RiskPriceWarrantError =
+  RiskPriceWarrantErrors[keyof RiskPriceWarrantErrors];
+
+export type RiskPriceWarrantResponses = {
+  /**
+   * Successful Response
+   */
+  200: WarrantPricerOutput;
+};
+
+export type RiskPriceWarrantResponse =
+  RiskPriceWarrantResponses[keyof RiskPriceWarrantResponses];
+
+export type RiskPriceBondData = {
+  body: BondPricerInput;
+  path?: never;
+  query?: never;
+  url: "/api/risk/pricer/bond";
+};
+
+export type RiskPriceBondErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type RiskPriceBondError = RiskPriceBondErrors[keyof RiskPriceBondErrors];
+
+export type RiskPriceBondResponses = {
+  /**
+   * Successful Response
+   */
+  200: BondPricerOutput;
+};
+
+export type RiskPriceBondResponse =
+  RiskPriceBondResponses[keyof RiskPriceBondResponses];
 
 export type ComplianceGetRestrictedListData = {
   body?: never;

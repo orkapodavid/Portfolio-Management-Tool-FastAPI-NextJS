@@ -118,6 +118,12 @@ import type {
   RiskGetRiskInputsData,
   RiskGetRiskInputsResponses,
   RiskGetRiskInputsErrors,
+  RiskPriceWarrantData,
+  RiskPriceWarrantResponses,
+  RiskPriceWarrantErrors,
+  RiskPriceBondData,
+  RiskPriceBondResponses,
+  RiskPriceBondErrors,
   ComplianceGetRestrictedListData,
   ComplianceGetRestrictedListResponses,
   ComplianceGetUndertakingsData,
@@ -1115,6 +1121,69 @@ export const riskGetRiskInputs = <ThrowOnError extends boolean = false>(
     ],
     url: "/api/risk/inputs",
     ...options,
+  });
+};
+
+/**
+ * Price Warrant
+ * Run the warrant pricer with the 21 Term + 7 Simulation inputs.
+ *
+ * Mirrors the Reflex `pricer_warrant_view` calculate handler. The chart
+ * series is the 2D payoff curve (Spot vs Value/Delta/Gamma) computed
+ * by `WarrantPricer.generate_payoff_curve`.
+ */
+export const riskPriceWarrant = <ThrowOnError extends boolean = false>(
+  options: Options<RiskPriceWarrantData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    RiskPriceWarrantResponses,
+    RiskPriceWarrantErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/risk/pricer/warrant",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+};
+
+/**
+ * Price Bond
+ * Run the convertible-bond pricer with the full Term + Simulation set.
+ *
+ * Mirrors the Reflex `pricer_bond_view` calculate handler. The chart
+ * series is the 2D yield-vs-maturity (or other axis pair) curve.
+ */
+export const riskPriceBond = <ThrowOnError extends boolean = false>(
+  options: Options<RiskPriceBondData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    RiskPriceBondResponses,
+    RiskPriceBondErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/risk/pricer/bond",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
   });
 };
 
