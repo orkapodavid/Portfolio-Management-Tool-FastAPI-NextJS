@@ -27,9 +27,9 @@ type PnlSummaryRow = {
 };
 
 const columns = [
-  dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
-  textColumn({ field: "underlying", header: "Underlying", pinned: "left", minWidth: 100 }),
-  textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
+  dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100, enableRowGroup: true }),
+  textColumn({ field: "underlying", header: "Underlying", pinned: "left", minWidth: 100, enableRowGroup: true }),
+  textColumn({ field: "currency", header: "Currency", minWidth: 90, enableRowGroup: true }),
   textColumn({ field: "price", header: "Price", minWidth: 90, align: "right" }),
   textColumn({ field: "price_t_1", header: "Price (T-1)", minWidth: 100, align: "right" }),
   textColumn({ field: "price_change", header: "Price Change", minWidth: 110, align: "right" }),
@@ -37,8 +37,8 @@ const columns = [
   textColumn({ field: "fx_rate_t_1", header: "FX Rate (T-1)", minWidth: 110, align: "right" }),
   textColumn({ field: "fx_rate_change", header: "FX Rate Change", minWidth: 120, align: "right" }),
   textColumn({ field: "dtl", header: "DTL", minWidth: 80 }),
-  textColumn({ field: "last_volume", header: "Last Volume", minWidth: 100, align: "right" }),
-  textColumn({ field: "adv_3m", header: "ADV 3M", minWidth: 90, align: "right" }),
+  textColumn({ field: "last_volume", header: "Last Volume", minWidth: 100, align: "right", enableRowGroup: true, aggFunc: "sum" }),
+  textColumn({ field: "adv_3m", header: "ADV 3M", minWidth: 90, align: "right", enableRowGroup: true, aggFunc: "avg" }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
@@ -105,6 +105,8 @@ export default function PnlSummaryPage() {
       rowIdKey="underlying"
       showCompactToggle
       showAutoRefresh
+      showRowGroupPanel
+      groupDefaultExpanded={-1}
       showRowNumbers
       enableMultiSelect
       enableCellFlash

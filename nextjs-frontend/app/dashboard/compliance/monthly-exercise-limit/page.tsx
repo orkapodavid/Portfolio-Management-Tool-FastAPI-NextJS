@@ -24,15 +24,15 @@ type MonthlyExerciseLimitRow = {
 };
 
 const columns = [
-  textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({ field: "underlying", header: "Underlying", minWidth: 100, enableRowGroup: true }),
+  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100, enableRowGroup: true }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
-  textColumn({ field: "sec_type", header: "Sec Type", minWidth: 90 }),
+  textColumn({ field: "sec_type", header: "Sec Type", minWidth: 90, enableRowGroup: true }),
   textColumn({ field: "original_nosh", header: "Original Nosh", minWidth: 110, align: "right" }),
-  textColumn({ field: "original_quantity", header: "Original Quantity", minWidth: 120, align: "right" }),
-  textColumn({ field: "monthly_exercised_quantity", header: "Monthly Exercised Qty", minWidth: 150, align: "right" }),
-  textColumn({ field: "monthly_exercised_pct", header: "Monthly Exercised %", minWidth: 130, align: "right" }),
-  textColumn({ field: "monthly_sal", header: "Monthly Sal", minWidth: 100, align: "right" }),
+  textColumn({ field: "original_quantity", header: "Original Quantity", minWidth: 120, align: "right", aggFunc: "sum" }),
+  textColumn({ field: "monthly_exercised_quantity", header: "Monthly Exercised Qty", minWidth: 150, align: "right", aggFunc: "sum" }),
+  textColumn({ field: "monthly_exercised_pct", header: "Monthly Exercised %", minWidth: 130, align: "right", aggFunc: "avg" }),
+  textColumn({ field: "monthly_sal", header: "Monthly Sal", minWidth: 100, align: "right", aggFunc: "sum" }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
@@ -99,6 +99,8 @@ export default function MonthlyExerciseLimitPage() {
     <DataGrid<MonthlyExerciseLimitRow>
       gridId="monthly_exercise_limit_grid"
       showCompactToggle
+      showRowGroupPanel
+      groupDefaultExpanded={-1}
       showRowNumbers
       enableMultiSelect
       enableCellFlash

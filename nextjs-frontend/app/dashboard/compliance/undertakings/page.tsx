@@ -22,11 +22,11 @@ type UndertakingRow = {
 
 const columns = [
   textColumn({ field: "deal_num", header: "Deal Num", minWidth: 90 }),
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100, enableRowGroup: true }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
-  textColumn({ field: "account", header: "Account", minWidth: 100 }),
+  textColumn({ field: "account", header: "Account", minWidth: 100, enableRowGroup: true }),
   textColumn({ field: "undertaking_expiry", header: "Undertaking Expiry", minWidth: 130 }),
-  textColumn({ field: "undertaking_type", header: "Undertaking Type", minWidth: 120 }),
+  textColumn({ field: "undertaking_type", header: "Undertaking Type", minWidth: 120, enableRowGroup: true }),
   textColumn({ field: "undertaking_details", header: "Undertaking Details", minWidth: 150 }),
 ];
 
@@ -75,6 +75,8 @@ export default function UndertakingsPage() {
     <DataGrid<UndertakingRow>
       gridId="undertakings_grid"
       showCompactToggle
+      showRowGroupPanel
+      groupDefaultExpanded={-1}
       showRowNumbers
       enableMultiSelect
       enableCellFlash
