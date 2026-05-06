@@ -38,6 +38,7 @@ const CATEGORY_TO_TYPE: Record<string, NotificationType> = {
 };
 
 const NOTIFICATION_FETCH_LIMIT = 200;
+const SIDEBAR_OPEN_STORAGE_KEY = "pmt:next:notificationSidebarOpen";
 
 type RawNotification = {
   id?: string | number;
@@ -92,7 +93,7 @@ const NotificationsContext = createContext<NotificationsContextValue | null>(
 
 export function NotificationsProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpenState] = useState(true);
   const [filter, setFilter] = useState<FilterValue>("all");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -124,8 +125,29 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     void refresh();
   }, [refresh]);
 
-  const toggleOpen = useCallback(() => setIsOpen((prev) => !prev), []);
-  const setOpen = useCallback((next: boolean) => setIsOpen(next), []);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem(SIDEBAR_OPEN_STORAGE_KEY);
+    if (stored === null) return;
+    setIsOpenState(stored === "true");
+  }, []);
+
+  const setOpen = useCallback((next: boolean) => {
+    setIsOpenState(next);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(SIDEBAR_OPEN_STORAGE_KEY, String(next));
+    }
+  }, []);
+
+  const toggleOpen = useCallback(() => {
+    setIsOpenState((prev) => {
+      const next = !prev;
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(SIDEBAR_OPEN_STORAGE_KEY, String(next));
+      }
+      return next;
+    });
+  }, []);
 
   const markRead = useCallback((id: string) => {
     setNotifications((prev) =>
