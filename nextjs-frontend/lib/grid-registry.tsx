@@ -43,6 +43,7 @@ type PendingHighlight = {
 };
 
 export const PENDING_HIGHLIGHT_STORAGE_KEY = "pmt:next:pendingHighlight";
+const PENDING_HIGHLIGHT_RETRY_TIMEOUT_MS = 15_000;
 
 const GridRegistryContext = createContext<GridRegistryContextValue | null>(null);
 
@@ -173,7 +174,10 @@ export function GridRegistryProvider({ children }: { children: ReactNode }) {
             }
             return false;
           }
-          if (Date.now() - startedAt > 10_000 && retryId !== null) {
+          if (
+            Date.now() - startedAt > PENDING_HIGHLIGHT_RETRY_TIMEOUT_MS &&
+            retryId !== null
+          ) {
             window.clearInterval(retryId);
             retryId = null;
             return false;

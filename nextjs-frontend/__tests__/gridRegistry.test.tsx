@@ -121,6 +121,45 @@ describe("GridRegistry", () => {
     expect(window.sessionStorage.getItem(PENDING_HIGHLIGHT_STORAGE_KEY)).toBeNull();
   });
 
+  it("keeps retrying pending highlights beyond 10 seconds", () => {
+    jest.useFakeTimers();
+    const node: RowNodeLike = { id: "row-AAPL", data: { ticker: "AAPL" } };
+    let rowIsLoaded = false;
+    const api: GridApiLike = {
+      getRowNode: jest.fn(() => undefined),
+      forEachNode: jest.fn((cb) => {
+        if (rowIsLoaded) cb(node);
+      }),
+      ensureNodeVisible: jest.fn(),
+      flashCells: jest.fn(),
+    };
+    window.sessionStorage.setItem(
+      PENDING_HIGHLIGHT_STORAGE_KEY,
+      JSON.stringify({
+        gridId: "pnl_change_grid",
+        rowId: "AAPL",
+        rowIdKey: "ticker",
+      })
+    );
+    const { result } = renderHook(() => useGridRegistry(), { wrapper });
+
+    act(() => {
+      result.current!.register("pnl_change_grid", { api, rowIdKey: "ticker" });
+      jest.advanceTimersByTime(10_200);
+    });
+    expect(api.ensureNodeVisible).not.toHaveBeenCalled();
+    expect(window.sessionStorage.getItem(PENDING_HIGHLIGHT_STORAGE_KEY)).not.toBeNull();
+
+    rowIsLoaded = true;
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
+
+    expect(api.ensureNodeVisible).toHaveBeenCalledWith(node, "middle");
+    expect(api.flashCells).toHaveBeenCalledWith({ rowNodes: [node] });
+    expect(window.sessionStorage.getItem(PENDING_HIGHLIGHT_STORAGE_KEY)).toBeNull();
+  });
+
   it("re-applies the sticky highlight every 200ms and clears it after 1.8s", () => {
     jest.useFakeTimers();
     const { api } = buildApi();
