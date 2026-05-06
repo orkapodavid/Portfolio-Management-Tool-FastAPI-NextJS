@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { eventsGetReverseInquiries } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
+import { SingleDateFilterBar } from "@/components/grid/filter-bar";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
 import { reverseInquirySimulator } from "@/lib/grid-simulators/events";
@@ -41,8 +42,10 @@ export default function ReverseInquiryPage() {
   const [rows, setRows] = useState<ReverseInquiryRow[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [draftDate, setDraftDate] = useState("");
+  const [appliedDate, setAppliedDate] = useState("");
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (date: string) => {
     setIsLoading(true);
     const token = getAuthToken();
     if (!token) {
@@ -51,6 +54,7 @@ export default function ReverseInquiryPage() {
     }
     const response = await eventsGetReverseInquiries({
       headers: { Authorization: `Bearer ${token}` },
+      query: date ? { position_date: date } : undefined,
     });
     const error = getApiError(response);
     if (error) {
@@ -69,8 +73,19 @@ export default function ReverseInquiryPage() {
   }, [router]);
 
   useEffect(() => {
-    void load();
+    void load("");
   }, [load]);
+
+  const onApply = () => {
+    setAppliedDate(draftDate);
+    void load(draftDate);
+  };
+
+  const onClear = () => {
+    setDraftDate("");
+    setAppliedDate("");
+    void load("");
+  };
 
   return (
     <DataGrid<ReverseInquiryRow>
@@ -84,10 +99,20 @@ export default function ReverseInquiryPage() {
       rows={rows}
       isLoading={isLoading}
       errorMessage={errorMessage}
-      onRefresh={load}
+      onRefresh={() => load(appliedDate)}
       simulateUpdate={reverseInquirySimulator}
       emptyMessage="No reverse inquiries available."
       searchPlaceholder="Search reverse inquiries…"
+      filterBar={
+        <SingleDateFilterBar
+          label="Position Date"
+          value={draftDate}
+          onChange={setDraftDate}
+          onApply={onApply}
+          onClear={onClear}
+          hasActiveFilters={Boolean(appliedDate)}
+        />
+      }
     />
   );
 }
