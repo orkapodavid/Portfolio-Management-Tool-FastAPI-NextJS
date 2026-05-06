@@ -2,12 +2,13 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Calculator } from "lucide-react";
+import { Calculator, Info } from "lucide-react";
 
 import { riskPriceWarrant } from "@/app/clientService";
 import { PayoffChart } from "@/components/risk/payoff-chart";
 import { getAuthToken } from "@/lib/auth/token-storage";
 import { getApiData, getApiError } from "@/lib/utils";
+import { PRICER_NOTES } from "../pricer-notes";
 
 type WarrantOutput = {
   fair_value: number;
@@ -88,19 +89,45 @@ const INITIAL: WarrantFormState = {
   y_axis: "Value",
 };
 
-const NOTES = [
-  "Field 'Model Ticker' is compulsory when 'Use Historical Spot' is True. Field 'Spot Price' is compulsory when 'Use Historical Spot' is False.",
-  "Field 'Reset on Day' is compulsory if 'Reset Frequency' is greater than 'biweekly', and is unnecessary if 'Reset Frequency' is 'weekly' or 'biweekly'.",
-  "Field 'Lookback Days' and 'Reset Multiplier' is compulsory when field 'Market Price Formula' is empty. Field 'Lookback Days' will start with the immediately preceding day.",
-  "Field 'Interest Rate Ticker' or 'Interest Rate' should be set.",
-  "Field 'Reset Cap' or 'Reset Floor Price' is optional.",
-];
-
 const LABEL_CLS = "text-[9px] font-bold text-gray-500 uppercase tracking-[0.08em] mb-0.5 block";
 const INPUT_CLS =
   "h-7 w-full px-2 text-[11px] font-medium text-gray-800 bg-white border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors";
 const SECTION_HEADER_CLS =
   "text-[10px] font-black text-gray-600 uppercase tracking-[0.15em] mb-3 pb-2 border-b-2 border-gray-300";
+
+type NumericTone = "positive" | "negative";
+
+type WarrantPricingRow = {
+  ticker: string;
+  spotPrice: string;
+  fairValue: string;
+  discount: string;
+  discountTone: NumericTone;
+};
+
+const WARRANT_PRICING_RESULTS: WarrantPricingRow[] = [
+  {
+    ticker: "7777 JP Warrant",
+    spotPrice: "498.00",
+    fairValue: "15.50",
+    discount: "+3.11%",
+    discountTone: "positive",
+  },
+  {
+    ticker: "7203 JP Warrant",
+    spotPrice: "2,845.00",
+    fairValue: "142.25",
+    discount: "+5.00%",
+    discountTone: "positive",
+  },
+  {
+    ticker: "9984 JP Warrant",
+    spotPrice: "8,520.00",
+    fairValue: "380.10",
+    discount: "-1.25%",
+    discountTone: "negative",
+  },
+];
 
 const getStatus = (e: unknown): number | undefined => {
   if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
@@ -310,13 +337,17 @@ export default function PricerWarrantPage() {
             )}
           </div>
         </div>
+        <div className="flex-[2] flex flex-col border-l border-gray-200">
+          <PricingResultsTable />
+        </div>
       </div>
       <div className="p-3">
         <div className="px-4 py-3 bg-amber-50/50 border border-amber-200/60 rounded-lg">
           <h4 className="flex items-center text-[9px] font-black text-gray-500 uppercase tracking-[0.1em] mb-2">
-            Notes
+            <Info size={12} className="text-amber-500" />
+            <span className="ml-1">Notes</span>
           </h4>
-          {NOTES.map((n) => (
+          {PRICER_NOTES.map((n) => (
             <p key={n} className="text-[9px] text-gray-500 leading-relaxed mb-1">
               • {n}
             </p>
@@ -335,6 +366,74 @@ export default function PricerWarrantPage() {
         />
       </div>
     </div>
+  );
+}
+
+function PricingResultsTable() {
+  return (
+    <div className="p-4 bg-white border-b border-gray-200">
+      <h3 className={SECTION_HEADER_CLS}>Pricing Results</h3>
+      <table className="w-full table-auto border-separate border-spacing-0">
+        <thead>
+          <tr>
+            <HeaderCell label="Ticker" />
+            <HeaderCell label="Spot Price" align="right" />
+            <HeaderCell label="Fair Value" align="right" />
+            <HeaderCell label="Discount" align="right" />
+          </tr>
+        </thead>
+        <tbody>
+          {WARRANT_PRICING_RESULTS.map((row) => (
+            <tr
+              key={row.ticker}
+              className="odd:bg-white even:bg-gray-50 hover:bg-gray-100 transition-colors"
+            >
+              <TextCell value={row.ticker} />
+              <NumberCell value={row.spotPrice} />
+              <NumberCell value={row.fairValue} />
+              <NumberCell value={row.discount} tone={row.discountTone} />
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function HeaderCell({ label, align = "left" }: { label: string; align?: "left" | "right" }) {
+  return (
+    <th
+      className={`px-3 py-3 text-[10px] font-bold text-gray-700 uppercase tracking-widest border-b-2 border-gray-400 bg-[#E5E7EB] sticky top-0 z-30 shadow-sm h-[44px] whitespace-nowrap ${
+        align === "right" ? "text-right" : "text-left"
+      }`}
+    >
+      {label}
+    </th>
+  );
+}
+
+function TextCell({ value }: { value: string }) {
+  return (
+    <td className="px-3 py-2 text-[10px] font-medium text-gray-700 border-b border-gray-200 align-middle whitespace-nowrap">
+      {value}
+    </td>
+  );
+}
+
+function NumberCell({ value, tone }: { value: string; tone?: NumericTone }) {
+  const toneClass =
+    tone === "positive"
+      ? "font-bold text-[#00AA00]"
+      : tone === "negative"
+        ? "font-bold text-[#DD0000]"
+        : "font-medium text-gray-700";
+
+  return (
+    <td
+      className={`px-3 py-2 text-[10px] font-mono border-b border-gray-200 text-right ${toneClass}`}
+    >
+      {value}
+    </td>
   );
 }
 

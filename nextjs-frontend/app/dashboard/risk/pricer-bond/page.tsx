@@ -2,12 +2,13 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Calculator } from "lucide-react";
+import { Calculator, Info } from "lucide-react";
 
 import { riskPriceBond } from "@/app/clientService";
 import { PayoffChart } from "@/components/risk/payoff-chart";
 import { getAuthToken } from "@/lib/auth/token-storage";
 import { getApiData, getApiError } from "@/lib/utils";
+import { PRICER_NOTES } from "../pricer-notes";
 
 type BondOutput = {
   fair_value: number;
@@ -117,6 +118,100 @@ const INPUT_CLS =
   "h-7 w-full px-2 text-[11px] font-medium text-gray-800 bg-white border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors";
 const SECTION_HEADER_CLS =
   "text-[10px] font-black text-gray-600 uppercase tracking-[0.15em] mb-3 pb-2 border-b-2 border-gray-300";
+
+type NumericTone = "negative";
+
+type BondPricingRow = {
+  ticker: string;
+  spotPrice: string;
+  fairValue: string;
+  discount: string;
+  discountTone?: NumericTone;
+  currency: string;
+  tradeDate: string;
+  strikePrice: string;
+  parity: string;
+  delta: string;
+  bondFloor: string;
+};
+
+const BOND_PRICING_RESULTS: BondPricingRow[] = [
+  {
+    ticker: "7777 JP CB",
+    spotPrice: "¥506.000",
+    fairValue: "¥101.020",
+    discount: "0.00%",
+    currency: "JPY",
+    tradeDate: "2026-02-11",
+    strikePrice: "¥506.000",
+    parity: "¥100.000",
+    delta: "0.14",
+    bondFloor: "¥97.508",
+  },
+  {
+    ticker: "7777 JP CB",
+    spotPrice: "¥504.710",
+    fairValue: "¥101.020",
+    discount: "(0.24%)",
+    discountTone: "negative",
+    currency: "JPY",
+    tradeDate: "2026-01-25",
+    strikePrice: "¥506.000",
+    parity: "¥99.745",
+    delta: "0.14",
+    bondFloor: "¥97.508",
+  },
+  {
+    ticker: "7777 JP CB",
+    spotPrice: "¥504.211",
+    fairValue: "¥100.121",
+    discount: "(0.12%)",
+    discountTone: "negative",
+    currency: "JPY",
+    tradeDate: "2026-02-05",
+    strikePrice: "¥506.000",
+    parity: "¥99.646",
+    delta: "0.14",
+    bondFloor: "¥97.500",
+  },
+  {
+    ticker: "7777 JP CB",
+    spotPrice: "¥503.500",
+    fairValue: "¥100.050",
+    discount: "0.05%",
+    currency: "JPY",
+    tradeDate: "2026-02-10",
+    strikePrice: "¥506.000",
+    parity: "¥99.505",
+    delta: "0.13",
+    bondFloor: "¥97.250",
+  },
+  {
+    ticker: "7777 JP CB",
+    spotPrice: "¥507.100",
+    fairValue: "¥101.420",
+    discount: "0.42%",
+    currency: "JPY",
+    tradeDate: "2026-02-11",
+    strikePrice: "¥506.000",
+    parity: "¥100.217",
+    delta: "0.14",
+    bondFloor: "¥97.650",
+  },
+  {
+    ticker: "7777 JP CB",
+    spotPrice: "¥500.000",
+    fairValue: "¥99.800",
+    discount: "(0.20%)",
+    discountTone: "negative",
+    currency: "JPY",
+    tradeDate: "2026-01-15",
+    strikePrice: "¥506.000",
+    parity: "¥98.814",
+    delta: "0.12",
+    bondFloor: "¥97.000",
+  },
+];
 
 const getStatus = (e: unknown): number | undefined => {
   if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
@@ -293,7 +388,7 @@ export default function PricerBondPage() {
             </div>
           </div>
         </div>
-        <div className="flex-[2] flex flex-col border-l border-gray-200">
+        <div className="flex-[3] flex flex-col border-l border-gray-200">
           <div className="p-4 bg-white">
             <h3 className={SECTION_HEADER_CLS}>Terms Cont.</h3>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
@@ -363,6 +458,22 @@ export default function PricerBondPage() {
             )}
           </div>
         </div>
+        <div className="flex-[4] flex flex-col border-l border-gray-200">
+          <BondPricingResultsTable />
+        </div>
+      </div>
+      <div className="p-3">
+        <div className="px-4 py-3 bg-amber-50/50 border border-amber-200/60 rounded-lg">
+          <h4 className="flex items-center text-[9px] font-black text-gray-500 uppercase tracking-[0.1em] mb-2">
+            <Info size={12} className="text-amber-500" />
+            <span className="ml-1">Notes</span>
+          </h4>
+          {PRICER_NOTES.map((n) => (
+            <p key={n} className="text-[9px] text-gray-500 leading-relaxed mb-1">
+              • {n}
+            </p>
+          ))}
+        </div>
       </div>
       <div className="flex items-end gap-6 p-3 bg-gray-50 border-y border-gray-200">
         <S name="x_axis" label="X-Axis" options={["Maturity", "Duration"]} />
@@ -377,6 +488,83 @@ export default function PricerBondPage() {
         />
       </div>
     </div>
+  );
+}
+
+function BondPricingResultsTable() {
+  return (
+    <div className="p-4 bg-white flex-1">
+      <h3 className={SECTION_HEADER_CLS}>Pricing Results</h3>
+      <div className="overflow-x-auto">
+        <table className="w-full table-auto border-separate border-spacing-0">
+          <thead>
+            <tr>
+              <HeaderCell label="Ticker" />
+              <HeaderCell label="Spot Price" align="right" />
+              <HeaderCell label="Fair Value" align="right" />
+              <HeaderCell label="Discount" align="right" />
+              <HeaderCell label="Currency" />
+              <HeaderCell label="Trade Date" />
+              <HeaderCell label="Strike Price" align="right" />
+              <HeaderCell label="Parity" align="right" />
+              <HeaderCell label="Delta" align="right" />
+              <HeaderCell label="Bond Floor" align="right" />
+            </tr>
+          </thead>
+          <tbody>
+            {BOND_PRICING_RESULTS.map((row) => (
+              <tr
+                key={`${row.tradeDate}-${row.spotPrice}-${row.fairValue}`}
+                className="odd:bg-white even:bg-gray-50 hover:bg-gray-100 transition-colors"
+              >
+                <TextCell value={row.ticker} />
+                <NumberCell value={row.spotPrice} />
+                <NumberCell value={row.fairValue} />
+                <NumberCell value={row.discount} tone={row.discountTone} />
+                <TextCell value={row.currency} />
+                <TextCell value={row.tradeDate} />
+                <NumberCell value={row.strikePrice} />
+                <NumberCell value={row.parity} />
+                <NumberCell value={row.delta} />
+                <NumberCell value={row.bondFloor} />
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function HeaderCell({ label, align = "left" }: { label: string; align?: "left" | "right" }) {
+  return (
+    <th
+      className={`px-3 py-3 text-[10px] font-bold text-gray-700 uppercase tracking-widest border-b-2 border-gray-400 bg-[#E5E7EB] sticky top-0 z-30 shadow-sm h-[44px] whitespace-nowrap ${
+        align === "right" ? "text-right" : "text-left"
+      }`}
+    >
+      {label}
+    </th>
+  );
+}
+
+function TextCell({ value }: { value: string }) {
+  return (
+    <td className="px-3 py-2 text-[10px] font-medium text-gray-700 border-b border-gray-200 align-middle whitespace-nowrap">
+      {value}
+    </td>
+  );
+}
+
+function NumberCell({ value, tone }: { value: string; tone?: NumericTone }) {
+  return (
+    <td
+      className={`px-3 py-2 text-[10px] font-mono border-b border-gray-200 text-right ${
+        tone === "negative" ? "font-bold text-[#DD0000]" : "font-medium text-gray-700"
+      }`}
+    >
+      {value}
+    </td>
   );
 }
 
