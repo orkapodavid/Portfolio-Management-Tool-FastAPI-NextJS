@@ -159,6 +159,8 @@ import type {
   PortfolioToolsGetPoSettlementData,
   PortfolioToolsGetPoSettlementResponses,
   PortfolioToolsGetPoSettlementErrors,
+  PortfolioToolsGetShortEclData,
+  PortfolioToolsGetShortEclResponses,
   InstrumentsGetTickerDataData,
   InstrumentsGetTickerDataResponses,
   InstrumentsGetStockScreenerData,
@@ -1527,6 +1529,29 @@ export const portfolioToolsGetPoSettlement = <
       },
     ],
     url: "/api/portfolio-tools/po-settlement",
+    ...options,
+  });
+};
+
+/**
+ * Get Short Ecl
+ */
+export const portfolioToolsGetShortEcl = <ThrowOnError extends boolean = false>(
+  options?: Options<PortfolioToolsGetShortEclData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PortfolioToolsGetShortEclResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/portfolio-tools/short-ecl",
     ...options,
   });
 };

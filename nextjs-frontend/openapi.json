@@ -2608,6 +2608,30 @@
         }
       }
     },
+    "/api/portfolio-tools/short-ecl": {
+      "get": {
+        "tags": [
+          "portfolio-tools"
+        ],
+        "summary": "Get Short Ecl",
+        "operationId": "portfolio-tools-get_short_ecl",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/api/instruments/ticker-data": {
       "get": {
         "tags": [

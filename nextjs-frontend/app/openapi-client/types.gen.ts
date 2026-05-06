@@ -1745,6 +1745,20 @@ export type PortfolioToolsGetPoSettlementResponses = {
   200: unknown;
 };
 
+export type PortfolioToolsGetShortEclData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/portfolio-tools/short-ecl";
+};
+
+export type PortfolioToolsGetShortEclResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
 export type InstrumentsGetTickerDataData = {
   body?: never;
   path?: never;
