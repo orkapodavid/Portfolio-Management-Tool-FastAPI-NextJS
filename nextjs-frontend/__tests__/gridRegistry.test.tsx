@@ -31,6 +31,12 @@ const buildApi = (overrides: Partial<GridApiLike> = {}) => {
 describe("GridRegistry", () => {
   beforeEach(() => {
     window.sessionStorage.clear();
+    document.body.innerHTML = "";
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    document.body.innerHTML = "";
   });
 
   it("returns null outside a provider", () => {
@@ -113,5 +119,37 @@ describe("GridRegistry", () => {
     expect(api.ensureNodeVisible).toHaveBeenCalledWith(node, "middle");
     expect(api.flashCells).toHaveBeenCalledWith({ rowNodes: [node] });
     expect(window.sessionStorage.getItem(PENDING_HIGHLIGHT_STORAGE_KEY)).toBeNull();
+  });
+
+  it("re-applies the sticky highlight every 200ms and clears it after 1.8s", () => {
+    jest.useFakeTimers();
+    const { api } = buildApi();
+    document.body.innerHTML = `<div row-id="row-AAPL"></div>`;
+    const row = document.querySelector("[row-id='row-AAPL']")!;
+    const { result } = renderHook(() => useGridRegistry(), { wrapper });
+
+    act(() => {
+      result.current!.register("positions_grid", { api, rowIdKey: "ticker" });
+      result.current!.jumpToRow("positions_grid", "row-AAPL");
+    });
+
+    expect(row).toHaveClass("pmt-notification-highlight");
+    row.classList.remove("pmt-notification-highlight");
+
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
+    expect(row).toHaveClass("pmt-notification-highlight");
+    row.classList.remove("pmt-notification-highlight");
+
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
+    expect(row).toHaveClass("pmt-notification-highlight");
+
+    act(() => {
+      jest.advanceTimersByTime(1_400);
+    });
+    expect(row).not.toHaveClass("pmt-notification-highlight");
   });
 });

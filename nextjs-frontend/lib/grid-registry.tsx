@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   type ReactNode,
@@ -73,6 +74,26 @@ const readPendingHighlight = (): PendingHighlight | null => {
 
 export function GridRegistryProvider({ children }: { children: ReactNode }) {
   const registry = useRef<Map<string, Registration>>(new Map());
+  const highlightIntervalRef = useRef<number | null>(null);
+  const highlightTimeoutRef = useRef<number | null>(null);
+
+  const clearNotificationHighlight = useCallback(() => {
+    if (typeof window !== "undefined") {
+      if (highlightIntervalRef.current !== null) {
+        window.clearInterval(highlightIntervalRef.current);
+        highlightIntervalRef.current = null;
+      }
+      if (highlightTimeoutRef.current !== null) {
+        window.clearTimeout(highlightTimeoutRef.current);
+        highlightTimeoutRef.current = null;
+      }
+    }
+    if (typeof document !== "undefined") {
+      document
+        .querySelectorAll(".pmt-notification-highlight")
+        .forEach((el) => el.classList.remove("pmt-notification-highlight"));
+    }
+  }, []);
 
   const jumpToRow = useCallback((gridId: string, rowId: string) => {
     const entry = registry.current.get(gridId);
@@ -95,26 +116,40 @@ export function GridRegistryProvider({ children }: { children: ReactNode }) {
     api.flashCells({ rowNodes: [node] });
 
     if (typeof document !== "undefined" && node.id) {
+      clearNotificationHighlight();
+      const highlightedRowId = node.id;
       const apply = () => {
         document
           .querySelectorAll(".pmt-notification-highlight")
-          .forEach((el) => el.classList.remove("pmt-notification-highlight"));
+          .forEach((el) => {
+            if (el.getAttribute("row-id") !== highlightedRowId) {
+              el.classList.remove("pmt-notification-highlight");
+            }
+          });
         document
-          .querySelectorAll<HTMLElement>(`[row-id='${node!.id}']`)
-          .forEach((el) => el.classList.add("pmt-notification-highlight"));
+          .querySelectorAll<HTMLElement>("[row-id]")
+          .forEach((el) => {
+            if (el.getAttribute("row-id") === highlightedRowId) {
+              el.classList.add("pmt-notification-highlight");
+            }
+          });
       };
       apply();
-      window.setTimeout(apply, 100);
-      window.setTimeout(apply, 350);
-      window.setTimeout(() => {
-        document
-          .querySelectorAll(".pmt-notification-highlight")
-          .forEach((el) => el.classList.remove("pmt-notification-highlight"));
+      highlightIntervalRef.current = window.setInterval(apply, 200);
+      highlightTimeoutRef.current = window.setTimeout(() => {
+        clearNotificationHighlight();
       }, 1_800);
     }
 
     return true;
-  }, []);
+  }, [clearNotificationHighlight]);
+
+  useEffect(
+    () => () => {
+      clearNotificationHighlight();
+    },
+    [clearNotificationHighlight]
+  );
 
   const register = useCallback(
     (gridId: string, entry: Registration) => {
