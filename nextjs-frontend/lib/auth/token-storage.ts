@@ -4,8 +4,16 @@ const ACCESS_TOKEN_KEY = "accessToken";
 const ACCESS_TOKEN_MAX_AGE_SECONDS = 60 * 60;
 const NOAUTH_PLACEHOLDER_TOKEN = "no-auth";
 
-function isAuthDisabled(): boolean {
-  return process.env.NEXT_PUBLIC_AUTH_DISABLED === "1";
+export function isAuthDisabled(): boolean {
+  const configuredValue = process.env.NEXT_PUBLIC_AUTH_DISABLED;
+
+  if (configuredValue === undefined) {
+    return true;
+  }
+
+  return !["0", "false", "no", "off"].includes(
+    configuredValue.trim().toLowerCase()
+  );
 }
 
 function readCookie(name: string): string | null {

@@ -53,16 +53,15 @@ The generator fetches the live backend schema, writes
 
 ## Auth
 
-Normal web development uses the FastAPI auth endpoints and token
-helpers in `lib/auth/`. Local parity work can skip login by starting
-the frontend with:
+Local web development skips login by default through the token helpers
+in `lib/auth/`. Set the frontend flag to `0` when a task needs to
+exercise the FastAPI auth endpoints and JWT flow:
 
 ```bash
-NEXT_PUBLIC_AUTH_DISABLED=1 pnpm dev
+NEXT_PUBLIC_AUTH_DISABLED=0 pnpm dev
 ```
 
-Pair it with `PMT_AUTH_DISABLED=true` on the backend. The committed
-frontend example keeps `NEXT_PUBLIC_AUTH_DISABLED=0`.
+Pair it with `PMT_AUTH_DISABLED=false` on the backend.
 
 ## Desktop Target
 

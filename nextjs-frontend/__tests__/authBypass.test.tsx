@@ -14,11 +14,11 @@ jest.mock("../app/clientService", () => ({
   usersCurrentUser: (...args: unknown[]) => usersCurrentUserMock(...args),
 }));
 
-describe("DashboardAuthGate (NEXT_PUBLIC_AUTH_DISABLED=1)", () => {
+describe("DashboardAuthGate auth bypass", () => {
   const originalFlag = process.env.NEXT_PUBLIC_AUTH_DISABLED;
 
   beforeAll(() => {
-    process.env.NEXT_PUBLIC_AUTH_DISABLED = "1";
+    delete process.env.NEXT_PUBLIC_AUTH_DISABLED;
   });
 
   afterAll(() => {
@@ -29,7 +29,7 @@ describe("DashboardAuthGate (NEXT_PUBLIC_AUTH_DISABLED=1)", () => {
     }
   });
 
-  it("renders children immediately and skips the /users/me validation call", () => {
+  it("renders children by default and skips the /users/me validation call", () => {
     render(
       <DashboardAuthGate>
         <div data-testid="protected">protected-content</div>

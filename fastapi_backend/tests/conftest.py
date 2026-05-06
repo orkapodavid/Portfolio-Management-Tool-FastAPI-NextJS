@@ -13,6 +13,18 @@ from app.main import app
 from app.users import get_jwt_strategy
 
 
+@pytest_asyncio.fixture(scope="function", autouse=True)
+async def require_auth_by_default_in_tests():
+    """Keep route auth tests explicit even though local app default is no-auth."""
+
+    original_auth_disabled = settings.AUTH_DISABLED
+    settings.AUTH_DISABLED = False
+    try:
+        yield
+    finally:
+        settings.AUTH_DISABLED = original_auth_disabled
+
+
 @pytest_asyncio.fixture(scope="function")
 async def engine():
     """Create a fresh test database engine for each test function."""

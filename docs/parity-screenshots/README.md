@@ -18,12 +18,13 @@ were re-shot against implementation HEAD `82142c9`:
 
 | Service  | Port | Flags |
 |---|---|---|
-| FastAPI backend | 8000 | `DATABASE_URL=sqlite+aiosqlite:///…/.pmt-dev.sqlite3 PMT_AUTH_DISABLED=true` |
-| Next.js dev | 3000 | `NEXT_PUBLIC_AUTH_DISABLED=1 pnpm dev` |
+| FastAPI backend | 8000 | `DATABASE_URL=sqlite+aiosqlite:///…/.pmt-dev.sqlite3` |
+| Next.js dev | 3000 | `pnpm dev` |
 | Reflex reference | 3001 | `uv run reflex run` (defaults) |
 
-The auth-bypass flags allow incognito-page parity comparison without
-logging in. Both flags default OFF in any committed env example.
+The local defaults allow incognito-page parity comparison without
+logging in. Set `PMT_AUTH_DISABLED=false` and
+`NEXT_PUBLIC_AUTH_DISABLED=0` to exercise authenticated JWT flows.
 
 AG Grid Enterprise is now installed on the Next.js side
 (`ag-grid-enterprise@35.0.1`). Without an Enterprise license key the
@@ -161,8 +162,8 @@ Reviewers should expect:
 ### Top-level chrome
 - **Top nav**: same dark `#333333` background, same uppercase 9 px
   module labels, same lucide-react icons. Reflex's avatar dropdown
-  is hidden by `NEXT_PUBLIC_AUTH_DISABLED=1` so the Next.js shell
-  does not render a user widget where Reflex shows one.
+  is hidden in local no-auth mode so the Next.js shell does not render
+  a user widget where Reflex shows one.
 - **Performance header**: both render the four KPI sparklines (Total
   NAV, Daily P&L, YTD Return, Net Exposure) and the three currency
   strips (Total Value, Daily Change, Total O/L). The "Show Top Movers"
@@ -239,14 +240,13 @@ you need a data-bearing comparison.
 ## Reproduction
 
 ```bash
-# Start the three services with bypass flags ON
+# Start the three services in default local no-auth mode
 cd fastapi_backend
 DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pmt-dev.sqlite3 \
-  PMT_AUTH_DISABLED=true \
   ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 
 cd ../nextjs-frontend
-NEXT_PUBLIC_AUTH_DISABLED=1 pnpm dev    # → :3000
+pnpm dev    # → :3000
 
 cd /Users/orbot/Developer/work/Portfolio-Management-Tool-reflex
 uv run reflex run                       # → :3001/pmt/

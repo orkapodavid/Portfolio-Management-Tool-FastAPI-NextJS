@@ -45,6 +45,8 @@ uv run alembic upgrade head
 
 Tauri packages a static Next.js export from `nextjs-frontend/out` and a
 FastAPI sidecar binary from `nextjs-frontend/src-tauri/binaries/`.
+See [Tauri Desktop Setup](tauri-desktop.md) for the full setup and
+troubleshooting guide.
 
 ```bash
 cd nextjs-frontend
@@ -74,6 +76,19 @@ pnpm tauri:build
 
 The sidecar defaults to `http://127.0.0.1:18475` and stores desktop
 data in the configured app-data directory.
+
+macOS artifacts are written under:
+
+```text
+src-tauri/target/release/bundle/macos/
+src-tauri/target/release/bundle/dmg/
+```
+
+Windows builds should be produced on a Windows machine or Windows CI
+runner with Microsoft C++ Build Tools, WebView2, Rust stable MSVC,
+Python/uv, Node, and pnpm. Tauri writes Windows artifacts under
+`src-tauri/target/release/bundle/` subfolders such as `nsis/` or
+`msi/`, depending on the configured targets and installed bundler tools.
 
 ## Release Notes
 

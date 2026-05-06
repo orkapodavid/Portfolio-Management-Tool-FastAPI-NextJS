@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { usersCurrentUser } from "@/app/clientService";
-import { clearAuthToken, getAuthToken } from "@/lib/auth/token-storage";
+import {
+  clearAuthToken,
+  getAuthToken,
+  isAuthDisabled,
+} from "@/lib/auth/token-storage";
 import { getApiError } from "@/lib/utils";
 
 type DashboardAuthGateProps = {
@@ -15,7 +19,7 @@ export function DashboardAuthGate({ children }: DashboardAuthGateProps) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    if (process.env.NEXT_PUBLIC_AUTH_DISABLED === "1") {
+    if (isAuthDisabled()) {
       setIsReady(true);
       return;
     }

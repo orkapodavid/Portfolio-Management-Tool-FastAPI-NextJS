@@ -25,16 +25,13 @@ uv run python -m commands.generate_openapi_schema
 
 ## Auth Bypass
 
-Local parity work can bypass login by starting both apps with matching
-flags:
+Local parity work bypasses login by default. Use explicit false values
+when you need to exercise authenticated JWT flows:
 
 ```bash
-PMT_AUTH_DISABLED=true
-NEXT_PUBLIC_AUTH_DISABLED=1
+PMT_AUTH_DISABLED=false
+NEXT_PUBLIC_AUTH_DISABLED=0
 ```
-
-Use these only in local shells. Committed env examples must keep the
-backend flag commented out and the frontend flag set to `0`.
 
 ## Tests
 
@@ -86,6 +83,10 @@ $env:NEXT_PUBLIC_DESKTOP_TARGET = "1"
 $env:NEXT_PUBLIC_DESKTOP_API_BASE_URL = "http://127.0.0.1:18475"
 pnpm build
 ```
+
+For the full desktop workflow, including sidecar build, dev launch,
+bundle output, health checks, and Windows prerequisites, see
+[Tauri Desktop Setup](tauri-desktop.md).
 
 ## Docker Services
 

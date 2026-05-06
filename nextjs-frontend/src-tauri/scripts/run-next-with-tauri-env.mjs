@@ -20,6 +20,8 @@ const env = {
     process.env.NEXT_PUBLIC_DESKTOP_TARGET ?? '1',
   NEXT_PUBLIC_DESKTOP_API_BASE_URL:
     process.env.NEXT_PUBLIC_DESKTOP_API_BASE_URL ?? 'http://127.0.0.1:18475',
+  NEXT_PUBLIC_AUTH_DISABLED:
+    process.env.NEXT_PUBLIC_AUTH_DISABLED ?? '1',
 };
 
 if (mode === 'build') {

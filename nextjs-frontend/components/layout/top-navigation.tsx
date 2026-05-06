@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { COLORS, LAYOUT, MODULES } from "@/lib/constants";
 import { logout } from "@/components/actions/logout-action";
+import { isAuthDisabled } from "@/lib/auth/token-storage";
 import { useNotifications } from "@/lib/notifications-context";
 import {
   Activity,
@@ -41,6 +42,7 @@ export function TopNavigation() {
   const pathname = usePathname();
   const router = useRouter();
   const { isOpen, toggleOpen, unreadCount } = useNotifications();
+  const authDisabled = isAuthDisabled();
 
   const activeModuleId = MODULES.find((m) =>
     pathname.startsWith(`/dashboard/${m.id}`)
@@ -142,7 +144,7 @@ export function TopNavigation() {
             )}
           </div>
         </button>
-        {process.env.NEXT_PUBLIC_AUTH_DISABLED !== "1" && (
+        {!authDisabled && (
           <button
             type="button"
             title="Log out"

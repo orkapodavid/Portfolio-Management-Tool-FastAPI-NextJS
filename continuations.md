@@ -1,5 +1,134 @@
 # Portfolio Management Tool - Continuation Log
 
+## Tauri Desktop Path Verification And Auth Bypass Default (2026-05-06 local session)
+
+Verified the Tauri desktop path on `feat/nextjs-fastapi-rebuild` and
+changed the web and desktop defaults so the app bypasses password auth
+by default for the current local workflow.
+
+Code changes:
+
+- `nextjs-frontend/src-tauri/scripts/run-next-with-tauri-env.mjs`
+  now defaults `NEXT_PUBLIC_AUTH_DISABLED=1` for Tauri Next dev/build
+  commands unless the parent environment explicitly sets another value.
+- `fastapi_backend/app/config.py` now defaults `PMT_AUTH_DISABLED` /
+  `AUTH_DISABLED` to true. Tests force the auth-required default back
+  on through `fastapi_backend/tests/conftest.py` so protected-route 401
+  assertions stay explicit.
+- `nextjs-frontend/lib/auth/token-storage.ts` now defaults auth to
+  disabled when `NEXT_PUBLIC_AUTH_DISABLED` is unset. Explicit
+  `0`, `false`, `no`, or `off` values re-enable the authenticated
+  frontend path.
+- `nextjs-frontend/components/auth/dashboard-auth-gate.tsx` now uses
+  the shared auth-disabled helper instead of checking only
+  `NEXT_PUBLIC_AUTH_DISABLED`.
+- `nextjs-frontend/components/layout/top-navigation.tsx` now uses the
+  shared auth-disabled helper so the logout button is hidden in default
+  no-auth mode.
+- `nextjs-frontend/src-tauri/src/lib.rs` now launches the sidecar with
+  `PMT_AUTH_DISABLED=true` by default unless the parent environment
+  explicitly sets `PMT_AUTH_DISABLED`.
+- Added `nextjs-frontend/__tests__/tokenStorage.test.ts` for desktop
+  and web no-auth token behavior plus explicit frontend auth opt-in.
+- Updated current setup docs and env examples to document default
+  no-auth for local web and desktop. Set `PMT_AUTH_DISABLED=false` and
+  `NEXT_PUBLIC_AUTH_DISABLED=0` to exercise JWT auth.
+- Added `docs/tauri-desktop.md` and expanded README/get-started/
+  deployment docs with the Tauri setup guide, expected sidecar binary
+  names, health checks, artifact paths, and Windows prerequisite notes.
+
+Environment/tooling sanity:
+
+| Check | Result |
+|---|---|
+| Branch | `feat/nextjs-fastapi-rebuild` |
+| `node --version` | `v24.14.0` |
+| `pnpm --version` | `10.30.3` |
+| `rustc --version` | `rustc 1.94.0 (4a4ef493e 2026-03-02)` |
+| `cargo --version` | `cargo 1.94.0 (85eff7c80 2026-01-15)` |
+| `uv --version` | `uv 0.10.9 (Homebrew 2026-03-06)` |
+| `pnpm --dir nextjs-frontend exec tauri --version` | `tauri-cli 2.10.1` |
+| Frontend deps | `nextjs-frontend/node_modules` present |
+| Backend venv | `fastapi_backend/.venv/bin/python` present, Python `3.12.13` |
+
+Desktop command results:
+
+| Check | Result |
+|---|---|
+| `pnpm tauri:sidecar` | PASS; PyInstaller completed and built `src-tauri/binaries/pmt-backend-aarch64-apple-darwin` |
+| Sidecar warnings | Non-fatal optional warnings only: `pyodbc not installed`, hidden import `pysqlite2` not found, macOS build warnings for Windows ctypes libs |
+| Platform sidecar binary | `nextjs-frontend/src-tauri/binaries/pmt-backend-aarch64-apple-darwin`, Mach-O arm64, 48M |
+| Debug sidecar copy | `nextjs-frontend/src-tauri/target/debug/pmt-backend`, Mach-O arm64, 49M |
+| Manual desktop static export | PASS: `TAURI_BUILD=1 NEXT_PUBLIC_DESKTOP_TARGET=1 NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 pnpm build` generated `59/59` static pages in 13.86 s real |
+| Static export output | `nextjs-frontend/out`, 7.1M |
+| `pnpm tauri:dev` | PASS; ran `pnpm dev:tauri`, reused sidecar, compiled `target/debug/pmt-desktop`, and launched the desktop shell |
+| Dev sidecar health | PASS: `curl http://127.0.0.1:18475/api/health` returned `{"status":"ok","runtime":"desktop","database_backend":"sqlite"}` |
+| Dev no-auth protected route | PASS after the auth-bypass change: `curl http://127.0.0.1:18475/api/positions/` returned `HTTP_STATUS:200 SIZE:6708` with no bearer token |
+| Dev dashboard request | Next dev log showed `GET /dashboard/market-data/market-data 200`; no login was required after the bypass change |
+| `pnpm tauri:build` | PASS in 106.88 s real; release Rust compile completed in 57.62 s and DMG packaging exited 0 |
+| Release app artifact | `nextjs-frontend/src-tauri/target/release/bundle/macos/Portfolio Management Tool.app`, 63M |
+| Release DMG artifact | `nextjs-frontend/src-tauri/target/release/bundle/dmg/Portfolio Management Tool_0.0.8_aarch64.dmg`, 54M |
+| Release app launch | PASS; `open -n .../Portfolio Management Tool.app` launched `pmt-desktop` and packaged `pmt-backend` processes |
+| Release sidecar health | PASS; health returned `{"status":"ok","runtime":"desktop","database_backend":"sqlite"}` after a 21 s cold start |
+| Release no-auth protected route | PASS: `curl http://127.0.0.1:18475/api/positions/` returned `HTTP_STATUS:200 SIZE:6708` with no bearer token |
+
+Verification after code changes:
+
+| Check | Result |
+|---|---|
+| `pnpm exec jest --runInBand __tests__/authBypass.test.tsx __tests__/tokenStorage.test.ts` | 2 suites / 4 tests passed in 0.323 s |
+| `pnpm exec jest --runInBand` | 31 suites / 163 tests passed in 2 s |
+| `pnpm exec tsc --noEmit --pretty false` | clean |
+| `cargo check` in `nextjs-frontend/src-tauri` | clean, finished in 2.05 s |
+| `pnpm lint` | 0 errors / 0 warnings |
+| `TEST_DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pytest-sqlite.sqlite3 ./.venv/bin/python -m pytest -q` | 187 passed / 2 skipped in 8.53 s |
+| Desktop static export | PASS, `59/59` static pages |
+| `pnpm tauri:dev` | PASS, sidecar health and no-auth protected route verified |
+| `pnpm tauri:build` | PASS, `.app` and `.dmg` produced and release app health/no-auth route verified |
+
+Fresh verification after default web no-auth change:
+
+| Check | Result |
+|---|---|
+| Source FastAPI default with `PMT_AUTH_DISABLED` unset | PASS: uvicorn on `127.0.0.1:18476`, `/api/health` returned `{"status":"ok","runtime":"server","database_backend":"sqlite"}`, and no-token `/api/positions/` returned `HTTP:200 SIZE:6708` |
+| `pnpm tauri:sidecar` | PASS after backend default change; PyInstaller completed in about 30.1 s and refreshed `src-tauri/binaries/pmt-backend-aarch64-apple-darwin` plus `src-tauri/target/debug/pmt-backend` |
+| Sidecar artifacts | `pmt-backend-aarch64-apple-darwin` 48M Mach-O arm64; debug copy 49M Mach-O arm64 |
+| Manual desktop static export | PASS: `59/59` static pages; `nextjs-frontend/out` 7.1M |
+| `cargo check` | clean in 0.17 s |
+| `rustup target list --installed` | `aarch64-apple-darwin`, `x86_64-pc-windows-msvc` |
+| `cargo check --target x86_64-pc-windows-msvc` | Blocked on this Mac host by missing Windows/MSVC C toolchain: `ring v0.17.14` could not find `assert.h`, with `VCINSTALLDIR = None` and no `CC_x86_64-pc-windows-msvc` |
+| Fresh `pnpm tauri:build` | PASS; Next export still `59/59`; Rust release compile finished in 13.01 s; bundles written under `src-tauri/target/release/bundle/` |
+| Fresh release app launch | PASS: `open -n .../Portfolio Management Tool.app` spawned packaged `pmt-desktop` and `pmt-backend`; `/api/health` eventually returned `{"status":"ok","runtime":"desktop","database_backend":"sqlite"}`; no-token `/api/positions/` returned `HTTP:200 SIZE:6708` |
+| Active `pnpm tauri:dev` restart for testing | PASS: Next dashboard `HEAD /dashboard/market-data/market-data` returned 200; `/api/health` returned desktop/sqlite; no-token `/api/positions/` returned `HTTP:200 SIZE:6708`; sidecar is listening on `127.0.0.1:18475` |
+| Current artifacts | `out` 7.1M; `src-tauri/binaries/pmt-backend-aarch64-apple-darwin` 48M; `src-tauri/target/debug/pmt-backend` 49M; release `.app` 63M; release `.dmg` 54M |
+| `git diff --check` | clean |
+| Tauri setup docs | Added `docs/tauri-desktop.md`; README, docs index, get-started, deployment, and additional settings now link or summarize it |
+
+Notes:
+
+- The sidecar cold start is real: dev and release launches spawned the
+  `pmt-backend` process before port `18475` started listening. Release
+  health became ready after 21 s in this run.
+- `screencapture` could not create a display image in this environment,
+  so window evidence is process/log based: Tauri launched
+  `pmt-desktop`, spawned `pmt-backend`, served health, and the dev log
+  showed dashboard route requests.
+- Committed env examples now intentionally default to no-auth for the
+  current local workflow. Use explicit false/0 values to exercise auth.
+- Windows is not fully proven on this Mac host. The Tauri naming and
+  target triple path are configured, but a real Windows validation
+  needs a native Windows runner with Rust, MSVC Build Tools, WebView2,
+  Python, uv, pnpm, and `pnpm tauri:sidecar` / `pnpm tauri:build`.
+- Stop-hook fresh verification rerun: `git diff --check` clean,
+  `pnpm exec jest --runInBand` passed 31 suites / 162 tests in 1.962 s,
+  `pnpm exec tsc --noEmit --pretty false` clean, `pnpm lint` clean,
+  and `cargo check` clean in 0.16 s. A fresh release `.app` launch
+  spawned packaged `pmt-desktop` / `pmt-backend`; the 40 s health poll
+  timed out just before the sidecar was observed listening at process
+  elapsed time 49 s, then `/api/health` returned
+  `{"status":"ok","runtime":"desktop","database_backend":"sqlite"}`
+  and no-token `/api/positions/` returned `HTTP_STATUS:200 SIZE:6708`.
+
 ## Review, Test, And Parity Re-Audit (2026-05-06 local session)
 
 Independent post-Milestone-C review found and fixed four defects:

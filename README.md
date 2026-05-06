@@ -43,6 +43,9 @@ the older handoff prompts.
 - Node.js 20+ and `pnpm`
 - Python 3.12 and `uv`
 - Rust toolchain (`rustup`, `cargo`) for Tauri work
+- Tauri platform prerequisites for desktop work:
+  Xcode Command Line Tools on macOS; Microsoft C++ Build Tools,
+  WebView2, and the Rust MSVC toolchain on Windows
 - The Reflex reference checkout at
   `/Users/orbot/Developer/work/Portfolio-Management-Tool-reflex` for
   parity checks
@@ -62,16 +65,16 @@ pnpm install
 
 ## Local Parity Run
 
-Use three terminals. The auth-bypass flags are for local parity work
-only. They must stay OFF in committed env examples and production
-environments.
+Use three terminals. Authentication is disabled by default for the
+current local web and desktop workflow. Set `PMT_AUTH_DISABLED=false`
+and `NEXT_PUBLIC_AUTH_DISABLED=0` when you need to exercise the
+authenticated JWT flow.
 
 Terminal A, FastAPI with a local SQLite dev DB:
 
 ```bash
 cd fastapi_backend
 DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pmt-dev.sqlite3 \
-  PMT_AUTH_DISABLED=true \
   ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
@@ -79,7 +82,7 @@ Terminal B, Next.js:
 
 ```bash
 cd nextjs-frontend
-NEXT_PUBLIC_AUTH_DISABLED=1 pnpm dev
+pnpm dev
 ```
 
 Terminal C, Reflex reference:
@@ -95,13 +98,11 @@ Windows PowerShell equivalents:
 cd fastapi_backend
 $backendPath = (Get-Location).Path -replace '\\', '/'
 $env:DATABASE_URL = "sqlite+aiosqlite:///$backendPath/.pmt-dev.sqlite3"
-$env:PMT_AUTH_DISABLED = "true"
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 ```powershell
 cd nextjs-frontend
-$env:NEXT_PUBLIC_AUTH_DISABLED = "1"
 pnpm dev
 ```
 
@@ -149,11 +150,47 @@ pnpm generate-client
 Do not hand-edit `nextjs-frontend/app/openapi-client/`; it is generated
 from the live backend schema.
 
-## Desktop / Tauri
+## Desktop / Tauri Setup
 
-Tauri uses the Next.js static export in `nextjs-frontend/out` and a
-PyInstaller FastAPI sidecar binary under
-`nextjs-frontend/src-tauri/binaries/`.
+Tauri packages the Next.js static export in `nextjs-frontend/out` and a
+PyInstaller FastAPI sidecar binary from
+`nextjs-frontend/src-tauri/binaries/`. The sidecar starts inside the
+desktop app, listens on `127.0.0.1:18475`, and uses a local app-data
+SQLite database. Full setup details are in
+[docs/tauri-desktop.md](docs/tauri-desktop.md).
+
+One-time sanity checks:
+
+```bash
+node --version
+pnpm --version
+uv --version
+rustc --version
+cargo --version
+pnpm --dir nextjs-frontend exec tauri --version
+```
+
+Build or refresh the sidecar:
+
+```bash
+cd nextjs-frontend
+pnpm tauri:sidecar
+```
+
+Expected macOS arm64 outputs:
+
+```text
+src-tauri/binaries/pmt-backend-aarch64-apple-darwin
+src-tauri/target/debug/pmt-backend
+```
+
+On 64-bit Windows, run the same command from PowerShell after installing
+the MSVC toolchain. Expected outputs:
+
+```text
+src-tauri/binaries/pmt-backend-x86_64-pc-windows-msvc.exe
+src-tauri/target/debug/pmt-backend.exe
+```
 
 Desktop static export verification:
 
@@ -175,17 +212,41 @@ $env:NEXT_PUBLIC_DESKTOP_API_BASE_URL = "http://127.0.0.1:18475"
 pnpm build
 ```
 
-Useful desktop commands:
+Run the desktop app in development:
 
 ```bash
 cd nextjs-frontend
-pnpm tauri:sidecar   # build or refresh the FastAPI sidecar binary
-pnpm tauri:dev       # run the Tauri shell in development
-pnpm tauri:build     # produce the desktop bundle
+pnpm tauri:dev
 ```
 
-The desktop sidecar listens on `127.0.0.1:18475` by default and uses a
-local app-data SQLite database.
+Health checks while the desktop app is running:
+
+```bash
+curl -sS http://127.0.0.1:18475/api/health
+curl -sS -o /tmp/pmt-positions.json -w 'HTTP:%{http_code} SIZE:%{size_download}\n' \
+  http://127.0.0.1:18475/api/positions/
+```
+
+Build the production bundle:
+
+```bash
+cd nextjs-frontend
+pnpm tauri:sidecar
+pnpm tauri:build
+```
+
+macOS artifacts are written under:
+
+```text
+src-tauri/target/release/bundle/macos/
+src-tauri/target/release/bundle/dmg/
+```
+
+Windows builds should be produced on a Windows machine or Windows CI
+runner with Microsoft C++ Build Tools, WebView2, Rust stable MSVC,
+Python/uv, Node, and pnpm. Tauri writes Windows artifacts under
+`src-tauri/target/release/bundle/` subfolders such as `nsis/` or
+`msi/`, depending on the installed bundler tools.
 
 ## Verification
 
@@ -220,14 +281,16 @@ $env:TEST_DATABASE_URL = "sqlite+aiosqlite:///$backendPath/.pytest-sqlite.sqlite
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-Last known gate-close verification:
+Last known verification on 2026-05-06:
 
 - TSC clean.
-- Jest: 28 suites / 157 tests passed in 1.857 s.
+- Jest: 31 suites / 163 tests passed in 2 s.
 - Lint: 0 errors / 0 warnings.
 - Web build: 59 / 59 static pages generated.
-- Backend pytest: 187 passed, 2 skipped in 9.42 s.
+- Backend pytest: 187 passed, 2 skipped in 8.53 s.
 - Desktop static export: 59 / 59 static pages generated.
+- `pnpm tauri:sidecar`, `pnpm tauri:dev`, and `pnpm tauri:build`
+  passed on macOS arm64.
 
 ## Parity Artifacts
 

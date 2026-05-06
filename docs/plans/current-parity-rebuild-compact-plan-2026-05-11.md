@@ -76,7 +76,6 @@ Terminal A, backend:
 ```bash
 cd fastapi_backend
 DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pmt-dev.sqlite3 \
-  PMT_AUTH_DISABLED=true \
   ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
@@ -84,7 +83,7 @@ Terminal B, Next.js:
 
 ```bash
 cd nextjs-frontend
-NEXT_PUBLIC_AUTH_DISABLED=1 pnpm dev
+pnpm dev
 ```
 
 Terminal C, Reflex reference:
@@ -134,7 +133,9 @@ sidebar.
   a documented intentional delta says otherwise.
 - Do not hand-edit `nextjs-frontend/app/openapi-client/`; regenerate
   with `pnpm generate-client` against a running backend.
-- Auth-bypass flags must default OFF in committed env examples.
+- Authentication is disabled by default for local parity. Set
+  `PMT_AUTH_DISABLED=false` and `NEXT_PUBLIC_AUTH_DISABLED=0` for
+  authenticated JWT checks.
 - Storage keys stay under the `pmt:next:` namespace.
 - One commit per defect or coherent documentation artifact.
 - Push every 2-3 commits during long work.

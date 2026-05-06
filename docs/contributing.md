@@ -23,9 +23,9 @@ three-service parity loop:
 - Next.js on `localhost:3000`
 - Reflex reference on `localhost:3001/pmt/`
 
-The local parity commands may enable `PMT_AUTH_DISABLED=true` and
-`NEXT_PUBLIC_AUTH_DISABLED=1`, but committed env examples must keep
-auth bypass OFF.
+The local parity commands use the default no-auth mode. Set
+`PMT_AUTH_DISABLED=false` and `NEXT_PUBLIC_AUTH_DISABLED=0` only when a
+task needs to exercise authenticated JWT flows.
 
 ## OpenAPI Changes
 

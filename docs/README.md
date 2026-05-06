@@ -6,7 +6,7 @@ history, but the compact plan is the day-to-day starting point.
 
 ## Start Here
 
-- [Get Started](get-started.md) - local setup, ports, auth-bypass
+- [Get Started](get-started.md) - local setup, ports, default no-auth
   parity loop, OpenAPI generation, desktop export, and verification.
 - [Current parity rebuild plan](plans/current-parity-rebuild-compact-plan-2026-05-11.md)
   - current state after Milestone B/C closure.
@@ -23,6 +23,7 @@ history, but the compact plan is the day-to-day starting point.
 - [Backend development guide](fastapi_backend/backend-development-guide.md)
 - [Backend API reference](fastapi_backend/backend-api-reference.md)
 - [Next.js frontend walkthrough](nextjs-frontend/walkthrough.md)
+- [Tauri desktop setup](tauri-desktop.md)
 - [Tauri implementation plan](plans/tauri-implementation-plan.md)
 
 ## Current Status
@@ -45,14 +46,14 @@ requires PostgreSQL:
 ```bash
 cd fastapi_backend
 DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pmt-dev.sqlite3 \
-  PMT_AUTH_DISABLED=true \
   ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 ```bash
 cd nextjs-frontend
-NEXT_PUBLIC_AUTH_DISABLED=1 pnpm dev
+pnpm dev
 ```
 
-The bypass flags above are local-only and must default OFF in committed
-env examples.
+Authentication is disabled by default for local web and desktop runs.
+Set `PMT_AUTH_DISABLED=false` and `NEXT_PUBLIC_AUTH_DISABLED=0` when
+you need to exercise authenticated JWT flows.

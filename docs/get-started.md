@@ -10,6 +10,9 @@ checks.
 - Node.js 20+ and `pnpm`
 - Python 3.12 and `uv`
 - Rust toolchain (`rustup`, `cargo`) for Tauri desktop work
+- Tauri platform prerequisites for desktop work:
+  Xcode Command Line Tools on macOS; Microsoft C++ Build Tools,
+  WebView2, and the Rust MSVC toolchain on Windows
 - Optional: Docker if you need the PostgreSQL/MailHog compose stack
 - Reflex reference checkout:
   `/Users/orbot/Developer/work/Portfolio-Management-Tool-reflex`
@@ -36,12 +39,14 @@ executables inside the backend venv live under `.\.venv\Scripts\`.
 
 ## Environment Files
 
-Committed examples must keep auth bypass OFF:
+Authentication is disabled by default for the current local web and
+desktop workflow:
 
-- `fastapi_backend/.env.example` documents
-  `# PMT_AUTH_DISABLED=true` as a commented local-only override.
-- `nextjs-frontend/.env.example` sets
-  `NEXT_PUBLIC_AUTH_DISABLED=0`.
+- `fastapi_backend/.env.example` sets `PMT_AUTH_DISABLED=true`.
+- `nextjs-frontend/.env.example` sets `NEXT_PUBLIC_AUTH_DISABLED=1`.
+
+For authenticated local development, set `PMT_AUTH_DISABLED=false` and
+`NEXT_PUBLIC_AUTH_DISABLED=0`.
 
 For normal authenticated local development, copy the examples and fill
 secret keys:
@@ -55,8 +60,8 @@ cd ../nextjs-frontend
 cp .env.example .env.local
 ```
 
-For parity work, prefer one-command environment overrides instead of
-editing `.env` files.
+For parity work, the defaults are enough; no auth-bypass shell
+overrides are needed.
 
 ## Three-Service Parity Loop
 
@@ -68,7 +73,6 @@ Terminal A, FastAPI backend on `127.0.0.1:8000`:
 ```bash
 cd fastapi_backend
 DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pmt-dev.sqlite3 \
-  PMT_AUTH_DISABLED=true \
   ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
@@ -76,7 +80,7 @@ Terminal B, Next.js web app on `localhost:3000`:
 
 ```bash
 cd nextjs-frontend
-NEXT_PUBLIC_AUTH_DISABLED=1 pnpm dev
+pnpm dev
 ```
 
 Terminal C, Reflex reference on `localhost:3001/pmt/`:
@@ -94,7 +98,6 @@ Terminal A:
 cd fastapi_backend
 $backendPath = (Get-Location).Path -replace '\\', '/'
 $env:DATABASE_URL = "sqlite+aiosqlite:///$backendPath/.pmt-dev.sqlite3"
-$env:PMT_AUTH_DISABLED = "true"
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
@@ -102,7 +105,6 @@ Terminal B:
 
 ```powershell
 cd nextjs-frontend
-$env:NEXT_PUBLIC_AUTH_DISABLED = "1"
 pnpm dev
 ```
 
@@ -162,6 +164,34 @@ The desktop shell packages a static Next.js export plus a FastAPI
 sidecar. Tauri reads the frontend from `nextjs-frontend/out` and the
 sidecar binary from `nextjs-frontend/src-tauri/binaries/`.
 
+See [Tauri Desktop Setup](tauri-desktop.md) for the full desktop setup
+guide, including Windows prerequisites and artifact paths.
+
+Desktop sanity checks:
+
+```bash
+node --version
+pnpm --version
+uv --version
+rustc --version
+cargo --version
+pnpm --dir nextjs-frontend exec tauri --version
+```
+
+Build or refresh the sidecar:
+
+```bash
+cd nextjs-frontend
+pnpm tauri:sidecar
+```
+
+Expected current-platform outputs:
+
+```text
+src-tauri/binaries/pmt-backend-<target-triple>[.exe]
+src-tauri/target/debug/pmt-backend[.exe]
+```
+
 Static export verification:
 
 ```bash
@@ -186,13 +216,27 @@ Desktop commands:
 
 ```bash
 cd nextjs-frontend
-pnpm tauri:sidecar
 pnpm tauri:dev
 pnpm tauri:build
 ```
 
 The sidecar default API URL is `http://127.0.0.1:18475`. Override it
 only when testing desktop startup or packaging behavior.
+
+Health checks while `pnpm tauri:dev` or a release app is running:
+
+```bash
+curl -sS http://127.0.0.1:18475/api/health
+curl -sS -o /tmp/pmt-positions.json -w 'HTTP:%{http_code} SIZE:%{size_download}\n' \
+  http://127.0.0.1:18475/api/positions/
+```
+
+Windows PowerShell:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:18475/api/health
+(Invoke-WebRequest http://127.0.0.1:18475/api/positions/).StatusCode
+```
 
 ## Verification Commands
 
@@ -232,11 +276,12 @@ Last known gate-close results:
 | Check | Result |
 |---|---|
 | TypeScript | clean |
-| Jest | 28 suites / 157 tests passed in 1.857 s |
+| Jest | 31 suites / 163 tests passed in 2 s |
 | Lint | 0 errors / 0 warnings |
 | Web build | 59 / 59 static pages generated |
-| Backend pytest | 187 passed, 2 skipped in 9.42 s |
+| Backend pytest | 187 passed, 2 skipped in 8.53 s |
 | Desktop static export | 59 / 59 static pages generated |
+| Tauri sidecar/dev/build | Passed on macOS arm64 |
 
 ## Parity Screenshots
 
@@ -255,9 +300,9 @@ route list, expected deltas, and reproduction steps.
   `http://127.0.0.1:8000/openapi.json` responds.
 - On Windows, use PowerShell `$env:NAME = "value"` assignments instead
   of POSIX inline `NAME=value command` syntax.
-- If dashboard pages redirect to login during parity work, confirm both
-  `PMT_AUTH_DISABLED=true` and `NEXT_PUBLIC_AUTH_DISABLED=1` are set
-  in the shell commands that started the backend and frontend.
+- If dashboard pages redirect to login during parity work, confirm
+  `PMT_AUTH_DISABLED` is not set to `false` and
+  `NEXT_PUBLIC_AUTH_DISABLED` is not set to `0`.
 - If Next.js screenshots show the notification sidebar collapsed, use a
   fresh browser session or clear the `pmt:next:notificationSidebarOpen`
   key.

@@ -57,13 +57,12 @@ Three-service parity loop:
 ```bash
 cd fastapi_backend
 DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pmt-dev.sqlite3 \
-  PMT_AUTH_DISABLED=true \
   ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 ```bash
 cd nextjs-frontend
-NEXT_PUBLIC_AUTH_DISABLED=1 pnpm dev
+pnpm dev
 ```
 
 ```bash
@@ -95,10 +94,11 @@ pnpm generate-client
 
 ## Safety Rules
 
-- Auth-bypass flags are local parity-only:
-  `PMT_AUTH_DISABLED=true` and `NEXT_PUBLIC_AUTH_DISABLED=1`.
-- Keep auth-bypass flags OFF in committed env examples.
-- Never enable auth bypass in production or shared long-lived
+- Authentication is disabled by default for the current local web and
+  desktop workflow.
+- Set `PMT_AUTH_DISABLED=false` and `NEXT_PUBLIC_AUTH_DISABLED=0` to
+  exercise authenticated JWT flows.
+- Never leave auth bypass enabled in production or shared long-lived
   environments.
 - All browser storage keys must use the `pmt:next:` prefix, including
   notification, pending-highlight, and grid-layout keys.

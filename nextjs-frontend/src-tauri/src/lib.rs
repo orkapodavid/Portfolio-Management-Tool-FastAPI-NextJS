@@ -23,6 +23,7 @@ const HEALTH_POLL_INTERVAL: Duration = Duration::from_millis(250);
 const HEALTH_REQUEST_TIMEOUT: Duration = Duration::from_secs(1);
 const DEFAULT_CORS_ORIGINS: &str = r#"["tauri://localhost","http://tauri.localhost","http://localhost:3000","http://127.0.0.1:3000"]"#;
 const SIDECAR_BINARY_NAME: &str = "pmt-backend";
+const AUTH_DISABLED_ENV: &str = "PMT_AUTH_DISABLED";
 const SIDECAR_WORKDIR_ENV: &str = "PMT_SIDECAR_WORKDIR";
 const SIDECAR_PORT_ENV: &str = "PMT_SIDECAR_PORT";
 const SIDECAR_HEALTH_TIMEOUT_ENV: &str = "PMT_SIDECAR_HEALTH_TIMEOUT_MS";
@@ -151,6 +152,10 @@ fn build_sidecar_command<R: Runtime>(
 
     if env::var_os("CORS_ORIGINS").is_none() {
         command = command.env("CORS_ORIGINS", DEFAULT_CORS_ORIGINS);
+    }
+
+    if env::var_os(AUTH_DISABLED_ENV).is_none() {
+        command = command.env(AUTH_DISABLED_ENV, "true");
     }
 
     if let Some(workdir) = env::var_os(SIDECAR_WORKDIR_ENV).map(PathBuf::from) {

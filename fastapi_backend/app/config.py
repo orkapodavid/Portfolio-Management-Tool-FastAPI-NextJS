@@ -58,11 +58,11 @@ class Settings(BaseSettings):
     # PMT Settings
     MOCK_DATA: bool = True  # Use mock data from pmt_core
 
-    # Dev-only escape hatch for parity work against the Reflex reference. When true,
-    # protected /api/* routes return a synthetic user instead of going through
-    # fastapi-users. Default False; never enable in production.
+    # Simple local/default mode: protected /api/* routes return a synthetic user
+    # instead of going through fastapi-users. Set PMT_AUTH_DISABLED=false when
+    # authenticated JWT flows need to be exercised.
     AUTH_DISABLED: bool = Field(
-        default=False,
+        default=True,
         validation_alias=AliasChoices("PMT_AUTH_DISABLED", "AUTH_DISABLED"),
     )
 
