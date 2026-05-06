@@ -7,6 +7,7 @@ import { instrumentsGetInstrumentTerm } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { instrumentTermSimulator } from "@/lib/grid-simulators/instruments";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type InstrumentTermRow = {
@@ -88,6 +89,7 @@ export default function InstrumentTermPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={instrumentTermSimulator}
       emptyMessage="No instrument term entries available."
       searchPlaceholder="Search instrument terms…"
     />

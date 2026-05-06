@@ -7,6 +7,7 @@ import { instrumentsGetInstrumentData } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { instrumentDataSimulator } from "@/lib/grid-simulators/instruments";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type InstrumentDataRow = {
@@ -88,6 +89,7 @@ export default function InstrumentDataPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={instrumentDataSimulator}
       emptyMessage="No instrument data entries available."
       searchPlaceholder="Search instrument data…"
     />

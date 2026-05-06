@@ -7,6 +7,7 @@ import { instrumentsGetStockScreener } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { stockScreenerSimulator } from "@/lib/grid-simulators/instruments";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type ScreenerRow = {
@@ -94,6 +95,7 @@ export default function StockScreenerPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={stockScreenerSimulator}
       rowIdKey="ticker"
       emptyMessage="No stock screener entries available."
       searchPlaceholder="Search screener…"

@@ -11,6 +11,7 @@ import {
   textColumn,
 } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { tickerDataSimulator } from "@/lib/grid-simulators/instruments";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type TickerRow = {
@@ -94,6 +95,7 @@ export default function InstrumentTickerDataPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={tickerDataSimulator}
       rowIdKey="ticker"
       emptyMessage="No ticker data available."
       searchPlaceholder="Search tickers…"
