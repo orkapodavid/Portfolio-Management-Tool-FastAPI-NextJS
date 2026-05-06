@@ -78,6 +78,11 @@ export default function InstrumentDataPage() {
   return (
     <DataGrid<InstrumentDataRow>
       gridId="instrument_data_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

@@ -80,6 +80,11 @@ export default function ShortEclPage() {
   return (
     <DataGrid<ShortEclRow>
       gridId="short_ecl_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

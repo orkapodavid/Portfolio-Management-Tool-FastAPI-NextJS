@@ -88,6 +88,11 @@ export default function PositionsPage() {
   return (
     <DataGrid<PositionRow>
       gridId="positions_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

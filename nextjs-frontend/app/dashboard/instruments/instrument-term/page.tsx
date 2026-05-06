@@ -78,6 +78,11 @@ export default function InstrumentTermPage() {
   return (
     <DataGrid<InstrumentTermRow>
       gridId="instrument_term_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

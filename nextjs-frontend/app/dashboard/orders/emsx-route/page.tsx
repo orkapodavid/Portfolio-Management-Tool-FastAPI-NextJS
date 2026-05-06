@@ -74,6 +74,11 @@ export default function EmsxRoutePage() {
   return (
     <DataGrid<RouteRow>
       gridId="emsx_route_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

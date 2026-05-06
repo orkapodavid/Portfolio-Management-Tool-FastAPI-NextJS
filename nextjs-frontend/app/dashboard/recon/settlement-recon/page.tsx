@@ -80,6 +80,11 @@ export default function SettlementReconPage() {
   return (
     <DataGrid<SettlementReconRow>
       gridId="settlement_recon_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

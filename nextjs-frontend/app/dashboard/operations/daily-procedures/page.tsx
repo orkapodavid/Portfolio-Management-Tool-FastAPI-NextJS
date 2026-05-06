@@ -80,6 +80,11 @@ export default function DailyProceduresPage() {
   return (
     <DataGrid<DailyProcedureRow>
       gridId="daily_procedures_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

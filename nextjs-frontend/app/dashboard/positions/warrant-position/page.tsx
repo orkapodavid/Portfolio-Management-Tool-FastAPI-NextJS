@@ -82,6 +82,11 @@ export default function WarrantPositionPage() {
   return (
     <DataGrid<WarrantPositionRow>
       gridId="warrant_position_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

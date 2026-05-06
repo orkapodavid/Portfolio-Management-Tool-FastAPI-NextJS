@@ -92,6 +92,11 @@ export default function FailedTradesPage() {
   return (
     <DataGrid<FailedTradeRow>
       gridId="failed_trades_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

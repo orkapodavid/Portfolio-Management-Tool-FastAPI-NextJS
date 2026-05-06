@@ -82,6 +82,11 @@ export default function DealIndicationPage() {
   return (
     <DataGrid<DealIndicationRow>
       gridId="deal_indication_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

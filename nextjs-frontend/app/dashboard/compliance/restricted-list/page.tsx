@@ -78,6 +78,11 @@ export default function RestrictedListPage() {
   return (
     <DataGrid<RestrictedListRow>
       gridId="restricted_list_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

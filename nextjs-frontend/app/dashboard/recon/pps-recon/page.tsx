@@ -78,6 +78,11 @@ export default function PpsReconPage() {
   return (
     <DataGrid<PpsReconRow>
       gridId="pps_recon_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

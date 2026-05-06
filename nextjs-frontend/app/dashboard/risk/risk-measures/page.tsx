@@ -86,6 +86,11 @@ export default function RiskMeasuresPage() {
   return (
     <DataGrid<RiskMeasureRow>
       gridId="risk_measures_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

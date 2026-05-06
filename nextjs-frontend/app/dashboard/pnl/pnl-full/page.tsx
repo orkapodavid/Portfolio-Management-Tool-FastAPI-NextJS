@@ -80,6 +80,11 @@ export default function PnlFullPage() {
   return (
     <DataGrid<PnlFullRow>
       gridId="pnl_full_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

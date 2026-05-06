@@ -86,6 +86,11 @@ export default function RiskInputsPage() {
   return (
     <DataGrid<RiskInputRow>
       gridId="risk_inputs_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

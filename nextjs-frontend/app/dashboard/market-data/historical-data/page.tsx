@@ -85,6 +85,11 @@ export default function HistoricalDataPage() {
   return (
     <DataGrid<HistoricalRow>
       gridId="historical_data_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

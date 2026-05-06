@@ -82,6 +82,11 @@ export default function EmsxOrderPage() {
   return (
     <DataGrid<OrderRow>
       gridId="emsx_order_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

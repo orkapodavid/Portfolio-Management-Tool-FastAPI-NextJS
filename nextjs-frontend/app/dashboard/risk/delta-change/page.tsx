@@ -78,6 +78,11 @@ export default function DeltaChangePage() {
   return (
     <DataGrid<DeltaChangeRow>
       gridId="delta_change_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

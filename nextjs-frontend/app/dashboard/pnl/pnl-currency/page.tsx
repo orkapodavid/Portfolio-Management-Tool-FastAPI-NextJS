@@ -83,6 +83,11 @@ export default function PnlCurrencyPage() {
   return (
     <DataGrid<PnlCurrencyRow>
       gridId="pnl_currency_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

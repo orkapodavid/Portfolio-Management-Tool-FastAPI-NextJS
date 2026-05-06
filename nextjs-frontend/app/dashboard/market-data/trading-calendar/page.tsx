@@ -82,6 +82,11 @@ export default function TradingCalendarPage() {
   return (
     <DataGrid<CalendarRow>
       gridId="trading_calendar_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

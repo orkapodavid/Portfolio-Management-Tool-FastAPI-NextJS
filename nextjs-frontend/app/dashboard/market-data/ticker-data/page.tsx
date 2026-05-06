@@ -84,6 +84,11 @@ export default function TickerDataPage() {
   return (
     <DataGrid<TickerRow>
       gridId="ticker_data_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

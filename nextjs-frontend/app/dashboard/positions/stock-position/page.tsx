@@ -86,6 +86,11 @@ export default function StockPositionPage() {
   return (
     <DataGrid<StockPositionRow>
       gridId="stock_position_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

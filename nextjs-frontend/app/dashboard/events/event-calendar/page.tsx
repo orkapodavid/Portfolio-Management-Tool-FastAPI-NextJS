@@ -74,6 +74,11 @@ export default function EventCalendarPage() {
   return (
     <DataGrid<EventCalendarRow>
       gridId="event_calendar_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

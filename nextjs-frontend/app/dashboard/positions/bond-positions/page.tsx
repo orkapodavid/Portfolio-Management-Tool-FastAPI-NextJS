@@ -82,6 +82,11 @@ export default function BondPositionsPage() {
   return (
     <DataGrid<BondPositionRow>
       gridId="bond_positions_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

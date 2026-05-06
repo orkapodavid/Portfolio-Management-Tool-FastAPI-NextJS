@@ -80,6 +80,11 @@ export default function PnlReconPage() {
   return (
     <DataGrid<PnlReconRow>
       gridId="pnl_recon_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

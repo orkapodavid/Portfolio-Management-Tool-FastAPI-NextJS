@@ -88,6 +88,11 @@ export default function TradeSummaryPage() {
   return (
     <DataGrid<TradeSummaryRow>
       gridId="trade_summary_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

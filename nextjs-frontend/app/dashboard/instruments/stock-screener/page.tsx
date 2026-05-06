@@ -84,6 +84,11 @@ export default function StockScreenerPage() {
   return (
     <DataGrid<ScreenerRow>
       gridId="stock_screener_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

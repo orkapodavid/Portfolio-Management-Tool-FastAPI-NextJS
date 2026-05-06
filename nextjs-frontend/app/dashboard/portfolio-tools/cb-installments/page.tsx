@@ -82,6 +82,11 @@ export default function CbInstallmentsPage() {
   return (
     <DataGrid<CbInstallmentRow>
       gridId="cb_installments_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

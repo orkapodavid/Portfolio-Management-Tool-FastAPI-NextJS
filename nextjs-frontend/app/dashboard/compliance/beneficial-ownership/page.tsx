@@ -80,6 +80,11 @@ export default function BeneficialOwnershipPage() {
   return (
     <DataGrid<BeneficialOwnershipRow>
       gridId="beneficial_ownership_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

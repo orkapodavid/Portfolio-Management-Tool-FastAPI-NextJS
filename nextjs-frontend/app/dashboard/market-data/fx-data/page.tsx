@@ -76,6 +76,11 @@ export default function FxDataPage() {
   return (
     <DataGrid<FxRow>
       gridId="fx_data_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

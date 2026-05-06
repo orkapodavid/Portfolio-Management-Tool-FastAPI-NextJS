@@ -84,6 +84,11 @@ export default function ResetDatesPage() {
   return (
     <DataGrid<ResetDateRow>
       gridId="reset_dates_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

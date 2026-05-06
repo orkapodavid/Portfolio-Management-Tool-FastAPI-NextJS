@@ -80,6 +80,11 @@ export default function PnlChangePage() {
   return (
     <DataGrid<PnlChangeRow>
       gridId="pnl_change_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}

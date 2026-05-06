@@ -76,6 +76,11 @@ export default function StockBorrowPage() {
   return (
     <DataGrid<StockBorrowRow>
       gridId="stock_borrow_grid"
+      showCompactToggle
+      showAutoRefresh
+      showRowNumbers
+      enableMultiSelect
+      enableCellFlash
       columns={columns}
       rows={rows}
       isLoading={isLoading}
