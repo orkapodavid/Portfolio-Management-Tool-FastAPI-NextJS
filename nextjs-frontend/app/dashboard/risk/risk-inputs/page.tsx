@@ -7,6 +7,7 @@ import { riskGetRiskInputs } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { riskInputsSimulator } from "@/lib/grid-simulators/risk";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type RiskInputRow = {
@@ -97,6 +98,7 @@ export default function RiskInputsPage() {
       errorMessage={errorMessage}
       onRefresh={load}
       rowIdKey="ticker"
+      simulateUpdate={riskInputsSimulator}
       emptyMessage="No risk inputs available."
       searchPlaceholder="Search risk inputs…"
     />

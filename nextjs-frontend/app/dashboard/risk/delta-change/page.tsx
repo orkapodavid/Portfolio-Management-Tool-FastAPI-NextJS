@@ -8,6 +8,7 @@ import { DataGrid } from "@/components/grid/data-grid";
 import { SingleDateFilterBar } from "@/components/grid/filter-bar";
 import { textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { deltaChangeSimulator } from "@/lib/grid-simulators/risk";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type DeltaChangeRow = {
@@ -107,6 +108,7 @@ export default function DeltaChangePage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={() => load(appliedDate)}
+      simulateUpdate={deltaChangeSimulator}
       emptyMessage="No delta change data available."
       searchPlaceholder="Search delta change…"
       filterBar={

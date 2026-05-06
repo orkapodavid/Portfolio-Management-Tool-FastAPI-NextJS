@@ -8,6 +8,7 @@ import { DataGrid } from "@/components/grid/data-grid";
 import { SingleDateFilterBar } from "@/components/grid/filter-bar";
 import { textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { riskMeasuresSimulator } from "@/lib/grid-simulators/risk";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type RiskMeasureRow = {
@@ -115,6 +116,7 @@ export default function RiskMeasuresPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={() => load(appliedDate)}
+      simulateUpdate={riskMeasuresSimulator}
       emptyMessage="No risk measures available."
       searchPlaceholder="Search risk measures…"
       filterBar={
