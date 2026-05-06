@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { complianceGetMonthlyExerciseLimit } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
+import { SingleDateFilterBar } from "@/components/grid/filter-bar";
 import { textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
 import { getApiData, getApiError } from "@/lib/utils";
@@ -44,36 +45,55 @@ export default function MonthlyExerciseLimitPage() {
   const [rows, setRows] = useState<MonthlyExerciseLimitRow[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [draftDate, setDraftDate] = useState("");
+  const [appliedDate, setAppliedDate] = useState("");
 
-  const load = useCallback(async () => {
-    setIsLoading(true);
-    const token = getAuthToken();
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-    const response = await complianceGetMonthlyExerciseLimit({
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const error = getApiError(response);
-    if (error) {
-      const status = getStatus(error);
-      if (status === 401 || status === 403) {
+  const load = useCallback(
+    async (date: string) => {
+      setIsLoading(true);
+      const token = getAuthToken();
+      if (!token) {
         router.replace("/login");
         return;
       }
-      setErrorMessage("Failed to load monthly exercise limit.");
+      const response = await complianceGetMonthlyExerciseLimit({
+        headers: { Authorization: `Bearer ${token}` },
+        query: date ? { position_date: date } : undefined,
+      });
+      const error = getApiError(response);
+      if (error) {
+        const status = getStatus(error);
+        if (status === 401 || status === 403) {
+          router.replace("/login");
+          return;
+        }
+        setErrorMessage("Failed to load monthly exercise limit.");
+        setIsLoading(false);
+        return;
+      }
+      setRows((getApiData(response) as MonthlyExerciseLimitRow[]) ?? []);
+      setErrorMessage(null);
       setIsLoading(false);
-      return;
-    }
-    setRows((getApiData(response) as MonthlyExerciseLimitRow[]) ?? []);
-    setErrorMessage(null);
-    setIsLoading(false);
-  }, [router]);
+    },
+    [router]
+  );
 
   useEffect(() => {
-    void load();
+    void load("");
   }, [load]);
+
+  const onApply = () => {
+    setAppliedDate(draftDate);
+    void load(draftDate);
+  };
+
+  const onClear = () => {
+    setDraftDate("");
+    setAppliedDate("");
+    void load("");
+  };
+
+  const onRefresh = () => load(appliedDate);
 
   return (
     <DataGrid<MonthlyExerciseLimitRow>
@@ -87,9 +107,19 @@ export default function MonthlyExerciseLimitPage() {
       rows={rows}
       isLoading={isLoading}
       errorMessage={errorMessage}
-      onRefresh={load}
+      onRefresh={onRefresh}
       emptyMessage="No monthly exercise limit entries available."
       searchPlaceholder="Search monthly exercise limit…"
+      filterBar={
+        <SingleDateFilterBar
+          label="Position Date"
+          value={draftDate}
+          onChange={setDraftDate}
+          onApply={onApply}
+          onClear={onClear}
+          hasActiveFilters={Boolean(appliedDate)}
+        />
+      }
     />
   );
 }

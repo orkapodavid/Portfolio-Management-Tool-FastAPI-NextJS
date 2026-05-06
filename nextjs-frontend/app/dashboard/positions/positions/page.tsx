@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { positionsGetPositions } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
+import { SingleDateFilterBar } from "@/components/grid/filter-bar";
 import {
   currencyColumn,
   dateColumn,
@@ -54,36 +55,53 @@ export default function PositionsPage() {
   const [rows, setRows] = useState<PositionRow[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [draftDate, setDraftDate] = useState("");
+  const [appliedDate, setAppliedDate] = useState("");
 
-  const load = useCallback(async () => {
-    setIsLoading(true);
-    const token = getAuthToken();
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-    const response = await positionsGetPositions({
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const error = getApiError(response);
-    if (error) {
-      const status = getStatus(error);
-      if (status === 401 || status === 403) {
+  const load = useCallback(
+    async (date: string) => {
+      setIsLoading(true);
+      const token = getAuthToken();
+      if (!token) {
         router.replace("/login");
         return;
       }
-      setErrorMessage("Failed to load positions.");
+      const response = await positionsGetPositions({
+        headers: { Authorization: `Bearer ${token}` },
+        query: date ? { position_date: date } : undefined,
+      });
+      const error = getApiError(response);
+      if (error) {
+        const status = getStatus(error);
+        if (status === 401 || status === 403) {
+          router.replace("/login");
+          return;
+        }
+        setErrorMessage("Failed to load positions.");
+        setIsLoading(false);
+        return;
+      }
+      setRows((getApiData(response) as PositionRow[]) ?? []);
+      setErrorMessage(null);
       setIsLoading(false);
-      return;
-    }
-    setRows((getApiData(response) as PositionRow[]) ?? []);
-    setErrorMessage(null);
-    setIsLoading(false);
-  }, [router]);
+    },
+    [router]
+  );
 
   useEffect(() => {
-    void load();
+    void load("");
   }, [load]);
+
+  const onApply = () => {
+    setAppliedDate(draftDate);
+    void load(draftDate);
+  };
+
+  const onClear = () => {
+    setDraftDate("");
+    setAppliedDate("");
+    void load("");
+  };
 
   return (
     <DataGrid<PositionRow>
@@ -97,9 +115,19 @@ export default function PositionsPage() {
       rows={rows}
       isLoading={isLoading}
       errorMessage={errorMessage}
-      onRefresh={load}
+      onRefresh={() => load(appliedDate)}
       emptyMessage="No positions available."
       searchPlaceholder="Search positions…"
+      filterBar={
+        <SingleDateFilterBar
+          label="Position Date"
+          value={draftDate}
+          onChange={setDraftDate}
+          onApply={onApply}
+          onClear={onClear}
+          hasActiveFilters={Boolean(appliedDate)}
+        />
+      }
     />
   );
 }

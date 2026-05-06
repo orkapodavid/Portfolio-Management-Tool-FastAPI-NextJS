@@ -111,6 +111,8 @@ type DataGridProps<TRow> = {
   toolbarDate?: string;
   /** Handler called when the toolbar date input changes. */
   onToolbarDateChange?: (value: string) => void;
+  /** Optional page-specific filter strip rendered between the toolbar and grid. */
+  filterBar?: React.ReactNode;
 };
 
 const COMPACT_ROW_HEIGHT = 28;
@@ -169,6 +171,7 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   onGenerate,
   toolbarDate,
   onToolbarDateChange,
+  filterBar,
 }: DataGridProps<TRow>) {
   const [generateOpen, setGenerateOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -551,6 +554,7 @@ export function DataGrid<TRow extends Record<string, unknown>>({
           {toolbarEnd}
         </div>
       </div>
+      {filterBar}
       {errorMessage ? (
         <div className="m-3 rounded border border-red-500/40 bg-red-50 p-3 text-sm text-red-700">
           {errorMessage}
