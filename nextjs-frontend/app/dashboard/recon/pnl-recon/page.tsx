@@ -99,7 +99,6 @@ export default function PnlReconPage() {
     <DataGrid<PnlReconRow>
       gridId="pnl_recon_grid"
       showCompactToggle
-      showAutoRefresh
       showRowNumbers
       enableMultiSelect
       enableCellFlash

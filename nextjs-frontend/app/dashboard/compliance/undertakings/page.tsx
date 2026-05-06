@@ -75,7 +75,6 @@ export default function UndertakingsPage() {
     <DataGrid<UndertakingRow>
       gridId="undertakings_grid"
       showCompactToggle
-      showAutoRefresh
       showRowNumbers
       enableMultiSelect
       enableCellFlash

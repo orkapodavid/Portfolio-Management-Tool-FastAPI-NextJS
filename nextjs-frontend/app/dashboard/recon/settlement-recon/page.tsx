@@ -99,7 +99,6 @@ export default function SettlementReconPage() {
     <DataGrid<SettlementReconRow>
       gridId="settlement_recon_grid"
       showCompactToggle
-      showAutoRefresh
       showRowNumbers
       enableMultiSelect
       enableCellFlash

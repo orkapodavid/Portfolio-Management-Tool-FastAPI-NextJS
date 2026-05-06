@@ -97,7 +97,6 @@ export default function PpsReconPage() {
     <DataGrid<PpsReconRow>
       gridId="pps_recon_grid"
       showCompactToggle
-      showAutoRefresh
       showRowNumbers
       enableMultiSelect
       enableCellFlash

@@ -75,7 +75,6 @@ export default function MarketHoursPage() {
     <DataGrid<MarketHoursRow>
       gridId="market_hours_grid"
       showCompactToggle
-      showAutoRefresh
       showRowNumbers
       enableMultiSelect
       enableCellFlash

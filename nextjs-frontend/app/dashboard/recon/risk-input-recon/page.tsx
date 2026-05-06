@@ -97,7 +97,6 @@ export default function RiskInputReconPage() {
     <DataGrid<RiskInputReconRow>
       gridId="risk_input_recon_grid"
       showCompactToggle
-      showAutoRefresh
       showRowNumbers
       enableMultiSelect
       enableCellFlash

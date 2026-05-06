@@ -86,7 +86,6 @@ export default function InstrumentTickerDataPage() {
     <DataGrid<TickerRow>
       gridId="ticker_data_grid"
       showCompactToggle
-      showAutoRefresh
       showRowNumbers
       enableMultiSelect
       enableCellFlash
