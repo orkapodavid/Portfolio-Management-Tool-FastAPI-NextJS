@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { eventsGetEventCalendar } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
+import { DateRangeFilterBar } from "@/components/grid/filter-bar";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
 import { getApiData, getApiError } from "@/lib/utils";
@@ -35,41 +36,66 @@ const getStatus = (e: unknown): number | undefined => {
   return (e as { response?: { status?: number } }).response?.status;
 };
 
+type DateRange = { start: string; end: string };
+const EMPTY_RANGE: DateRange = { start: "", end: "" };
+
 export default function EventCalendarPage() {
   const router = useRouter();
   const [rows, setRows] = useState<EventCalendarRow[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [draftRange, setDraftRange] = useState<DateRange>(EMPTY_RANGE);
+  const [appliedRange, setAppliedRange] = useState<DateRange>(EMPTY_RANGE);
 
-  const load = useCallback(async () => {
-    setIsLoading(true);
-    const token = getAuthToken();
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-    const response = await eventsGetEventCalendar({
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const error = getApiError(response);
-    if (error) {
-      const status = getStatus(error);
-      if (status === 401 || status === 403) {
+  const load = useCallback(
+    async (range: DateRange) => {
+      setIsLoading(true);
+      const token = getAuthToken();
+      if (!token) {
         router.replace("/login");
         return;
       }
-      setErrorMessage("Failed to load event calendar.");
+      const query: { start_date?: string; end_date?: string } = {};
+      if (range.start) query.start_date = range.start;
+      if (range.end) query.end_date = range.end;
+      const response = await eventsGetEventCalendar({
+        headers: { Authorization: `Bearer ${token}` },
+        query: Object.keys(query).length > 0 ? query : undefined,
+      });
+      const error = getApiError(response);
+      if (error) {
+        const status = getStatus(error);
+        if (status === 401 || status === 403) {
+          router.replace("/login");
+          return;
+        }
+        setErrorMessage("Failed to load event calendar.");
+        setIsLoading(false);
+        return;
+      }
+      setRows((getApiData(response) as EventCalendarRow[]) ?? []);
+      setErrorMessage(null);
       setIsLoading(false);
-      return;
-    }
-    setRows((getApiData(response) as EventCalendarRow[]) ?? []);
-    setErrorMessage(null);
-    setIsLoading(false);
-  }, [router]);
+    },
+    [router]
+  );
 
   useEffect(() => {
-    void load();
+    void load(EMPTY_RANGE);
   }, [load]);
+
+  const onApply = () => {
+    setAppliedRange(draftRange);
+    void load(draftRange);
+  };
+
+  const onClear = () => {
+    setDraftRange(EMPTY_RANGE);
+    setAppliedRange(EMPTY_RANGE);
+    void load(EMPTY_RANGE);
+  };
+
+  const hasActive = Boolean(appliedRange.start || appliedRange.end);
 
   return (
     <DataGrid<EventCalendarRow>
@@ -83,9 +109,20 @@ export default function EventCalendarPage() {
       rows={rows}
       isLoading={isLoading}
       errorMessage={errorMessage}
-      onRefresh={load}
+      onRefresh={() => load(appliedRange)}
       emptyMessage="No event calendar entries available."
       searchPlaceholder="Search events…"
+      filterBar={
+        <DateRangeFilterBar
+          fromValue={draftRange.start}
+          toValue={draftRange.end}
+          onFromChange={(start) => setDraftRange((prev) => ({ ...prev, start }))}
+          onToChange={(end) => setDraftRange((prev) => ({ ...prev, end }))}
+          onApply={onApply}
+          onClear={onClear}
+          hasActiveFilters={hasActive}
+        />
+      }
     />
   );
 }
