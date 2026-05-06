@@ -34,6 +34,20 @@ class TestComplianceBeneficialOwnership:
         response = await test_client.get("/api/compliance/beneficial-ownership")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
+    @pytest.mark.asyncio(loop_scope="function")
+    async def test_accepts_position_date_query(
+        self, test_client, authenticated_user
+    ):
+        response = await test_client.get(
+            "/api/compliance/beneficial-ownership",
+            headers=authenticated_user["headers"],
+            params={"position_date": "2026-04-15"},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        body = response.json()
+        assert body, "expected mock data"
+        assert all(row["trade_date"] == "2026-04-15" for row in body)
+
 
 class TestComplianceMonthlyExerciseLimit:
     @pytest.mark.asyncio(loop_scope="function")

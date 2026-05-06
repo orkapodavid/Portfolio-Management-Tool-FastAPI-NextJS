@@ -27,9 +27,12 @@ async def get_undertakings(
 
 @router.get("/beneficial-ownership")
 async def get_beneficial_ownership(
+    position_date: Optional[str] = Query(default=None),
     user: User = Depends(current_active_user),
 ):
-    return await compliance_service.get_beneficial_ownership()
+    return await compliance_service.get_beneficial_ownership(
+        position_date=position_date
+    )
 
 
 @router.get("/monthly-exercise-limit")
