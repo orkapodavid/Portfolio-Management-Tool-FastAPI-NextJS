@@ -13,7 +13,7 @@ does on the Reflex reference.
 ## Capture environment
 
 Re-captured 2026-05-11 at 1440×900 viewport via `playwright-cli`
-after the Milestone C independent polish pass. All 22 canonical PNGs
+after the Milestone C gate-close pass. All 22 canonical PNGs
 were re-shot against:
 
 | Service  | Port | Flags |

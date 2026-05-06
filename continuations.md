@@ -43,11 +43,16 @@ Milestone C items that did not require product decisions:
   under `pmt:next:notificationSidebarOpen`.
 - `fddcc06 style(portfolio-tools): normalize column labels with Reflex`
   closed F-36 label abbreviation drift on Portfolio Tools pages.
+- `6a3b434 docs(parity): document column supersets and closed gates`
+  documents F-35 Next.js read-only column supersets as intentional.
+- `789c784 docs(parity-screenshots): re-capture canonical screenshots after gate close`
+  re-shot all 22 canonical Reflex/Next.js screenshot pairs at 1440x900.
 
-Visual QA: a contact sheet of the 22 refreshed captures was inspected.
-The captures are nonblank and framed correctly. Re-shoot after the
-final verification pass captures the default-open notification sidebar
-and Reset Dates filter bar.
+Visual QA: all 22 refreshed captures are 1440x900 and nonblank. The
+representative Next.js Market Data capture shows the notification
+sidebar open by default. A Playwright spot-check on
+`/dashboard/portfolio-tools/reset-dates` showed the filter bar present,
+five selects rendered, and `Market Price` absent from visible text.
 
 ### Product gates closed
 
@@ -69,9 +74,9 @@ Grid Enterprise license procurement.
 | Check | Result |
 |---|---|
 | `pnpm exec tsc --noEmit` | clean |
-| `pnpm exec jest --runInBand` | 26 suites / 153 tests passed in 1.653 s |
+| `pnpm exec jest --runInBand` | 28 suites / 157 tests passed in 1.857 s |
 | `pnpm lint` | 0 errors / 0 warnings |
-| Backend pytest with sqlite override | 186 passed, 2 skipped in 8.61 s |
+| Backend pytest with sqlite override | 187 passed, 2 skipped in 9.42 s |
 | `pnpm build` | PASS — 59 / 59 static pages generated |
 | Desktop static export (`TAURI_BUILD=1 NEXT_PUBLIC_DESKTOP_TARGET=1 ... pnpm build`) | PASS — 59 / 59 static pages generated |
 
