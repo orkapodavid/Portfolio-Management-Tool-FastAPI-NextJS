@@ -13,6 +13,7 @@ import {
   type StatusPanelDef,
 } from "ag-grid-community";
 import {
+  CalendarDays,
   ChevronDown,
   Clock,
   FileSpreadsheet,
@@ -105,6 +106,10 @@ type DataGridProps<TRow> = {
   generateItems?: string[];
   /** Handler invoked with the chosen Generate item label. */
   onGenerate?: (item: string) => void;
+  /** Show a single-date picker in the toolbar (controlled). */
+  toolbarDate?: string;
+  /** Handler called when the toolbar date input changes. */
+  onToolbarDateChange?: (value: string) => void;
 };
 
 const COMPACT_ROW_HEIGHT = 28;
@@ -161,6 +166,8 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   autoRefreshIntervalMs = 30_000,
   generateItems,
   onGenerate,
+  toolbarDate,
+  onToolbarDateChange,
 }: DataGridProps<TRow>) {
   const [generateOpen, setGenerateOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -453,6 +460,23 @@ export function DataGrid<TRow extends Record<string, unknown>>({
               </button>
             ) : null}
           </div>
+          {onToolbarDateChange ? (
+            <div className="group relative flex items-center bg-white border border-gray-200/80 rounded-lg h-7 min-w-[140px] shadow-sm hover:shadow-md hover:border-blue-300/60 transition-all duration-200 overflow-hidden cursor-pointer">
+              <div className="flex items-center justify-center w-7 h-full bg-gradient-to-br from-blue-50 to-indigo-50 border-r border-gray-100 group-hover:from-blue-100 group-hover:to-indigo-100 transition-all duration-200">
+                <CalendarDays size={14} className="text-blue-500 group-hover:text-blue-600 transition-colors" />
+              </div>
+              <input
+                type="date"
+                aria-label="Date"
+                value={toolbarDate ?? ""}
+                onChange={(event) => onToolbarDateChange(event.target.value)}
+                className="flex-1 bg-transparent text-[11px] font-semibold text-gray-700 outline-none px-2.5 h-full cursor-pointer"
+              />
+              <div className="flex items-center justify-center pr-2">
+                <ChevronDown size={12} className="text-gray-400 group-hover:text-blue-500 transition-colors" />
+              </div>
+            </div>
+          ) : null}
         </div>
         <div className="flex items-center gap-1 shrink-0">
           {showCompactToggle ? (
