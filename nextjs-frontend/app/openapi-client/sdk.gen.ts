@@ -128,6 +128,7 @@ import type {
   ComplianceGetRestrictedListResponses,
   ComplianceGetUndertakingsData,
   ComplianceGetUndertakingsResponses,
+  ComplianceGetUndertakingsErrors,
   ComplianceGetBeneficialOwnershipData,
   ComplianceGetBeneficialOwnershipResponses,
   ComplianceGetBeneficialOwnershipErrors,
@@ -1221,7 +1222,7 @@ export const complianceGetUndertakings = <ThrowOnError extends boolean = false>(
 ) => {
   return (options?.client ?? client).get<
     ComplianceGetUndertakingsResponses,
-    unknown,
+    ComplianceGetUndertakingsErrors,
     ThrowOnError
   >({
     responseType: "json",

@@ -1738,9 +1738,24 @@ export type ComplianceGetRestrictedListResponses = {
 export type ComplianceGetUndertakingsData = {
   body?: never;
   path?: never;
-  query?: never;
+  query?: {
+    /**
+     * Position Date
+     */
+    position_date?: string | null;
+  };
   url: "/api/compliance/undertakings";
 };
+
+export type ComplianceGetUndertakingsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type ComplianceGetUndertakingsError =
+  ComplianceGetUndertakingsErrors[keyof ComplianceGetUndertakingsErrors];
 
 export type ComplianceGetUndertakingsResponses = {
   /**
