@@ -75,6 +75,7 @@ export default function FxDataPage() {
 
   return (
     <DataGrid<FxRow>
+      gridId="fx_data_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

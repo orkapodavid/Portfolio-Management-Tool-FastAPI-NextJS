@@ -73,6 +73,7 @@ export default function EventCalendarPage() {
 
   return (
     <DataGrid<EventCalendarRow>
+      gridId="event_calendar_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

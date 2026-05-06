@@ -77,6 +77,7 @@ export default function PpsReconPage() {
 
   return (
     <DataGrid<PpsReconRow>
+      gridId="pps_recon_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

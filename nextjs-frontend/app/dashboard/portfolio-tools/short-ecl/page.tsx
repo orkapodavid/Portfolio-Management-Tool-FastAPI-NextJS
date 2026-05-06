@@ -79,6 +79,7 @@ export default function ShortEclPage() {
 
   return (
     <DataGrid<ShortEclRow>
+      gridId="short_ecl_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

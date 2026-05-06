@@ -85,6 +85,7 @@ export default function EventStreamPage() {
 
   return (
     <DataGrid<EventStreamRow>
+      gridId="event_stream_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

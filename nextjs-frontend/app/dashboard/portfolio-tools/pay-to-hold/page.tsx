@@ -85,6 +85,7 @@ export default function PayToHoldPage() {
 
   return (
     <DataGrid<PayToHoldRow>
+      gridId="pay_to_hold_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

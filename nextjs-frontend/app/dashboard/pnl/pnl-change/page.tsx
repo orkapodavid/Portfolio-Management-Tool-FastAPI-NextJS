@@ -79,6 +79,7 @@ export default function PnlChangePage() {
 
   return (
     <DataGrid<PnlChangeRow>
+      gridId="pnl_change_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

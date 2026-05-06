@@ -82,6 +82,7 @@ export default function PnlSummaryPage() {
 
   return (
     <DataGrid<PnlSummaryRow>
+      gridId="pnl_summary_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

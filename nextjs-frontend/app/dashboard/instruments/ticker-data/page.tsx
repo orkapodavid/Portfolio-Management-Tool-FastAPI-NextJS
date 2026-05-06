@@ -83,6 +83,7 @@ export default function InstrumentTickerDataPage() {
 
   return (
     <DataGrid<TickerRow>
+      gridId="ticker_data_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

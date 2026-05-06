@@ -77,6 +77,7 @@ export default function ExcessAmountPage() {
 
   return (
     <DataGrid<ExcessAmountRow>
+      gridId="excess_amount_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

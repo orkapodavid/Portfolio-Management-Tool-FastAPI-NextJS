@@ -85,6 +85,7 @@ export default function RiskInputsPage() {
 
   return (
     <DataGrid<RiskInputRow>
+      gridId="risk_inputs_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

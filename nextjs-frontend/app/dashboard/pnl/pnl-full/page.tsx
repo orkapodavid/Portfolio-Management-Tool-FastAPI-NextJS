@@ -79,6 +79,7 @@ export default function PnlFullPage() {
 
   return (
     <DataGrid<PnlFullRow>
+      gridId="pnl_full_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

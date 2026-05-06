@@ -99,6 +99,7 @@ export default function MarketDataPage() {
 
   return (
     <DataGrid<MarketDataRow>
+      gridId="market_data_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

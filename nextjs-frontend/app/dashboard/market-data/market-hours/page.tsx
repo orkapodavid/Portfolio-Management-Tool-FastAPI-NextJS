@@ -73,6 +73,7 @@ export default function MarketHoursPage() {
 
   return (
     <DataGrid<MarketHoursRow>
+      gridId="market_hours_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

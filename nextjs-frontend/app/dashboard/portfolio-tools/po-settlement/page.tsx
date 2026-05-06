@@ -81,6 +81,7 @@ export default function PoSettlementPage() {
 
   return (
     <DataGrid<PoSettlementRow>
+      gridId="po_settlement_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

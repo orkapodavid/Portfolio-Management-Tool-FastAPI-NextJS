@@ -79,6 +79,7 @@ export default function DailyProceduresPage() {
 
   return (
     <DataGrid<DailyProcedureRow>
+      gridId="daily_procedures_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

@@ -83,6 +83,7 @@ export default function StockScreenerPage() {
 
   return (
     <DataGrid<ScreenerRow>
+      gridId="stock_screener_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

@@ -81,6 +81,7 @@ export default function EmsxOrderPage() {
 
   return (
     <DataGrid<OrderRow>
+      gridId="emsx_order_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

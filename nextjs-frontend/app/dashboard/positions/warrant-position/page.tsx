@@ -81,6 +81,7 @@ export default function WarrantPositionPage() {
 
   return (
     <DataGrid<WarrantPositionRow>
+      gridId="warrant_position_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

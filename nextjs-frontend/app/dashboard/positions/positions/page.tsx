@@ -87,6 +87,7 @@ export default function PositionsPage() {
 
   return (
     <DataGrid<PositionRow>
+      gridId="positions_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

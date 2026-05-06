@@ -73,6 +73,7 @@ export default function UndertakingsPage() {
 
   return (
     <DataGrid<UndertakingRow>
+      gridId="undertakings_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

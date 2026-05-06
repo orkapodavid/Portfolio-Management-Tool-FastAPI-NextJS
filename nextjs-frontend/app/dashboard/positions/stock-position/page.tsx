@@ -85,6 +85,7 @@ export default function StockPositionPage() {
 
   return (
     <DataGrid<StockPositionRow>
+      gridId="stock_position_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

@@ -75,6 +75,7 @@ export default function StockBorrowPage() {
 
   return (
     <DataGrid<StockBorrowRow>
+      gridId="stock_borrow_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

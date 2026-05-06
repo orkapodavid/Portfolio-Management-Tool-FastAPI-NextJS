@@ -65,6 +65,7 @@ export default function OperationProcessPage() {
 
   return (
     <DataGrid<OperationProcessRow>
+      gridId="operation_process_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

@@ -75,6 +75,7 @@ export default function SpecialTermsPage() {
 
   return (
     <DataGrid<SpecialTermRow>
+      gridId="special_term_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

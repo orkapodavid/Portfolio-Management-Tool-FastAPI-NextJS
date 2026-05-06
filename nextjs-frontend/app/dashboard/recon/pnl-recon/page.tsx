@@ -79,6 +79,7 @@ export default function PnlReconPage() {
 
   return (
     <DataGrid<PnlReconRow>
+      gridId="pnl_recon_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

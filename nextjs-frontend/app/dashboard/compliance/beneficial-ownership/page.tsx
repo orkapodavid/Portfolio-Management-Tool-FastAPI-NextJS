@@ -79,6 +79,7 @@ export default function BeneficialOwnershipPage() {
 
   return (
     <DataGrid<BeneficialOwnershipRow>
+      gridId="beneficial_ownership_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

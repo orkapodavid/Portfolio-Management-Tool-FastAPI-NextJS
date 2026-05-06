@@ -77,6 +77,7 @@ export default function MonthlyExerciseLimitPage() {
 
   return (
     <DataGrid<MonthlyExerciseLimitRow>
+      gridId="monthly_exercise_limit_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

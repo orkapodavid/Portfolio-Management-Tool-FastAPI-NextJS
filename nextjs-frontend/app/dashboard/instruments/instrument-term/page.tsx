@@ -77,6 +77,7 @@ export default function InstrumentTermPage() {
 
   return (
     <DataGrid<InstrumentTermRow>
+      gridId="instrument_term_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

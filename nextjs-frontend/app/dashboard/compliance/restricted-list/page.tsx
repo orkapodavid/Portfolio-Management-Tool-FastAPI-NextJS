@@ -77,6 +77,7 @@ export default function RestrictedListPage() {
 
   return (
     <DataGrid<RestrictedListRow>
+      gridId="restricted_list_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

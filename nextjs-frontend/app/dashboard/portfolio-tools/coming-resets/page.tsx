@@ -77,6 +77,7 @@ export default function ComingResetsPage() {
 
   return (
     <DataGrid<ComingResetRow>
+      gridId="coming_resets_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

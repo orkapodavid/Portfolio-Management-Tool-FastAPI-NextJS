@@ -73,6 +73,7 @@ export default function ReverseInquiryPage() {
 
   return (
     <DataGrid<ReverseInquiryRow>
+      gridId="reverse_inquiry_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

@@ -85,6 +85,7 @@ export default function RiskMeasuresPage() {
 
   return (
     <DataGrid<RiskMeasureRow>
+      gridId="risk_measures_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}

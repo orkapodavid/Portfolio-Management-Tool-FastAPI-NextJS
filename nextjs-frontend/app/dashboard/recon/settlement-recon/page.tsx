@@ -79,6 +79,7 @@ export default function SettlementReconPage() {
 
   return (
     <DataGrid<SettlementReconRow>
+      gridId="settlement_recon_grid"
       columns={columns}
       rows={rows}
       isLoading={isLoading}
