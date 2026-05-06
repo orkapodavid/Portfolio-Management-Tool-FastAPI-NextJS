@@ -12,6 +12,7 @@ import {
   textColumn,
 } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { historicalDataSimulator } from "@/lib/grid-simulators/market-data-historical";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type HistoricalRow = {
@@ -95,6 +96,8 @@ export default function HistoricalDataPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={historicalDataSimulator}
+      simulateUpdateIntervalMs={5_000}
       emptyMessage="No historical data available."
       searchPlaceholder="Search history…"
     />
