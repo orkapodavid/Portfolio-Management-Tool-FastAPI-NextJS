@@ -7,6 +7,7 @@ import { portfolioToolsGetResetDates } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { resetDatesSimulator } from "@/lib/grid-simulators/portfolio-tools";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type ResetDateRow = {
@@ -94,6 +95,7 @@ export default function ResetDatesPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={resetDatesSimulator}
       emptyMessage="No reset dates available."
       searchPlaceholder="Search reset dates…"
     />

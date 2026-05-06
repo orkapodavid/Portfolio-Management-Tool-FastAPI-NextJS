@@ -8,6 +8,7 @@ import { DataGrid } from "@/components/grid/data-grid";
 import { SingleDateFilterBar } from "@/components/grid/filter-bar";
 import { textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { poSettlementSimulator } from "@/lib/grid-simulators/portfolio-tools";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type PoSettlementRow = {
@@ -110,6 +111,7 @@ export default function PoSettlementPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={() => load(appliedDate)}
+      simulateUpdate={poSettlementSimulator}
       emptyMessage="No PO settlement entries available."
       searchPlaceholder="Search PO settlement…"
       filterBar={

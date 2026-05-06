@@ -7,6 +7,7 @@ import { portfolioToolsGetStockBorrow } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { stockBorrowSimulator } from "@/lib/grid-simulators/portfolio-tools";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type StockBorrowRow = {
@@ -86,6 +87,7 @@ export default function StockBorrowPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={stockBorrowSimulator}
       emptyMessage="No stock borrow entries available."
       searchPlaceholder="Search stock borrow…"
     />

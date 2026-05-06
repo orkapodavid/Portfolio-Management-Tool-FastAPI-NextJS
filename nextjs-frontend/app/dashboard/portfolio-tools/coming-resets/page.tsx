@@ -7,6 +7,7 @@ import { portfolioToolsGetComingResets } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { comingResetsSimulator } from "@/lib/grid-simulators/portfolio-tools";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type ComingResetRow = {
@@ -88,6 +89,7 @@ export default function ComingResetsPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={comingResetsSimulator}
       emptyMessage="No coming resets available."
       searchPlaceholder="Search coming resets…"
     />

@@ -8,6 +8,7 @@ import { DataGrid } from "@/components/grid/data-grid";
 import { SingleDateFilterBar } from "@/components/grid/filter-bar";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { cbInstallmentsSimulator } from "@/lib/grid-simulators/portfolio-tools";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type CbInstallmentRow = {
@@ -110,6 +111,7 @@ export default function CbInstallmentsPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={() => load(appliedDate)}
+      simulateUpdate={cbInstallmentsSimulator}
       emptyMessage="No CB installments available."
       searchPlaceholder="Search CB installments…"
       filterBar={

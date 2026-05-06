@@ -7,6 +7,7 @@ import { portfolioToolsGetShortEcl } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { shortEclSimulator } from "@/lib/grid-simulators/portfolio-tools";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type ShortEclRow = {
@@ -90,6 +91,7 @@ export default function ShortEclPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={shortEclSimulator}
       emptyMessage="No short ECL entries available."
       searchPlaceholder="Search short ECL…"
     />

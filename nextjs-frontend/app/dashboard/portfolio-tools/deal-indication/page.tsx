@@ -7,6 +7,7 @@ import { portfolioToolsGetDealIndication } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { dealIndicationSimulator } from "@/lib/grid-simulators/portfolio-tools";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type DealIndicationRow = {
@@ -92,6 +93,7 @@ export default function DealIndicationPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={dealIndicationSimulator}
       emptyMessage="No deal indication entries available."
       searchPlaceholder="Search deal indication…"
     />
