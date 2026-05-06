@@ -12,7 +12,7 @@ import {
   type RowSelectionOptions,
   type StatusPanelDef,
 } from "ag-grid-community";
-import { RefreshCw, Search } from "lucide-react";
+import { RefreshCw, Search, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -166,15 +166,25 @@ export function DataGrid<TRow extends Record<string, unknown>>({
               className={cn(isRefreshing ? "animate-spin" : undefined)}
             />
           </button>
-          <div className="flex items-center bg-white border border-gray-200 rounded px-2 h-6 flex-1 max-w-[200px] shadow-sm">
+          <div className="flex items-center bg-white border border-gray-200 rounded px-2 h-6 flex-1 max-w-[200px] shadow-sm transition-all focus-within:border-blue-400 focus-within:ring-1 focus-within:ring-blue-100">
             <Search size={12} className="text-gray-400 mr-1.5 shrink-0" />
             <input
               type="search"
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
               placeholder={searchPlaceholder}
-              className="bg-transparent text-[10px] font-bold outline-none w-full text-gray-700 placeholder-gray-400"
+              className="bg-transparent text-[10px] font-bold outline-none w-full text-gray-700 placeholder-gray-400 [&::-webkit-search-cancel-button]:appearance-none"
             />
+            {searchValue ? (
+              <button
+                type="button"
+                aria-label="Clear search"
+                onClick={() => setSearchValue("")}
+                className="p-0.5 rounded-full hover:bg-gray-100 ml-1 transition-colors text-gray-400 hover:text-gray-600 shrink-0"
+              >
+                <X size={10} />
+              </button>
+            ) : null}
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">{toolbarEnd}</div>
