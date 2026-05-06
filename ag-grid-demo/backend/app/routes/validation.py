@@ -44,13 +44,17 @@ async def validate_cell(cell: CellValidation) -> ValidationResult:
 
     if field == "symbol":
         if not re.match(r"^[A-Z]{1,5}$", value):
-            return ValidationResult(valid=False, error="Symbol must be 1-5 uppercase letters")
+            return ValidationResult(
+                valid=False, error="Symbol must be 1-5 uppercase letters"
+            )
 
     elif field == "price":
         try:
             v = _parse_finite_float(value)
             if v < 0 or v > 1_000_000:
-                return ValidationResult(valid=False, error="Price must be between 0 and 1,000,000")
+                return ValidationResult(
+                    valid=False, error="Price must be between 0 and 1,000,000"
+                )
         except ValueError:
             return ValidationResult(valid=False, error="Price must be a finite number")
 
@@ -58,7 +62,9 @@ async def validate_cell(cell: CellValidation) -> ValidationResult:
         try:
             v = int(value)
             if v < 1 or v > 10_000:
-                return ValidationResult(valid=False, error="Quantity must be between 1 and 10,000")
+                return ValidationResult(
+                    valid=False, error="Quantity must be between 1 and 10,000"
+                )
         except ValueError:
             return ValidationResult(valid=False, error="Quantity must be an integer")
 
@@ -66,13 +72,18 @@ async def validate_cell(cell: CellValidation) -> ValidationResult:
         try:
             v = _parse_finite_float(value)
             if v < -100 or v > 100:
-                return ValidationResult(valid=False, error="Change must be between -100 and 100")
+                return ValidationResult(
+                    valid=False, error="Change must be between -100 and 100"
+                )
         except ValueError:
             return ValidationResult(valid=False, error="Change must be a finite number")
 
     elif field == "sector":
         if value not in VALID_SECTORS:
-            return ValidationResult(valid=False, error=f"Invalid sector. Must be one of: {', '.join(sorted(VALID_SECTORS))}")
+            return ValidationResult(
+                valid=False,
+                error=f"Invalid sector. Must be one of: {', '.join(sorted(VALID_SECTORS))}",
+            )
 
     return ValidationResult(valid=True)
 
@@ -80,9 +91,34 @@ async def validate_cell(cell: CellValidation) -> ValidationResult:
 @router.get("/rules")
 async def get_validation_rules():
     return [
-        {"field": "symbol", "type": "string", "constraints": "Pattern: A-Z, 1-5 chars", "errorMessage": "Symbol must be 1-5 uppercase letters"},
-        {"field": "price", "type": "number", "constraints": "Range: 0 - 1,000,000", "errorMessage": "Price must be between 0 and 1,000,000"},
-        {"field": "qty", "type": "integer", "constraints": "Range: 1 - 10,000", "errorMessage": "Quantity must be between 1 and 10,000"},
-        {"field": "change", "type": "number", "constraints": "Range: -100 to 100", "errorMessage": "Change must be between -100% and 100%"},
-        {"field": "sector", "type": "enum", "constraints": "Technology, Finance, Healthcare, Energy", "errorMessage": "Invalid sector"},
+        {
+            "field": "symbol",
+            "type": "string",
+            "constraints": "Pattern: A-Z, 1-5 chars",
+            "errorMessage": "Symbol must be 1-5 uppercase letters",
+        },
+        {
+            "field": "price",
+            "type": "number",
+            "constraints": "Range: 0 - 1,000,000",
+            "errorMessage": "Price must be between 0 and 1,000,000",
+        },
+        {
+            "field": "qty",
+            "type": "integer",
+            "constraints": "Range: 1 - 10,000",
+            "errorMessage": "Quantity must be between 1 and 10,000",
+        },
+        {
+            "field": "change",
+            "type": "number",
+            "constraints": "Range: -100 to 100",
+            "errorMessage": "Change must be between -100% and 100%",
+        },
+        {
+            "field": "sector",
+            "type": "enum",
+            "constraints": "Technology, Finance, Healthcare, Energy",
+            "errorMessage": "Invalid sector",
+        },
     ]

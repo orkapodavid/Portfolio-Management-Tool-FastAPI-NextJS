@@ -68,9 +68,7 @@ class ReverseInquiryService:
             try:
                 base_date = datetime.strptime(position_date, "%Y-%m-%d")
             except ValueError:
-                logger.warning(
-                    f"Invalid position_date '{position_date}', using today"
-                )
+                logger.warning(f"Invalid position_date '{position_date}', using today")
                 base_date = datetime.now()
         else:
             base_date = datetime.now()

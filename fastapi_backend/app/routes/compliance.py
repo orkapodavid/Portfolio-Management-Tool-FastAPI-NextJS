@@ -23,9 +23,7 @@ async def get_undertakings(
     position_date: Optional[str] = Query(default=None),
     user: User = Depends(current_active_user),
 ):
-    return await compliance_service.get_undertakings(
-        position_date=position_date
-    )
+    return await compliance_service.get_undertakings(position_date=position_date)
 
 
 @router.get("/beneficial-ownership")

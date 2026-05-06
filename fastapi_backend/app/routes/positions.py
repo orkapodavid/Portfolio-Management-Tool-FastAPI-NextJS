@@ -14,7 +14,9 @@ position_service = PositionService()
 
 @router.get("/")
 async def get_positions(
-    position_date: Optional[str] = Query(None, description="Position date (YYYY-MM-DD)"),
+    position_date: Optional[str] = Query(
+        None, description="Position date (YYYY-MM-DD)"
+    ),
     user: User = Depends(current_active_user),
 ):
     date = validate_date(position_date, "position_date")

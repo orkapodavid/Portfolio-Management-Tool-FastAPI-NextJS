@@ -15,9 +15,7 @@ class TestInstrumentsSimpleListRoutes:
     async def test_returns_200_for_authenticated(
         self, test_client, authenticated_user, path
     ):
-        response = await test_client.get(
-            path, headers=authenticated_user["headers"]
-        )
+        response = await test_client.get(path, headers=authenticated_user["headers"])
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.json(), list)
 
@@ -29,9 +27,7 @@ class TestInstrumentsSimpleListRoutes:
 
 class TestInstrumentsSpecialTerms:
     @pytest.mark.asyncio(loop_scope="function")
-    async def test_accepts_pos_date_query(
-        self, test_client, authenticated_user
-    ):
+    async def test_accepts_pos_date_query(self, test_client, authenticated_user):
         response = await test_client.get(
             "/api/instruments/special-terms",
             headers=authenticated_user["headers"],

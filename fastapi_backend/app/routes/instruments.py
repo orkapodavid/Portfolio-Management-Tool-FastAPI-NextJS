@@ -30,9 +30,7 @@ async def get_special_terms(
     pos_date: Optional[str] = Query(default=None),
     user: User = Depends(current_active_user),
 ):
-    return await instruments_service.get_special_terms(
-        position_date=pos_date or ""
-    )
+    return await instruments_service.get_special_terms(position_date=pos_date or "")
 
 
 @router.get("/instrument-data")

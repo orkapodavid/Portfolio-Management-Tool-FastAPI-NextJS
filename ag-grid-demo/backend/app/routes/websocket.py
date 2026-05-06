@@ -39,9 +39,7 @@ async def stream_prices(websocket: WebSocket):
                 "id": row_id,
                 "price": new_price,
                 "change": change,
-                "symbol": next(
-                    d["symbol"] for d in SAMPLE_DATA if d["id"] == row_id
-                ),
+                "symbol": next(d["symbol"] for d in SAMPLE_DATA if d["id"] == row_id),
             }
             await websocket.send_json(update)
             await asyncio.sleep(settings.websocket_interval)

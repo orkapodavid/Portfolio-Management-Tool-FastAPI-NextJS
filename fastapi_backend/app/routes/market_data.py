@@ -19,8 +19,11 @@ def _parse_date(value: Optional[str], field: str) -> Optional[str]:
     if value is None:
         return None
     import re
+
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", value):
-        raise HTTPException(status_code=422, detail=f"{field} must be YYYY-MM-DD format")
+        raise HTTPException(
+            status_code=422, detail=f"{field} must be YYYY-MM-DD format"
+        )
     return value
 
 

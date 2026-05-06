@@ -34,9 +34,7 @@ async def rerun_process(
     payload: ProcessActionRequest = ProcessActionRequest(),
     user: User = Depends(current_active_user),
 ):
-    return await operations_service.rerun_process(
-        process_id, payload.process_name
-    )
+    return await operations_service.rerun_process(process_id, payload.process_name)
 
 
 @router.post("/processes/{process_id}/kill")
@@ -45,6 +43,4 @@ async def kill_process(
     payload: ProcessActionRequest = ProcessActionRequest(),
     user: User = Depends(current_active_user),
 ):
-    return await operations_service.kill_process(
-        process_id, payload.process_name
-    )
+    return await operations_service.kill_process(process_id, payload.process_name)

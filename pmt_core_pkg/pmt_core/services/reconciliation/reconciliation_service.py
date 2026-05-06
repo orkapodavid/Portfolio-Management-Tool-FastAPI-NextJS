@@ -40,9 +40,13 @@ class ReconciliationService:
             for i in range(10)
         ]
 
-    async def get_settlement_recon(self, position_date: str = None) -> list[dict[str, Any]]:
+    async def get_settlement_recon(
+        self, position_date: str = None
+    ) -> list[dict[str, Any]]:
         """Get settlement reconciliation data. TODO: Replace with DB query."""
-        logger.info(f"Returning mock settlement reconciliation data for date={position_date}")
+        logger.info(
+            f"Returning mock settlement reconciliation data for date={position_date}"
+        )
         tickers = ["AAPL", "MSFT", "TSLA", "NVDA", "GOOGL"]
         return [
             {
@@ -61,7 +65,9 @@ class ReconciliationService:
             for i in range(8)
         ]
 
-    async def get_failed_trades(self, position_date: str = None) -> list[dict[str, Any]]:
+    async def get_failed_trades(
+        self, position_date: str = None
+    ) -> list[dict[str, Any]]:
         """Get failed trades data. TODO: Replace with DB query."""
         logger.info(f"Returning mock failed trades data for date={position_date}")
         tickers = ["TSLA", "AMD", "NVDA"]
@@ -109,9 +115,13 @@ class ReconciliationService:
             for i in range(8)
         ]
 
-    async def get_risk_input_recon(self, position_date: str = None) -> list[dict[str, Any]]:
+    async def get_risk_input_recon(
+        self, position_date: str = None
+    ) -> list[dict[str, Any]]:
         """Get risk input reconciliation data. TODO: Replace with DB query."""
-        logger.info(f"Returning mock risk input reconciliation data for date={position_date}")
+        logger.info(
+            f"Returning mock risk input reconciliation data for date={position_date}"
+        )
         tickers = ["AAPL", "TSLA", "NVDA", "META", "AMD"]
         return [
             {

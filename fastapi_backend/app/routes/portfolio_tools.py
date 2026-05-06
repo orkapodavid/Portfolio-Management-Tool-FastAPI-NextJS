@@ -70,9 +70,7 @@ async def get_excess_amount(
     position_date: Optional[str] = Query(default=None),
     user: User = Depends(current_active_user),
 ):
-    return await portfolio_tools_service.get_excess_amount(
-        position_date=position_date
-    )
+    return await portfolio_tools_service.get_excess_amount(position_date=position_date)
 
 
 @router.get("/deal-indication")
@@ -87,9 +85,7 @@ async def get_po_settlement(
     position_date: Optional[str] = Query(default=None),
     user: User = Depends(current_active_user),
 ):
-    return await portfolio_tools_service.get_po_settlement(
-        position_date=position_date
-    )
+    return await portfolio_tools_service.get_po_settlement(position_date=position_date)
 
 
 @router.get("/short-ecl")

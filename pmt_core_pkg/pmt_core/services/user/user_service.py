@@ -20,9 +20,7 @@ class UserService:
     Real implementation would delegate to a repository layer.
     """
 
-    async def get_user_profile(
-        self, user_id: Optional[str] = None
-    ) -> dict[str, Any]:
+    async def get_user_profile(self, user_id: Optional[str] = None) -> dict[str, Any]:
         """Get user profile data. TODO: Fetch from database or auth service."""
         logger.warning("Using mock user profile data.")
 
@@ -51,9 +49,7 @@ class UserService:
         profile.update(kwargs)
         return profile
 
-    async def get_user_settings(
-        self, user_id: Optional[str] = None
-    ) -> dict[str, Any]:
+    async def get_user_settings(self, user_id: Optional[str] = None) -> dict[str, Any]:
         """Get user settings/preferences. TODO: Fetch from database."""
         logger.warning("Using mock user settings data.")
 
@@ -141,9 +137,7 @@ class UserService:
             "created_at": datetime.now().isoformat(),
         }
 
-    async def get_goals(
-        self, user_id: Optional[str] = None
-    ) -> list[dict[str, Any]]:
+    async def get_goals(self, user_id: Optional[str] = None) -> list[dict[str, Any]]:
         """Get financial goals for a user. TODO: Fetch from database."""
         logger.warning("Using mock goals data. Implement real DB integration!")
         return []
@@ -159,9 +153,7 @@ class UserService:
 
         return goal_data
 
-    async def delete_goal(
-        self, goal_id: str, user_id: Optional[str] = None
-    ) -> bool:
+    async def delete_goal(self, goal_id: str, user_id: Optional[str] = None) -> bool:
         """Delete a financial goal. TODO: Delete from database."""
         logger.info(f"Mock: Deleting goal {goal_id}")
         return True

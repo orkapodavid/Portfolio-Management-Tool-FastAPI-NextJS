@@ -92,7 +92,9 @@ class PerformanceService:
 
         # --- Compute YTD Return ---
         total_cost = sum(h["shares"] * h["avg_cost"] for h in holdings)
-        ytd_return_pct = ((total_nav - total_cost) / total_cost * 100) if total_cost else 0.0
+        ytd_return_pct = (
+            ((total_nav - total_cost) / total_cost * 100) if total_cost else 0.0
+        )
         ytd_positive = ytd_return_pct >= 0
 
         # --- Compute Net Exposure ---

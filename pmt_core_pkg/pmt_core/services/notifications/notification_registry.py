@@ -59,9 +59,13 @@ class NotificationRegistry:
             try:
                 provider_notifications = provider()
                 notifications.extend(provider_notifications)
-                logger.debug(f"Provider '{name}' returned {len(provider_notifications)} notifications")
+                logger.debug(
+                    f"Provider '{name}' returned {len(provider_notifications)} notifications"
+                )
             except Exception as e:
-                logger.exception(f"Error getting notifications from provider '{name}': {e}")
+                logger.exception(
+                    f"Error getting notifications from provider '{name}': {e}"
+                )
         return notifications
 
     @classmethod

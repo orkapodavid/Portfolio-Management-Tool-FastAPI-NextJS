@@ -21,7 +21,7 @@ class PositionRepository(DatabaseRepository):
             # Using basic dicts that match PositionRecord structure, relying on TypedDict
             # In a real scenario, we would map SQL rows to PositionRecord
             positions = []
-            
+
             # Generate 10 Equity positions
             for i in range(10):
                 positions.append(
@@ -44,7 +44,7 @@ class PositionRepository(DatabaseRepository):
                         market_value=f"${(i + 1) * 52500:,.2f}",
                     )
                 )
-            
+
             # Generate 5 Warrant positions
             for i in range(5):
                 positions.append(
@@ -67,7 +67,7 @@ class PositionRepository(DatabaseRepository):
                         market_value=f"${(i + 1) * 26250:,.2f}",
                     )
                 )
-            
+
             # Generate 5 Bond positions
             for i in range(5):
                 positions.append(
@@ -90,7 +90,7 @@ class PositionRepository(DatabaseRepository):
                         market_value=f"${(i + 1) * 101500:,.2f}",
                     )
                 )
-            
+
             return positions
         return []
 

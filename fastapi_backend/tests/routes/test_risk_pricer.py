@@ -32,9 +32,7 @@ _BOND_PAYLOAD = {
 
 class TestPricerWarrant:
     @pytest.mark.asyncio(loop_scope="function")
-    async def test_returns_outputs_and_curve(
-        self, test_client, authenticated_user
-    ):
+    async def test_returns_outputs_and_curve(self, test_client, authenticated_user):
         response = await test_client.post(
             "/api/risk/pricer/warrant",
             json=_WARRANT_PAYLOAD,
@@ -42,7 +40,13 @@ class TestPricerWarrant:
         )
         assert response.status_code == status.HTTP_200_OK
         body = response.json()
-        for key in ("fair_value", "delta", "expected_discount", "currency", "payoff_curve"):
+        for key in (
+            "fair_value",
+            "delta",
+            "expected_discount",
+            "currency",
+            "payoff_curve",
+        ):
             assert key in body
         assert body["currency"] == "JPY"
         curve = body["payoff_curve"]
@@ -61,9 +65,7 @@ class TestPricerWarrant:
 
 class TestPricerBond:
     @pytest.mark.asyncio(loop_scope="function")
-    async def test_returns_outputs_and_curve(
-        self, test_client, authenticated_user
-    ):
+    async def test_returns_outputs_and_curve(self, test_client, authenticated_user):
         response = await test_client.post(
             "/api/risk/pricer/bond",
             json=_BOND_PAYLOAD,
@@ -92,7 +94,5 @@ class TestPricerBond:
 
     @pytest.mark.asyncio(loop_scope="function")
     async def test_unauthorized(self, test_client):
-        response = await test_client.post(
-            "/api/risk/pricer/bond", json=_BOND_PAYLOAD
-        )
+        response = await test_client.post("/api/risk/pricer/bond", json=_BOND_PAYLOAD)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED

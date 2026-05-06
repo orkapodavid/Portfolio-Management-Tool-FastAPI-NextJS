@@ -55,7 +55,12 @@ class WarrantPricer:
         """
         # Mock pricing: intrinsic + time value with vol/rate adjustments
         intrinsic = max(0.0, spot_price - strike_price)
-        time_value = spot_price * volatility * math.sqrt(max(time_to_maturity_years, 0.001)) * 0.4
+        time_value = (
+            spot_price
+            * volatility
+            * math.sqrt(max(time_to_maturity_years, 0.001))
+            * 0.4
+        )
         borrow_cost = spot_price * (borrow_rate_bps / 10000.0) * time_to_maturity_years
         rate_adj = interest_rate * spot_price * time_to_maturity_years * 0.1
 
@@ -150,13 +155,9 @@ class WarrantPricer:
                 -((x_vals - strike_price) ** 2) / (center * 10)
             ) * (center * 0.05)
         elif y_type == "Delta":
-            y_vals = 0.5 + 0.5 * np.tanh(
-                (x_vals - strike_price) / (center * 0.1)
-            )
+            y_vals = 0.5 + 0.5 * np.tanh((x_vals - strike_price) / (center * 0.1))
         else:  # Gamma
-            y_vals = 0.01 * np.exp(
-                -(((x_vals - strike_price) / (center * 0.2)) ** 2)
-            )
+            y_vals = 0.01 * np.exp(-(((x_vals - strike_price) / (center * 0.2)) ** 2))
 
         return {"x_values": x_vals, "y_values": y_vals}
 
@@ -183,18 +184,12 @@ class WarrantPricer:
         X, Y = np.meshgrid(x, y)
 
         if z_type == "Volatility":
-            Z = (
-                0.2
-                + 0.1 * ((X - strike_price) / center) ** 2
-                + 0.05 * np.exp(-Y)
-            )
+            Z = 0.2 + 0.1 * ((X - strike_price) / center) ** 2 + 0.05 * np.exp(-Y)
             colorscale = "Plasma"
         else:  # Time
             Z = np.maximum(X - strike_price, 0) * np.exp(-0.05 * Y) + (
                 center * 0.05
-            ) * np.exp(
-                -0.5 * ((X - strike_price) / (center * 0.1)) ** 2
-            ) * np.sqrt(Y)
+            ) * np.exp(-0.5 * ((X - strike_price) / (center * 0.1)) ** 2) * np.sqrt(Y)
             colorscale = "Viridis"
 
         return {

@@ -44,7 +44,9 @@ class ComplianceRepository(DatabaseRepository):
             ]
         return []
 
-    async def get_undertakings(self, position_date: str = None) -> List[ComplianceRecord]:
+    async def get_undertakings(
+        self, position_date: str = None
+    ) -> List[ComplianceRecord]:
         """Get undertakings data."""
         if self.mock_mode:
             logger.info(f"Returning mock undertakings data for date={position_date}")
@@ -88,7 +90,7 @@ class ComplianceRepository(DatabaseRepository):
                 f"Returning mock beneficial ownership data for date={position_date}"
             )
             tickers = ["AAPL", "TSLA", "NVDA", "AMD", "META", "GOOGL"]
-            today = (position_date or datetime.now().strftime("%Y-%m-%d"))
+            today = position_date or datetime.now().strftime("%Y-%m-%d")
             records: List[BeneficialOwnershipRecord] = []
             for i in range(10):
                 stock = (i + 1) * 250_000

@@ -32,7 +32,9 @@ engine = create_async_engine(ASYNC_DATABASE_URL, **engine_kwargs)
 if is_sqlite_database_url(ASYNC_DATABASE_URL):
 
     @event.listens_for(engine.sync_engine, "connect")
-    def _configure_sqlite_connection(dbapi_connection: Any, _connection_record: Any) -> None:
+    def _configure_sqlite_connection(
+        dbapi_connection: Any, _connection_record: Any
+    ) -> None:
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.execute("PRAGMA busy_timeout=5000")
@@ -40,6 +42,7 @@ if is_sqlite_database_url(ASYNC_DATABASE_URL):
         cursor.fetchone()
         cursor.execute("PRAGMA synchronous=NORMAL")
         cursor.close()
+
 
 async_session_maker = async_sessionmaker(
     engine, expire_on_commit=settings.EXPIRE_ON_COMMIT

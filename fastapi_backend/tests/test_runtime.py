@@ -30,7 +30,12 @@ def test_run_migrations_to_head_upgrades_existing_sqlite_schema(
 
     engine = create_engine(sync_database_url)
     with engine.connect() as connection:
-        assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one() == "402d067a8b92"
+        assert (
+            connection.execute(
+                text("SELECT version_num FROM alembic_version")
+            ).scalar_one()
+            == "402d067a8b92"
+        )
         assert "items" not in inspect(connection).get_table_names()
     engine.dispose()
 
@@ -38,7 +43,12 @@ def test_run_migrations_to_head_upgrades_existing_sqlite_schema(
 
     engine = create_engine(sync_database_url)
     with engine.connect() as connection:
-        assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one() == "b389592974f8"
+        assert (
+            connection.execute(
+                text("SELECT version_num FROM alembic_version")
+            ).scalar_one()
+            == "b389592974f8"
+        )
         assert "items" in inspect(connection).get_table_names()
     engine.dispose()
 
@@ -61,7 +71,12 @@ def test_run_migrations_to_head_stamps_legacy_sqlite_schema_without_alembic_vers
 
     engine = create_engine(sync_database_url)
     with engine.connect() as connection:
-        assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one() == "b389592974f8"
+        assert (
+            connection.execute(
+                text("SELECT version_num FROM alembic_version")
+            ).scalar_one()
+            == "b389592974f8"
+        )
         assert {"user", "items"}.issubset(set(inspect(connection).get_table_names()))
     engine.dispose()
 
@@ -77,7 +92,9 @@ def test_run_migrations_to_head_stamps_legacy_sqlite_schema_with_empty_alembic_v
     engine = create_engine(sync_database_url)
     Base.metadata.create_all(engine)
     with engine.begin() as connection:
-      connection.execute(text("CREATE TABLE alembic_version (version_num VARCHAR(32) NOT NULL)"))
+        connection.execute(
+            text("CREATE TABLE alembic_version (version_num VARCHAR(32) NOT NULL)")
+        )
     engine.dispose()
 
     monkeypatch.setenv("DATABASE_URL", async_database_url)
@@ -86,6 +103,11 @@ def test_run_migrations_to_head_stamps_legacy_sqlite_schema_with_empty_alembic_v
 
     engine = create_engine(sync_database_url)
     with engine.connect() as connection:
-        assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar_one() == "b389592974f8"
+        assert (
+            connection.execute(
+                text("SELECT version_num FROM alembic_version")
+            ).scalar_one()
+            == "b389592974f8"
+        )
         assert {"user", "items"}.issubset(set(inspect(connection).get_table_names()))
     engine.dispose()

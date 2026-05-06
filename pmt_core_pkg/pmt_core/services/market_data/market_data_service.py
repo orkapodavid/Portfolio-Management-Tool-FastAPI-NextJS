@@ -291,8 +291,13 @@ class MarketDataService:
 
         # Day-of-week names
         day_names = [
-            "Monday", "Tuesday", "Wednesday", "Thursday",
-            "Friday", "Saturday", "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
         ]
 
         result = []

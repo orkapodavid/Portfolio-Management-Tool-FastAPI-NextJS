@@ -16,9 +16,7 @@ class TestMarketDataSimpleListRoutes:
     async def test_returns_200_for_authenticated(
         self, test_client, authenticated_user, path
     ):
-        response = await test_client.get(
-            path, headers=authenticated_user["headers"]
-        )
+        response = await test_client.get(path, headers=authenticated_user["headers"])
         assert response.status_code == status.HTTP_200_OK
         assert isinstance(response.json(), list)
 
@@ -30,9 +28,7 @@ class TestMarketDataSimpleListRoutes:
 
 class TestMarketDataTopMovers:
     @pytest.mark.asyncio(loop_scope="function")
-    async def test_returns_200_for_authenticated(
-        self, test_client, authenticated_user
-    ):
+    async def test_returns_200_for_authenticated(self, test_client, authenticated_user):
         response = await test_client.get(
             "/api/market-data/top-movers",
             headers=authenticated_user["headers"],
@@ -46,23 +42,19 @@ class TestMarketDataTopMovers:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.asyncio(loop_scope="function")
-    async def test_accepts_category(
-        self, test_client, authenticated_user
-    ):
+    async def test_accepts_category(self, test_client, authenticated_user):
         for category in ("ops", "ytd", "delta", "price", "volume"):
             response = await test_client.get(
                 "/api/market-data/top-movers",
                 headers=authenticated_user["headers"],
                 params={"category": category},
             )
-            assert response.status_code == status.HTTP_200_OK, (
-                f"category={category} failed"
-            )
+            assert (
+                response.status_code == status.HTTP_200_OK
+            ), f"category={category} failed"
 
     @pytest.mark.asyncio(loop_scope="function")
-    async def test_rejects_invalid_category(
-        self, test_client, authenticated_user
-    ):
+    async def test_rejects_invalid_category(self, test_client, authenticated_user):
         response = await test_client.get(
             "/api/market-data/top-movers",
             headers=authenticated_user["headers"],
@@ -73,9 +65,7 @@ class TestMarketDataTopMovers:
 
 class TestMarketDataTradingCalendar:
     @pytest.mark.asyncio(loop_scope="function")
-    async def test_returns_200_for_authenticated(
-        self, test_client, authenticated_user
-    ):
+    async def test_returns_200_for_authenticated(self, test_client, authenticated_user):
         response = await test_client.get(
             "/api/market-data/trading-calendar",
             headers=authenticated_user["headers"],
@@ -89,9 +79,7 @@ class TestMarketDataTradingCalendar:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.asyncio(loop_scope="function")
-    async def test_accepts_date_range(
-        self, test_client, authenticated_user
-    ):
+    async def test_accepts_date_range(self, test_client, authenticated_user):
         response = await test_client.get(
             "/api/market-data/trading-calendar",
             headers=authenticated_user["headers"],
@@ -102,9 +90,7 @@ class TestMarketDataTradingCalendar:
 
 class TestMarketDataHistorical:
     @pytest.mark.asyncio(loop_scope="function")
-    async def test_returns_200_for_authenticated(
-        self, test_client, authenticated_user
-    ):
+    async def test_returns_200_for_authenticated(self, test_client, authenticated_user):
         response = await test_client.get(
             "/api/market-data/historical",
             headers=authenticated_user["headers"],
@@ -118,9 +104,7 @@ class TestMarketDataHistorical:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.asyncio(loop_scope="function")
-    async def test_accepts_tickers_and_dates(
-        self, test_client, authenticated_user
-    ):
+    async def test_accepts_tickers_and_dates(self, test_client, authenticated_user):
         response = await test_client.get(
             "/api/market-data/historical",
             headers=authenticated_user["headers"],
@@ -135,9 +119,7 @@ class TestMarketDataHistorical:
 
 class TestMarketDataStock:
     @pytest.mark.asyncio(loop_scope="function")
-    async def test_stock_returns_200(
-        self, test_client, authenticated_user
-    ):
+    async def test_stock_returns_200(self, test_client, authenticated_user):
         response = await test_client.get(
             "/api/market-data/stock/AAPL",
             headers=authenticated_user["headers"],
@@ -151,9 +133,7 @@ class TestMarketDataStock:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.asyncio(loop_scope="function")
-    async def test_history_returns_200(
-        self, test_client, authenticated_user
-    ):
+    async def test_history_returns_200(self, test_client, authenticated_user):
         response = await test_client.get(
             "/api/market-data/stock/AAPL/history",
             headers=authenticated_user["headers"],
@@ -167,9 +147,7 @@ class TestMarketDataStock:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     @pytest.mark.asyncio(loop_scope="function")
-    async def test_history_accepts_period(
-        self, test_client, authenticated_user
-    ):
+    async def test_history_accepts_period(self, test_client, authenticated_user):
         response = await test_client.get(
             "/api/market-data/stock/AAPL/history",
             headers=authenticated_user["headers"],
@@ -178,9 +156,7 @@ class TestMarketDataStock:
         assert response.status_code == status.HTTP_200_OK
 
     @pytest.mark.asyncio(loop_scope="function")
-    async def test_news_returns_200(
-        self, test_client, authenticated_user
-    ):
+    async def test_news_returns_200(self, test_client, authenticated_user):
         response = await test_client.get(
             "/api/market-data/stock/AAPL/news",
             headers=authenticated_user["headers"],

@@ -156,7 +156,9 @@ class PortfolioToolsService:
             },
         ]
 
-    async def get_po_settlement(self, position_date: str = None) -> list[dict[str, Any]]:
+    async def get_po_settlement(
+        self, position_date: str = None
+    ) -> list[dict[str, Any]]:
         """Get PO settlement data. TODO: Replace with DB query."""
         logger.info(f"Returning mock PO settlement data for date={position_date}")
         return [
@@ -247,7 +249,9 @@ class PortfolioToolsService:
             },
         ]
 
-    async def get_cb_installments(self, position_date: str = None) -> list[dict[str, Any]]:
+    async def get_cb_installments(
+        self, position_date: str = None
+    ) -> list[dict[str, Any]]:
         """Get CB installments data. TODO: Replace with DB query."""
         logger.info(f"Returning mock CB installments data for date={position_date}")
         return [
@@ -267,7 +271,9 @@ class PortfolioToolsService:
             },
         ]
 
-    async def get_excess_amount(self, position_date: str = None) -> list[dict[str, Any]]:
+    async def get_excess_amount(
+        self, position_date: str = None
+    ) -> list[dict[str, Any]]:
         """Get excess amount data. TODO: Replace with DB query."""
         logger.info(f"Returning mock excess amount data for date={position_date}")
         return [

@@ -94,17 +94,25 @@ class OperationsService:
             },
         ]
 
-    async def rerun_process(self, process_id: int, process_name: str = "") -> dict[str, Any]:
+    async def rerun_process(
+        self, process_id: int, process_name: str = ""
+    ) -> dict[str, Any]:
         """Rerun an operation process. TODO: Replace with actual orchestration call."""
-        logger.info(f"Mock rerun requested for process id={process_id} name='{process_name}'")
+        logger.info(
+            f"Mock rerun requested for process id={process_id} name='{process_name}'"
+        )
         return {
             "success": True,
             "message": f"Process '{process_name}' (id={process_id}) has been queued for rerun.",
         }
 
-    async def kill_process(self, process_id: int, process_name: str = "") -> dict[str, Any]:
+    async def kill_process(
+        self, process_id: int, process_name: str = ""
+    ) -> dict[str, Any]:
         """Kill a running operation process. TODO: Replace with actual orchestration call."""
-        logger.info(f"Mock kill requested for process id={process_id} name='{process_name}'")
+        logger.info(
+            f"Mock kill requested for process id={process_id} name='{process_name}'"
+        )
         return {
             "success": True,
             "message": f"Process '{process_name}' (id={process_id}) has been terminated.",

@@ -51,9 +51,7 @@ class AlembicAssets:
     prepend_sys_path: tuple[Path, ...]
 
 
-def parse_cors_origins(
-    value: Any, *, default: Iterable[str] | None = None
-) -> set[str]:
+def parse_cors_origins(value: Any, *, default: Iterable[str] | None = None) -> set[str]:
     default_values = {origin.strip() for origin in default or () if origin.strip()}
 
     if value is None:
@@ -65,12 +63,12 @@ def parse_cors_origins(
             return default_values
 
         if stripped_value.startswith("["):
-            return parse_cors_origins(json.loads(stripped_value), default=default_values)
+            return parse_cors_origins(
+                json.loads(stripped_value), default=default_values
+            )
 
         return {
-            origin.strip()
-            for origin in stripped_value.split(",")
-            if origin.strip()
+            origin.strip() for origin in stripped_value.split(",") if origin.strip()
         }
 
     if isinstance(value, (list, tuple, set, frozenset)):
@@ -262,9 +260,7 @@ def _stamp_legacy_sqlite_revision_if_needed(
         connection.close()
 
 
-def _legacy_sqlite_revision_for_tables(
-    tables: set[str], config: Any
-) -> str | None:
+def _legacy_sqlite_revision_for_tables(tables: set[str], config: Any) -> str | None:
     if "user" not in tables:
         return None
 

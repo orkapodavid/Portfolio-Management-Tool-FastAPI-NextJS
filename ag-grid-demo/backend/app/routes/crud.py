@@ -9,11 +9,41 @@ router = APIRouter(prefix="/api/crud", tags=["crud"])
 
 # In-memory store
 _store: dict[int, dict] = {
-    1: {"id": 1, "name": "Alice Johnson", "email": "alice@example.com", "department": "Engineering", "salary": 95000},
-    2: {"id": 2, "name": "Bob Smith", "email": "bob@example.com", "department": "Marketing", "salary": 72000},
-    3: {"id": 3, "name": "Carol White", "email": "carol@example.com", "department": "HR", "salary": 68000},
-    4: {"id": 4, "name": "David Brown", "email": "david@example.com", "department": "Sales", "salary": 81000},
-    5: {"id": 5, "name": "Eve Davis", "email": "eve@example.com", "department": "Engineering", "salary": 102000},
+    1: {
+        "id": 1,
+        "name": "Alice Johnson",
+        "email": "alice@example.com",
+        "department": "Engineering",
+        "salary": 95000,
+    },
+    2: {
+        "id": 2,
+        "name": "Bob Smith",
+        "email": "bob@example.com",
+        "department": "Marketing",
+        "salary": 72000,
+    },
+    3: {
+        "id": 3,
+        "name": "Carol White",
+        "email": "carol@example.com",
+        "department": "HR",
+        "salary": 68000,
+    },
+    4: {
+        "id": 4,
+        "name": "David Brown",
+        "email": "david@example.com",
+        "department": "Sales",
+        "salary": 81000,
+    },
+    5: {
+        "id": 5,
+        "name": "Eve Davis",
+        "email": "eve@example.com",
+        "department": "Engineering",
+        "salary": 102000,
+    },
 }
 _next_id = 6
 
@@ -45,7 +75,9 @@ class EmployeeCreate(BaseModel):
     @classmethod
     def valid_department(cls, v: str) -> str:
         if v not in VALID_DEPARTMENTS:
-            raise ValueError(f"Department must be one of: {', '.join(sorted(VALID_DEPARTMENTS))}")
+            raise ValueError(
+                f"Department must be one of: {', '.join(sorted(VALID_DEPARTMENTS))}"
+            )
         return v
 
     @field_validator("salary")
@@ -82,7 +114,9 @@ class EmployeeUpdate(BaseModel):
     @classmethod
     def valid_department(cls, v: str | None) -> str | None:
         if v is not None and v not in VALID_DEPARTMENTS:
-            raise ValueError(f"Department must be one of: {', '.join(sorted(VALID_DEPARTMENTS))}")
+            raise ValueError(
+                f"Department must be one of: {', '.join(sorted(VALID_DEPARTMENTS))}"
+            )
         return v
 
     @field_validator("salary")
@@ -131,11 +165,41 @@ async def delete_employee(emp_id: int):
 async def reset_employees():
     global _next_id, _store
     _store = {
-        1: {"id": 1, "name": "Alice Johnson", "email": "alice@example.com", "department": "Engineering", "salary": 95000},
-        2: {"id": 2, "name": "Bob Smith", "email": "bob@example.com", "department": "Marketing", "salary": 72000},
-        3: {"id": 3, "name": "Carol White", "email": "carol@example.com", "department": "HR", "salary": 68000},
-        4: {"id": 4, "name": "David Brown", "email": "david@example.com", "department": "Sales", "salary": 81000},
-        5: {"id": 5, "name": "Eve Davis", "email": "eve@example.com", "department": "Engineering", "salary": 102000},
+        1: {
+            "id": 1,
+            "name": "Alice Johnson",
+            "email": "alice@example.com",
+            "department": "Engineering",
+            "salary": 95000,
+        },
+        2: {
+            "id": 2,
+            "name": "Bob Smith",
+            "email": "bob@example.com",
+            "department": "Marketing",
+            "salary": 72000,
+        },
+        3: {
+            "id": 3,
+            "name": "Carol White",
+            "email": "carol@example.com",
+            "department": "HR",
+            "salary": 68000,
+        },
+        4: {
+            "id": 4,
+            "name": "David Brown",
+            "email": "david@example.com",
+            "department": "Sales",
+            "salary": 81000,
+        },
+        5: {
+            "id": 5,
+            "name": "Eve Davis",
+            "email": "eve@example.com",
+            "department": "Engineering",
+            "salary": 102000,
+        },
     }
     _next_id = 6
     return {"status": "reset", "count": len(_store)}

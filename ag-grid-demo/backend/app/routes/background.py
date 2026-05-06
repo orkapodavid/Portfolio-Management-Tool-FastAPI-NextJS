@@ -48,12 +48,14 @@ async def _background_loop():
         new_price = max(0.01, round(old_price + delta, 2))
         _prices[symbol] = new_price
 
-        _task_state["updates"].append({
-            "symbol": symbol,
-            "price": new_price,
-            "change": delta,
-            "timestamp": time.time(),
-        })
+        _task_state["updates"].append(
+            {
+                "symbol": symbol,
+                "price": new_price,
+                "change": delta,
+                "timestamp": time.time(),
+            }
+        )
 
         # Keep update queue bounded
         if len(_task_state["updates"]) > 100:
