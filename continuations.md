@@ -28,6 +28,9 @@ Milestone C items that did not require product decisions:
   Reflex-style Stock Screener filter bar and client-side filtering.
 - `dd1c013 docs(parity-screenshots): re-capture 22 canonical screenshots after Milestone C`
   re-shot the 22 canonical Reflex/Next.js screenshot pairs at 1440x900.
+- `feat(notifications): lazy-render sidebar alerts on scroll` closes
+  F-23 by rendering sidebar notifications in 20-card batches with an
+  IntersectionObserver sentinel and click fallback.
 
 Visual QA: a contact sheet of the 22 refreshed captures was inspected.
 The captures are nonblank and framed correctly. The visible remaining
@@ -44,7 +47,6 @@ pending user direction:
   for strict Reflex parity.
 - F-21: make the notification sidebar default open like Reflex or keep
   the current collapsed default.
-- F-23: port notification infinite scroll now or defer it.
 - F-35/F-36: trim Next.js column-set supersets to Reflex or document
   them as intentional enhancements.
 

@@ -2,7 +2,7 @@
 
 import { ArrowRight, BellOff, Check, CircleX, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   PENDING_HIGHLIGHT_STORAGE_KEY,
@@ -31,6 +31,8 @@ const TYPE_BORDER: Record<NotificationType, string> = {
   info: "border-blue-500",
 };
 
+const NOTIFICATION_BATCH_SIZE = 20;
+
 function AlertCard({
   notification,
   onMarkRead,
@@ -52,7 +54,7 @@ function AlertCard({
         "p-3 rounded-md border-l-4 shadow-sm hover:shadow-md transition-all duration-300 animate-in slide-in-from-right fade-in",
         TYPE_BG[notification.type],
         TYPE_BORDER[notification.type],
-        opacity
+        opacity,
       )}
     >
       <div className="flex justify-between items-start mb-2">
@@ -63,7 +65,7 @@ function AlertCard({
           <h4
             className={cn(
               "text-[11px] font-black leading-tight uppercase tracking-wider",
-              textColor
+              textColor,
             )}
           >
             {notification.header}
@@ -131,7 +133,7 @@ function FilterTab({
         "px-2 py-1 rounded text-[8px] uppercase",
         active
           ? "bg-blue-600 text-white font-black shadow-sm"
-          : "bg-gray-200 text-gray-600 font-bold hover:bg-gray-300 transition-colors"
+          : "bg-gray-200 text-gray-600 font-bold hover:bg-gray-300 transition-colors",
       )}
     >
       {label}
@@ -151,11 +153,60 @@ export function NotificationSidebar() {
     dismiss,
   } = useNotifications();
   const router = useRouter();
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
+  const sentinelRef = useRef<HTMLButtonElement | null>(null);
+  const [visibleCount, setVisibleCount] = useState(NOTIFICATION_BATCH_SIZE);
 
-  const visibleNotifications = useMemo(() => {
+  const filteredNotifications = useMemo(() => {
     if (filter === "all") return notifications;
     return notifications.filter((n) => n.type === filter);
   }, [filter, notifications]);
+
+  const visibleNotifications = useMemo(
+    () => filteredNotifications.slice(0, visibleCount),
+    [filteredNotifications, visibleCount],
+  );
+  const hasMoreNotifications = visibleCount < filteredNotifications.length;
+
+  useEffect(() => {
+    setVisibleCount(NOTIFICATION_BATCH_SIZE);
+  }, [filter]);
+
+  const loadMoreNotifications = useCallback(() => {
+    setVisibleCount((current) =>
+      Math.min(current + NOTIFICATION_BATCH_SIZE, filteredNotifications.length),
+    );
+  }, [filteredNotifications.length]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    const scrollArea = scrollAreaRef.current;
+    if (
+      !isOpen ||
+      !hasMoreNotifications ||
+      !sentinel ||
+      !scrollArea ||
+      typeof IntersectionObserver === "undefined"
+    ) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          loadMoreNotifications();
+        }
+      },
+      {
+        root: scrollArea,
+        rootMargin: "100px",
+        threshold: 0.1,
+      },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMoreNotifications, isOpen, loadMoreNotifications]);
 
   const registry = useGridRegistry();
   const handleGoToDetails = (notification: NotificationItem) => {
@@ -166,7 +217,7 @@ export function NotificationSidebar() {
     const jumped = registry?.jumpToRow(
       notification.gridId,
       notification.rowId,
-      rowIdKey
+      rowIdKey,
     );
     if (jumped) return;
 
@@ -177,7 +228,7 @@ export function NotificationSidebar() {
           gridId: notification.gridId,
           rowId: notification.rowId,
           rowIdKey,
-        })
+        }),
       );
     }
 
@@ -190,7 +241,7 @@ export function NotificationSidebar() {
         "flex flex-col shrink-0 bg-[#F9F9F9] z-40 overflow-hidden transition-all duration-300 ease-in-out border-l border-gray-200",
         isOpen
           ? "w-[220px] md:static fixed inset-y-0 right-0 max-w-full shadow-2xl md:shadow-none opacity-100"
-          : "w-0 opacity-0 border-l-0 pointer-events-none fixed inset-y-0 right-0 md:static md:relative"
+          : "w-0 opacity-0 border-l-0 pointer-events-none fixed inset-y-0 right-0 md:static md:relative",
       )}
     >
       <div className="h-full w-full flex flex-col min-w-[220px]">
@@ -224,7 +275,7 @@ export function NotificationSidebar() {
             onClick={() => setFilter("info")}
           />
         </div>
-        <div className="flex-1 w-full overflow-y-auto">
+        <div ref={scrollAreaRef} className="flex-1 w-full overflow-y-auto">
           <div className="flex flex-col gap-2 p-2 min-h-0">
             {isLoading ? (
               <div className="flex items-center justify-center gap-2 py-4 text-gray-400">
@@ -249,11 +300,23 @@ export function NotificationSidebar() {
                 </p>
               </div>
             )}
+            {!isLoading && hasMoreNotifications && (
+              <button
+                ref={sentinelRef}
+                type="button"
+                onClick={loadMoreNotifications}
+                className="min-h-5 rounded py-2 text-center text-[8px] font-bold text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+              >
+                Scroll for more • {visibleNotifications.length} of{" "}
+                {filteredNotifications.length}
+              </button>
+            )}
           </div>
         </div>
         <div className="flex items-center justify-center px-3 py-2 border-t border-gray-200 bg-white/80 backdrop-blur-sm">
           <span className="text-[9px] font-bold text-gray-500">
-            Showing {visibleNotifications.length} of {notifications.length}
+            Showing {visibleNotifications.length} of{" "}
+            {filteredNotifications.length}
           </span>
         </div>
       </div>

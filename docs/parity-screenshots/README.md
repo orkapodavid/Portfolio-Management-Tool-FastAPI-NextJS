@@ -131,6 +131,9 @@ feature-parity pass those have been closed:
   Position Date filter.
 - **Chrome polish** — notification entry animation, subtab overflow,
   and toolbar date-input styling align more closely with Reflex.
+- **Notification infinite scroll** — the sidebar fetches a bounded
+  notification set and renders 20 cards initially, with the same
+  scroll-sentinel / fallback load-more pattern Reflex uses.
 - **Pricer detail** — pricer result tables and full note copy are back
   on Warrant and Bond pricer pages; the out-of-scope Plotly 3-D chart
   remains intentionally deferred.

@@ -37,6 +37,8 @@ const CATEGORY_TO_TYPE: Record<string, NotificationType> = {
   System: "info",
 };
 
+const NOTIFICATION_FETCH_LIMIT = 200;
+
 type RawNotification = {
   id?: string | number;
   category?: string;
@@ -84,7 +86,9 @@ type NotificationsContextValue = {
   refresh: () => Promise<void>;
 };
 
-const NotificationsContext = createContext<NotificationsContextValue | null>(null);
+const NotificationsContext = createContext<NotificationsContextValue | null>(
+  null,
+);
 
 export function NotificationsProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -100,7 +104,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     const response = await getNotifications({
       headers: { Authorization: `Bearer ${token}` },
-      query: { limit: 50 },
+      query: { limit: NOTIFICATION_FETCH_LIMIT },
     });
 
     const error = getApiError(response);
@@ -125,7 +129,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
 
   const markRead = useCallback((id: string) => {
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
   }, []);
 
@@ -173,7 +177,7 @@ export function useNotifications(): NotificationsContextValue {
   const ctx = useContext(NotificationsContext);
   if (!ctx) {
     throw new Error(
-      "useNotifications must be used inside <NotificationsProvider>"
+      "useNotifications must be used inside <NotificationsProvider>",
     );
   }
   return ctx;
