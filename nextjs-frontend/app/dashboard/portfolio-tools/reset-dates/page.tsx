@@ -28,7 +28,12 @@ type ResetDateRow = {
 
 const columns = [
   textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 130 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 130,
+  }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
   textColumn({ field: "sec_type", header: "Sec Type", minWidth: 90 }),
   textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
@@ -38,11 +43,11 @@ const columns = [
   dateColumn({ field: "latest_reset", header: "Latest Reset", minWidth: 110 }),
   dateColumn({ field: "reset_date", header: "Reset Date", minWidth: 100 }),
   textColumn({ field: "reset_up_down", header: "Up / Down", minWidth: 100 }),
-  textColumn({ field: "market_price", header: "Market Price", minWidth: 110, align: "right" }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
