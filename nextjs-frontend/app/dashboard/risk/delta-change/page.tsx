@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { riskGetDeltaChange } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
+import { SingleDateFilterBar } from "@/components/grid/filter-bar";
 import { textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
 import { getApiData, getApiError } from "@/lib/utils";
@@ -44,40 +45,58 @@ export default function DeltaChangePage() {
   const [rows, setRows] = useState<DeltaChangeRow[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [draftDate, setDraftDate] = useState("");
+  const [appliedDate, setAppliedDate] = useState("");
 
-  const load = useCallback(async () => {
-    setIsLoading(true);
-    const token = getAuthToken();
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-    const response = await riskGetDeltaChange({
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const error = getApiError(response);
-    if (error) {
-      const status = getStatus(error);
-      if (status === 401 || status === 403) {
+  const load = useCallback(
+    async (date: string) => {
+      setIsLoading(true);
+      const token = getAuthToken();
+      if (!token) {
         router.replace("/login");
         return;
       }
-      setErrorMessage("Failed to load delta change.");
+      const response = await riskGetDeltaChange({
+        headers: { Authorization: `Bearer ${token}` },
+        query: date ? { trade_date: date } : undefined,
+      });
+      const error = getApiError(response);
+      if (error) {
+        const status = getStatus(error);
+        if (status === 401 || status === 403) {
+          router.replace("/login");
+          return;
+        }
+        setErrorMessage("Failed to load delta change.");
+        setIsLoading(false);
+        return;
+      }
+      setRows((getApiData(response) as DeltaChangeRow[]) ?? []);
+      setErrorMessage(null);
       setIsLoading(false);
-      return;
-    }
-    setRows((getApiData(response) as DeltaChangeRow[]) ?? []);
-    setErrorMessage(null);
-    setIsLoading(false);
-  }, [router]);
+    },
+    [router]
+  );
 
   useEffect(() => {
-    void load();
+    void load("");
   }, [load]);
+
+  const onApply = () => {
+    setAppliedDate(draftDate);
+    void load(draftDate);
+  };
+
+  const onClear = () => {
+    setDraftDate("");
+    setAppliedDate("");
+    void load("");
+  };
 
   return (
     <DataGrid<DeltaChangeRow>
       gridId="delta_change_grid"
+      rowIdKey="ticker"
       showCompactToggle
       showAutoRefresh
       showRowNumbers
@@ -87,10 +106,19 @@ export default function DeltaChangePage() {
       rows={rows}
       isLoading={isLoading}
       errorMessage={errorMessage}
-      onRefresh={load}
-      rowIdKey="ticker"
+      onRefresh={() => load(appliedDate)}
       emptyMessage="No delta change data available."
       searchPlaceholder="Search delta change…"
+      filterBar={
+        <SingleDateFilterBar
+          label="Position Date"
+          value={draftDate}
+          onChange={setDraftDate}
+          onApply={onApply}
+          onClear={onClear}
+          hasActiveFilters={Boolean(appliedDate)}
+        />
+      }
     />
   );
 }
