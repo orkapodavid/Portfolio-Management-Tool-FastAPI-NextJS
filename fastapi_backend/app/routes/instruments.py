@@ -35,3 +35,10 @@ async def get_instrument_data(
     user: User = Depends(current_active_user),
 ):
     return await instruments_service.get_instrument_data()
+
+
+@router.get("/instrument-term")
+async def get_instrument_term(
+    user: User = Depends(current_active_user),
+):
+    return await instruments_service.get_instrument_terms()
