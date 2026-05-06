@@ -13,6 +13,7 @@ import {
   type StatusPanelDef,
 } from "ag-grid-community";
 import {
+  ChevronDown,
   Clock,
   FileSpreadsheet,
   RefreshCw,
@@ -21,6 +22,7 @@ import {
   Save,
   Search,
   X,
+  Zap,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -99,6 +101,10 @@ type DataGridProps<TRow> = {
   showAutoRefresh?: boolean;
   /** Polling interval in milliseconds when auto-refresh is on (default 30s). */
   autoRefreshIntervalMs?: number;
+  /** Items to render in a Generate dropdown placed first in the toolbar. */
+  generateItems?: string[];
+  /** Handler invoked with the chosen Generate item label. */
+  onGenerate?: (item: string) => void;
 };
 
 const COMPACT_ROW_HEIGHT = 28;
@@ -153,7 +159,10 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   showCompactToggle = false,
   showAutoRefresh = false,
   autoRefreshIntervalMs = 30_000,
+  generateItems,
+  onGenerate,
 }: DataGridProps<TRow>) {
+  const [generateOpen, setGenerateOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCompact, setIsCompact] = useState(false);
@@ -362,6 +371,42 @@ export function DataGrid<TRow extends Record<string, unknown>>({
       ) : null}
       <div className="flex items-center justify-between gap-2 px-3 py-1.5 bg-[#F9F9F9] border-b border-gray-200 shrink-0 h-[40px]">
         <div className="flex items-center gap-2 flex-1 min-w-0">
+          {generateItems && generateItems.length > 0 ? (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setGenerateOpen((prev) => !prev)}
+                className="px-3 h-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded hover:shadow-md transition-all flex items-center shadow-sm"
+              >
+                <Zap size={12} />
+                <span className="ml-1.5">Generate</span>
+                <ChevronDown size={10} className="ml-1 opacity-70" />
+              </button>
+              {generateOpen ? (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setGenerateOpen(false)}
+                  />
+                  <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-100 py-1 z-50">
+                    {generateItems.map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => {
+                          setGenerateOpen(false);
+                          onGenerate?.(item);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-[10px] font-bold text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition-colors"
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : null}
+            </div>
+          ) : null}
           {toolbarStart}
           {showExcelButton ? (
             <button
