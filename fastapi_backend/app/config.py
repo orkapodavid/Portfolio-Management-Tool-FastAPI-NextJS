@@ -1,8 +1,8 @@
 from pathlib import Path
-from typing import Literal, Set
+from typing import Annotated, Literal, Set
 
 from pydantic import AliasChoices, Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 from .runtime import parse_cors_origins
 
@@ -53,7 +53,10 @@ class Settings(BaseSettings):
     )
 
     # CORS
-    CORS_ORIGINS: Set[str]
+    # NoDecode skips pydantic_settings' default JSON decoding so the raw env
+    # string reaches parse_cors_origin_values, which accepts JSON arrays,
+    # comma-separated strings, and empty/missing values.
+    CORS_ORIGINS: Annotated[Set[str], NoDecode] = Field(default_factory=set)
 
     # PMT Settings
     MOCK_DATA: bool = True  # Use mock data from pmt_core
