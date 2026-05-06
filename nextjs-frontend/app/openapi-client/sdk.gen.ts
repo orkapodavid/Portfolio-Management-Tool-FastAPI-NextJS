@@ -152,6 +152,7 @@ import type {
   ReconciliationGetRiskInputReconErrors,
   PortfolioToolsGetPayToHoldData,
   PortfolioToolsGetPayToHoldResponses,
+  PortfolioToolsGetPayToHoldErrors,
   PortfolioToolsGetStockBorrowData,
   PortfolioToolsGetStockBorrowResponses,
   PortfolioToolsGetResetDatesData,
@@ -1425,7 +1426,7 @@ export const portfolioToolsGetPayToHold = <
 ) => {
   return (options?.client ?? client).get<
     PortfolioToolsGetPayToHoldResponses,
-    unknown,
+    PortfolioToolsGetPayToHoldErrors,
     ThrowOnError
   >({
     responseType: "json",

@@ -30,6 +30,28 @@ class TestPortfolioToolsSimpleListRoutes:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
+POSITION_DATE_ENDPOINTS = [
+    "/api/portfolio-tools/pay-to-hold",
+    "/api/portfolio-tools/cb-installments",
+    "/api/portfolio-tools/excess-amount",
+]
+
+
+@pytest.mark.parametrize("path", POSITION_DATE_ENDPOINTS)
+class TestPortfolioToolsPositionDateRoutes:
+    @pytest.mark.asyncio(loop_scope="function")
+    async def test_accepts_position_date_query(
+        self, test_client, authenticated_user, path
+    ):
+        response = await test_client.get(
+            path,
+            headers=authenticated_user["headers"],
+            params={"position_date": "2026-04-15"},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert isinstance(response.json(), list)
+
+
 class TestPortfolioToolsDealIndication:
     @pytest.mark.asyncio(loop_scope="function")
     async def test_returns_canonical_shape(self, test_client, authenticated_user):

@@ -13,6 +13,7 @@ portfolio_tools_service = PortfolioToolsService()
 
 @router.get("/pay-to-hold")
 async def get_pay_to_hold(
+    position_date: Optional[str] = Query(default=None),  # noqa: ARG001
     user: User = Depends(current_active_user),
 ):
     return await portfolio_tools_service.get_pay_to_hold()

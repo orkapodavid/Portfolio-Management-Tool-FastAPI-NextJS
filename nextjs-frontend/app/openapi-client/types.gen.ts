@@ -1980,9 +1980,24 @@ export type ReconciliationGetRiskInputReconResponses = {
 export type PortfolioToolsGetPayToHoldData = {
   body?: never;
   path?: never;
-  query?: never;
+  query?: {
+    /**
+     * Position Date
+     */
+    position_date?: string | null;
+  };
   url: "/api/portfolio-tools/pay-to-hold";
 };
+
+export type PortfolioToolsGetPayToHoldErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PortfolioToolsGetPayToHoldError =
+  PortfolioToolsGetPayToHoldErrors[keyof PortfolioToolsGetPayToHoldErrors];
 
 export type PortfolioToolsGetPayToHoldResponses = {
   /**
