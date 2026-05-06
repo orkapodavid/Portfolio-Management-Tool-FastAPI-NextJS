@@ -50,8 +50,8 @@ the older handoff prompts.
   `/Users/orbot/Developer/work/Portfolio-Management-Tool-reflex` for
   parity checks
 
-Docker is optional. The default documented local path below uses SQLite
-and does not require Docker or PostgreSQL.
+The default local path below uses SQLite and does not require
+PostgreSQL.
 
 Install dependencies once:
 

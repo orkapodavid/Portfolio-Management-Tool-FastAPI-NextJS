@@ -1,8 +1,7 @@
 # Deployment and Packaging
 
 The active rebuild target is local web development plus Tauri desktop
-packaging. Earlier template-era Vercel instructions are no longer the
-source of truth for this branch.
+packaging.
 
 ## Web Build
 

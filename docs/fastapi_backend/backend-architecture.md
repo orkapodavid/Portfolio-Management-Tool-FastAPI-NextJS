@@ -1,231 +1,317 @@
 # Backend Architecture
 
-This page provides an in-depth overview of the FastAPI backend — its module structure, request lifecycle, database layer, authentication system, and supporting services.
+This page documents the FastAPI backend that powers the Portfolio
+Management Tool parity rebuild: module layout, request lifecycle,
+runtime modes, database layer, authentication, and how the Tauri
+desktop sidecar boots.
 
 ## Project Structure
 
-```
+```text
 fastapi_backend/
 ├── app/
-│   ├── main.py            # FastAPI app creation, middleware, router registration
-│   ├── config.py          # Settings (Pydantic BaseSettings) loaded from .env
-│   ├── database.py        # Async SQLAlchemy engine, session factory, dependencies
-│   ├── models.py          # SQLAlchemy ORM models (User, Item, Base)
-│   ├── schemas.py         # Pydantic schemas for request/response validation
-│   ├── users.py           # fastapi-users integration (UserManager, JWT auth)
-│   ├── email.py           # Email sending via fastapi-mail
-│   ├── utils.py           # Utility functions (route ID generation)
-│   ├── email_templates/   # Jinja2 HTML templates for emails
+│   ├── main.py            # FastAPI app, CORS, router registration, pagination
+│   ├── config.py          # Settings (Pydantic BaseSettings) loaded from .env / env vars
+│   ├── runtime.py         # Runtime helpers: sqlite/postgres URL parsing, desktop bootstrap, alembic
+│   ├── database.py        # Async engine, sessions, sqlite PRAGMAs, fastapi-users adapter
+│   ├── models.py          # SQLAlchemy ORM (User, Item)
+│   ├── schemas.py         # Pydantic schemas (UserRead/Create/Update, ItemBase/Read/Create)
+│   ├── users.py           # fastapi-users wiring + AUTH_DISABLED bypass
+│   ├── email.py           # Password-reset email via fastapi-mail
+│   ├── utils.py           # Route ID helper for clean OpenAPI operation IDs
+│   ├── email_templates/   # Jinja2 HTML templates
 │   └── routes/
-│       └── items.py       # CRUD endpoints for items
+│       ├── _validation.py # Shared query-param validators (date strings, etc.)
+│       ├── health.py      # GET /api/health
+│       ├── items.py       # Legacy template CRUD under /items
+│       ├── positions.py   # /api/positions/*
+│       ├── pnl.py         # /api/pnl/*
+│       ├── market_data.py # /api/market-data/*
+│       ├── risk.py        # /api/risk/*
+│       ├── compliance.py  # /api/compliance/*
+│       ├── reconciliation.py    # /api/recon/*
+│       ├── portfolio_tools.py   # /api/portfolio-tools/*
+│       ├── instruments.py # /api/instruments/*
+│       ├── events.py      # /api/events/*
+│       ├── operations.py  # /api/operations/*
+│       ├── orders.py      # /api/orders/*
+│       ├── performance.py # /api/performance/*
+│       └── notifications.py     # /api/notifications/
 ├── commands/
-│   └── generate_openapi_schema.py  # CLI script to export OpenAPI JSON
-├── migrations/            # Alembic migration files
-├── tests/
-│   ├── conftest.py        # Shared pytest-asyncio fixtures
-│   └── test_*.py          # Test modules
-├── watcher.py             # File watcher for auto-regenerating OpenAPI schema
-├── start.sh               # Dev server startup script (FastAPI + watcher)
-├── Dockerfile             # Production container image
+│   ├── generate_openapi_schema.py  # Export the live OpenAPI JSON
+│   └── run_tauri_sidecar.py        # Entry point used by the PyInstaller sidecar
+├── alembic_migrations/    # Alembic environment + revision scripts
+├── tests/                 # pytest-asyncio suite
+├── watcher.py             # Watches app/ and re-exports the OpenAPI schema
 ├── alembic.ini            # Alembic configuration
-└── pyproject.toml         # Project dependencies and tool config
+└── pyproject.toml         # Dependencies and tool config
 ```
 
 ## Application Lifecycle
 
-The FastAPI application is created in `app/main.py`:
+The FastAPI app is created in `app/main.py`:
 
-1. **App instantiation** — A `FastAPI` instance is created with a custom `generate_unique_id_function` (for clean OpenAPI operation IDs) and a configurable `openapi_url`.
-2. **CORS middleware** — `CORSMiddleware` is added using origins from `settings.CORS_ORIGINS`.
-3. **Router registration** — Authentication routers (from `fastapi-users`) and the items router are mounted with appropriate prefixes.
-4. **Pagination** — `fastapi-pagination` is configured via `add_pagination(app)`.
+1. **App construction** - `FastAPI(...)` with
+   `generate_unique_id_function=simple_generate_unique_route_id` so
+   generated TypeScript client method names stay clean.
+2. **CORS middleware** - `CORSMiddleware` wired to `settings.CORS_ORIGINS`.
+3. **Auth and user routers** - The five `fastapi-users` routers
+   (`auth/jwt`, register, reset-password, verify, users CRUD).
+4. **PMT routers** - 14 modules mounted under `/api/*`, plus the legacy
+   `/items` and `/api/health`.
+5. **Pagination** - `add_pagination(app)` enables
+   `fastapi-pagination` for the `/items` list endpoint.
 
-### Development Server
+## Runtime Modes
 
-The `start.sh` script runs two processes in parallel:
+`app/config.py` exposes `RUNTIME_MODE` (read from `PMT_RUNTIME_MODE` /
+`PMT_RUNTIME`) with values `"server"` (default) and `"desktop"`.
 
-- **FastAPI dev server** — `fastapi dev app/main.py` with hot-reload enabled
-- **File watcher** — `watcher.py` monitors `app/` for changes to `main.py`, `schemas.py`, or any file in `routes/`. On change it runs mypy type checks and regenerates the OpenAPI schema.
+- **Server mode** is what `pnpm dev` and CI use. The backend is started
+  by `uvicorn` and `DATABASE_URL` must be set explicitly (typically
+  the local SQLite override or a Postgres URL).
+- **Desktop mode** is what the Tauri shell runs. The PyInstaller
+  sidecar entry point calls `runtime.ensure_desktop_sidecar_environment()`
+  before importing the FastAPI app, which:
+  - Creates `~/.portfolio-management-tool/` (override with
+    `PMT_APP_DATA_DIR`) and chmods it `0o700`.
+  - Materializes a SQLite database at
+    `~/.portfolio-management-tool/portfolio-management-tool.sqlite3`.
+  - Persists JWT secret keys in `desktop-runtime.json` so they survive
+    app restarts.
+  - Runs Alembic migrations against the desktop SQLite file.
+  - Defaults `PMT_AUTH_DISABLED=true` so the local desktop UX skips
+    login.
+
+`/api/health` echoes `runtime` (`"server"` or `"desktop"`) and the
+detected `database_backend` (`"sqlite"` / `"postgresql"`), which is the
+quickest way to confirm the mode that is actually running.
 
 ## Request Flow
 
 ```mermaid
 sequenceDiagram
     participant Client
-    participant FastAPI
-    participant Middleware
+    participant CORS
     participant Router
-    participant Dependency
-    participant Database
+    participant CurrentUser
+    participant Service as pmt_core service
+    participant DB
 
-    Client->>FastAPI: HTTP Request
-    FastAPI->>Middleware: CORS check
-    Middleware->>Router: Route to handler
-    Router->>Dependency: Resolve dependencies<br/>(session, auth)
-    Dependency->>Database: get_async_session()
-    Database-->>Dependency: AsyncSession
-    Dependency-->>Router: Injected deps
-    Router->>Database: Execute query
-    Database-->>Router: Result
-    Router-->>Client: JSON Response
+    Client->>CORS: HTTP request (Bearer or no token)
+    CORS->>Router: Route to handler
+    Router->>CurrentUser: Depends(current_active_user)
+    alt AUTH_DISABLED
+        CurrentUser-->>Router: synthetic noauth user
+    else
+        CurrentUser->>DB: load user via JWT
+        DB-->>CurrentUser: User row
+        CurrentUser-->>Router: User instance
+    end
+    Router->>Service: positions.get_positions(date)
+    Service-->>Router: TypedDict / list
+    Router-->>Client: JSON response
 ```
+
+Most PMT routes are **read-only** wrappers around `pmt_core` services.
+The User dependency only gates access; route logic does not consult
+the SQL database for PMT data because mock data ships from `pmt_core`
+by default (`MOCK_DATA=true`). The `/auth/*`, `/users/*`, and
+`/items/*` routers do hit the SQL database.
 
 ## Module Dependencies
 
 ```mermaid
 graph TD
-    main["main.py<br/>App + Routers"]
-    config["config.py<br/>Settings"]
-    database["database.py<br/>Engine + Sessions"]
-    models["models.py<br/>User, Item, Base"]
-    schemas["schemas.py<br/>Pydantic Schemas"]
-    users["users.py<br/>Auth + UserManager"]
-    email["email.py<br/>Password Reset Email"]
-    items["routes/items.py<br/>Item CRUD"]
-    utils["utils.py<br/>Route ID Helper"]
+    main["main.py"]
+    config["config.py"]
+    runtime["runtime.py"]
+    database["database.py"]
+    models["models.py"]
+    schemas["schemas.py"]
+    users["users.py"]
+    email["email.py"]
+    routes["routes/*.py"]
+    pmt_core["pmt_core_pkg/pmt_core"]
 
     main --> config
     main --> users
-    main --> items
+    main --> routes
     main --> schemas
-    main --> utils
     users --> config
     users --> database
     users --> email
     users --> models
     users --> schemas
     database --> config
+    database --> runtime
     database --> models
+    runtime --> config
     email --> config
-    email --> models
-    items --> database
-    items --> models
-    items --> schemas
-    items --> users
+    routes --> users
+    routes --> pmt_core
 ```
+
+`pmt_core_pkg/pmt_core` is the source of truth for PMT domain models
+and business logic; route handlers stay thin.
 
 ## Database Layer
 
-The database layer (`app/database.py`) uses **async SQLAlchemy** with the `asyncpg` driver:
+`app/database.py` builds an async SQLAlchemy engine from
+`settings.DATABASE_URL` after passing it through
+`runtime.normalize_async_database_url`. The driver is selected from the
+URL backend:
 
-- **Engine** — Created with `create_async_engine` using `NullPool` (optimised for serverless environments like Vercel where persistent connection pools are not viable).
-- **Session factory** — `async_sessionmaker` produces `AsyncSession` instances with configurable `expire_on_commit`.
-- **`get_async_session`** — A FastAPI dependency that yields a session per request and ensures cleanup.
-- **`get_user_db`** — Wraps the session with `SQLAlchemyUserDatabase` for `fastapi-users` operations.
-- **`create_db_and_tables`** — Creates all tables from `Base.metadata` (used in tests; production uses Alembic migrations).
+| Backend | Async driver | Engine kwargs |
+|---|---|---|
+| `postgresql` | `postgresql+asyncpg` | `poolclass=NullPool` (serverless-safe) |
+| `sqlite` | `sqlite+aiosqlite` | `connect_args={"timeout": 30}` |
 
-### Database URL Handling
+For SQLite, a connection-time event listener applies PMT's pragmas:
 
-The `DATABASE_URL` setting is parsed via `urllib.parse.urlparse` and reconstructed as an `asyncpg` connection string (`postgresql+asyncpg://...`). This allows storing a standard PostgreSQL URL in the environment while using the async driver.
+```python
+PRAGMA foreign_keys=ON
+PRAGMA busy_timeout=5000
+PRAGMA journal_mode=WAL
+PRAGMA synchronous=NORMAL
+```
+
+`get_async_session` is the FastAPI dependency that yields a session per
+request. `get_user_db` wraps the session with `SQLAlchemyUserDatabase`
+for `fastapi-users`. `create_db_and_tables` is used by tests; production
+schema is managed by Alembic.
 
 ### Migrations
 
-Database schema changes are managed through **Alembic**:
-
 ```bash
-# Generate a new migration after modifying models
-uv run alembic revision --autogenerate -m "description"
-
-# Apply pending migrations
+cd fastapi_backend
+uv run alembic revision --autogenerate -m "describe change"
 uv run alembic upgrade head
 ```
 
-The migration environment is configured in `alembic.ini` and `migrations/env.py`.
+`alembic.ini` and `alembic_migrations/env.py` live alongside the app.
+The desktop sidecar invokes `runtime.run_migrations_to_head()` at
+startup so a fresh installation gets the schema without manual setup.
 
 ## Models
 
-All models extend `Base` (a `DeclarativeBase` subclass) defined in `app/models.py`:
+`app/models.py` extends `Base` (a `DeclarativeBase`).
 
 ### User
 
-Inherits from `SQLAlchemyBaseUserTableUUID` (provided by `fastapi-users`), which adds:
-
-| Column | Type | Description |
-|---|---|---|
-| `id` | `UUID` | Primary key (auto-generated) |
-| `email` | `String` | Unique email address |
-| `hashed_password` | `String` | Bcrypt-hashed password |
-| `is_active` | `Boolean` | Account active flag |
-| `is_superuser` | `Boolean` | Superuser flag |
-| `is_verified` | `Boolean` | Email verified flag |
-
-Additionally, `User` defines a one-to-many relationship to `Item` with `cascade="all, delete-orphan"`.
+`User(SQLAlchemyBaseUserTableUUID, Base)` adds the standard
+`fastapi-users` columns: `id` (UUID), `email`, `hashed_password`,
+`is_active`, `is_superuser`, `is_verified`. It owns a one-to-many
+`items` relationship with `cascade="all, delete-orphan"`.
 
 ### Item
 
-| Column | Type | Description |
+The `items` table is a legacy template surface. PMT domain data does
+not have its own ORM tables - it is served directly from `pmt_core`
+services.
+
+| Column | Type | Notes |
 |---|---|---|
-| `id` | `UUID` | Primary key (auto-generated via `uuid4`) |
-| `name` | `String` | Item name (required) |
-| `description` | `String` | Optional description |
-| `quantity` | `Integer` | Optional quantity |
-| `user_id` | `UUID` | Foreign key to `user.id` |
+| `id` | `UUID` | primary key, default `uuid4` |
+| `name` | `String` | required |
+| `description` | `String` | optional |
+| `quantity` | `Integer` | optional |
+| `user_id` | `UUID` | FK to `user.id` |
 
-## Authentication System
+## Authentication
 
-Authentication is powered by [fastapi-users](https://fastapi-users.github.io/fastapi-users/) and configured in `app/users.py`:
+`app/users.py` wires `fastapi-users` with a JWT backend.
 
-### JWT Strategy
+- **Transport** - `PMTBearerTransport` (a `BearerTransport` subclass
+  that returns `200 {"detail": "Successfully logged out"}` on logout).
+- **Strategy** - `JWTStrategy(secret=ACCESS_SECRET_KEY,
+  lifetime_seconds=ACCESS_TOKEN_EXPIRE_SECONDS)`.
+- **Backend name** - `"jwt"`.
 
-- **Transport** — `BearerTransport` with `tokenUrl` pointing to `auth/jwt/login`
-- **Strategy** — `JWTStrategy` using `ACCESS_SECRET_KEY` with a configurable `ACCESS_TOKEN_EXPIRE_SECONDS` (default: 3600s / 1 hour)
-- **Backend** — An `AuthenticationBackend` named `"jwt"` combining the transport and strategy
+### `current_active_user`
 
-### UserManager
+PMT does not use `fastapi-users.current_user` directly. Instead, it
+wraps `fastapi_users.current_user(active=True, optional=True)`:
 
-The `UserManager` handles user lifecycle events and password validation:
+```python
+async def current_active_user(
+    user: Optional[User] = Depends(_optional_current_user),
+) -> User:
+    if settings.AUTH_DISABLED:
+        return _build_noauth_user()
+    if user is None:
+        raise HTTPException(status_code=401)
+    return user
+```
 
-- **`on_after_register`** — Logs the new user ID
-- **`on_after_forgot_password`** — Sends a password reset email via `send_reset_password_email`
-- **`on_after_request_verify`** — Logs the verification token
-- **`validate_password`** — Enforces password rules:
-    - Minimum 8 characters
-    - Must not contain the user's email
-    - At least one uppercase letter
-    - At least one special character (`!@#$%^&*(),.?":{}|<>`)
+When `AUTH_DISABLED` (alias `PMT_AUTH_DISABLED`) is true, every route
+sees a synthetic user with id `00000000-0000-0000-0000-0000000000a1`,
+which is what the local web and desktop workflows rely on.
 
-### Obtaining the Current User
+`AUTH_DISABLED` defaults to **true** in the application code, but the
+test suite forces it back to false in `tests/conftest.py` so 401
+assertions stay meaningful. Committed `.env.example` files match the
+test default.
 
-The `current_active_user` dependency (from `fastapi_users.current_user(active=True)`) is used in route handlers to require authentication and inject the authenticated `User` object.
+### Password rules
 
-## Email Subsystem
+`UserManager.validate_password` enforces:
 
-Email functionality is provided by [fastapi-mail](https://sabuhish.github.io/fastapi-mail/) in `app/email.py`:
+- Minimum 8 characters.
+- Must not contain the user's email address.
+- At least one uppercase letter.
+- At least one special character from `!@#$%^&*(),.?":{}|<>`.
 
-- **Configuration** — `ConnectionConfig` is built from `Settings` fields (SMTP server, credentials, TLS settings)
-- **Templates** — Jinja2 HTML templates stored in `app/email_templates/`
-- **Password Reset** — `send_reset_password_email(user, token)` constructs a reset link pointing to `{FRONTEND_URL}/password-recovery/confirm?token=...` and sends it using the `password_reset.html` template
+## Email
 
-## OpenAPI Schema Generation
+`app/email.py` configures `fastapi-mail` from the `MAIL_*` settings
+and ships one Jinja2 template (`password_reset.html`). The reset link
+points at `{FRONTEND_URL}/password-recovery/confirm?token=...`.
 
-The OpenAPI schema powers the frontend's auto-generated typed API client:
+In local SQLite/no-auth mode the reset flow is not used. Authenticated
+workflows require an SMTP server reachable via the `MAIL_*` settings.
 
-1. **Generation script** — `commands/generate_openapi_schema.py` calls `app.openapi()`, cleans up operation IDs by removing tag prefixes, and writes the JSON to the path specified by `OPENAPI_OUTPUT_FILE`.
-2. **Auto-regeneration** — `watcher.py` uses `watchdog` to monitor file changes in `app/` and re-runs the generation script automatically during development.
-3. **Frontend consumption** — The generated schema is used by `openapi-fetch` on the frontend to create a fully typed API client.
+## OpenAPI Schema
+
+The OpenAPI schema is the contract between FastAPI and the Next.js
+client.
+
+1. **Live schema** - `GET /openapi.json` is served by FastAPI itself.
+2. **Export script** - `uv run python -m commands.generate_openapi_schema`
+   writes the schema to `OPENAPI_OUTPUT_FILE`.
+3. **Auto regeneration during dev** - `watcher.py` watches `app/` and
+   re-runs the export when relevant files change.
+4. **Frontend consumption** - `pnpm generate-client` (run from
+   `nextjs-frontend/`) pulls the live schema and regenerates
+   `app/openapi-client/`. Do not hand-edit those files.
 
 ## Configuration
 
-All settings are defined in `app/config.py` using Pydantic's `BaseSettings`. Values are loaded from environment variables with fallback to a `.env` file.
+Settings are loaded by `app/config.py` from environment variables and
+`fastapi_backend/.env`.
 
-| Group | Variable | Type | Default | Description |
+| Group | Variable | Type | Default | Notes |
 |---|---|---|---|---|
-| **OpenAPI** | `OPENAPI_URL` | `str` | `"/openapi.json"` | Path to serve the OpenAPI schema |
-| **Database** | `DATABASE_URL` | `str` | — | PostgreSQL connection URL |
-| | `TEST_DATABASE_URL` | `str?` | `None` | Separate database URL for tests |
-| | `EXPIRE_ON_COMMIT` | `bool` | `False` | SQLAlchemy session behaviour |
-| **Auth** | `ACCESS_SECRET_KEY` | `str` | — | JWT signing secret |
-| | `RESET_PASSWORD_SECRET_KEY` | `str` | — | Password reset token secret |
-| | `VERIFICATION_SECRET_KEY` | `str` | — | Email verification token secret |
-| | `ALGORITHM` | `str` | `"HS256"` | JWT algorithm |
-| | `ACCESS_TOKEN_EXPIRE_SECONDS` | `int` | `3600` | Token lifetime in seconds |
-| **Email** | `MAIL_USERNAME` | `str?` | `None` | SMTP username |
-| | `MAIL_PASSWORD` | `str?` | `None` | SMTP password |
-| | `MAIL_FROM` | `str?` | `None` | Sender email address |
-| | `MAIL_SERVER` | `str?` | `None` | SMTP server hostname |
-| | `MAIL_PORT` | `int?` | `None` | SMTP port |
-| | `MAIL_FROM_NAME` | `str` | `"FastAPI template"` | Display name for sender |
-| | `MAIL_STARTTLS` | `bool` | `True` | Use STARTTLS |
-| | `MAIL_SSL_TLS` | `bool` | `False` | Use SSL/TLS |
-| **Frontend** | `FRONTEND_URL` | `str` | `"http://localhost:3000"` | Frontend base URL (used in emails) |
-| **CORS** | `CORS_ORIGINS` | `Set[str]` | — | Allowed CORS origins |
+| OpenAPI | `OPENAPI_URL` | `str` | `/openapi.json` | path the schema is served at |
+| Database | `DATABASE_URL` | `str` | required | SQLite or Postgres URL |
+| | `TEST_DATABASE_URL` | `str?` | `None` | optional override for pytest |
+| | `EXPIRE_ON_COMMIT` | `bool` | `False` | SQLAlchemy session behavior |
+| Auth | `ACCESS_SECRET_KEY` | `str` | required | JWT signing secret |
+| | `RESET_PASSWORD_SECRET_KEY` | `str` | required | reset-token secret |
+| | `VERIFICATION_SECRET_KEY` | `str` | required | email-verify secret |
+| | `ALGORITHM` | `str` | `HS256` | JWT algorithm |
+| | `ACCESS_TOKEN_EXPIRE_SECONDS` | `int` | `3600` | token lifetime |
+| | `AUTH_DISABLED` (`PMT_AUTH_DISABLED`) | `bool` | `True` | bypass auth in local mode |
+| Email | `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM`, `MAIL_SERVER`, `MAIL_PORT` | mixed | `None` | SMTP wiring |
+| | `MAIL_FROM_NAME` | `str` | `Portfolio Management Tool` | sender display name |
+| | `MAIL_STARTTLS` / `MAIL_SSL_TLS` | `bool` | `True` / `False` | TLS posture |
+| | `USE_CREDENTIALS`, `VALIDATE_CERTS` | `bool` | `True` | fastapi-mail flags |
+| | `TEMPLATE_DIR` | `str` | `email_templates` | templates folder |
+| Frontend | `FRONTEND_URL` | `str` | `http://localhost:3000` | used in reset emails |
+| Runtime | `RUNTIME_MODE` (`PMT_RUNTIME_MODE`/`PMT_RUNTIME`) | `Literal[server, desktop]` | `server` | reported by `/api/health` |
+| | `APP_DATA_DIR` (`PMT_APP_DATA_DIR`/`PMT_DESKTOP_APP_DATA_DIR`) | `str?` | `None` | desktop app data dir |
+| | `MOCK_DATA` | `bool` | `True` | use mock data from `pmt_core` |
+| CORS | `CORS_ORIGINS` | `Set[str]` | required | JSON array or comma-separated |
+
+Strings parsed by `parse_cors_origins` accept JSON arrays
+(`["http://localhost:3000"]`) and comma-separated lists.

@@ -13,14 +13,13 @@ checks.
 - Tauri platform prerequisites for desktop work:
   Xcode Command Line Tools on macOS; Microsoft C++ Build Tools,
   WebView2, and the Rust MSVC toolchain on Windows
-- Optional: Docker if you need the PostgreSQL/MailHog compose stack
 - Reflex reference checkout:
   `/Users/orbot/Developer/work/Portfolio-Management-Tool-reflex`
 
-The main local setup path is non-Docker: FastAPI uses a local SQLite
+The local setup path uses SQLite: FastAPI runs against a local SQLite
 file, Next.js runs with `pnpm dev`, and Reflex runs from the sibling
-reference checkout. Use Docker only when a task specifically needs
-PostgreSQL or MailHog.
+reference checkout. PostgreSQL is supported by setting `DATABASE_URL`
+yourself, but is not required for parity work.
 
 Install dependencies:
 

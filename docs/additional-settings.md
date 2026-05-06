@@ -88,18 +88,6 @@ For the full desktop workflow, including sidecar build, dev launch,
 bundle output, health checks, and Windows prerequisites, see
 [Tauri Desktop Setup](tauri-desktop.md).
 
-## Docker Services
-
-Docker is optional. It remains useful for PostgreSQL and MailHog when a
-task needs the compose stack:
-
-```bash
-docker compose up db -d
-make docker-up-mailhog
-```
-
-MailHog is available at `http://localhost:8025`.
-
 ## Migrations
 
 For PostgreSQL-backed work:

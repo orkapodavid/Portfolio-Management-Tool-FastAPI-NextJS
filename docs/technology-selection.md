@@ -9,10 +9,10 @@ Portfolio Management Tool currently uses:
 | Desktop | Tauri v2, Rust, PyInstaller FastAPI sidecar |
 | Backend | FastAPI, Pydantic, SQLAlchemy, fastapi-users |
 | Business logic | `pmt_core_pkg/pmt_core` shared services and repositories |
-| Databases | SQLite for local parity/desktop; PostgreSQL for composed web environments |
+| Databases | SQLite for local parity/desktop; PostgreSQL optional via `DATABASE_URL` |
 | API contract | OpenAPI + `@hey-api/openapi-ts` generated TypeScript client |
 | Testing | Pytest for backend; Jest and React Testing Library for frontend |
-| Tooling | `uv`, `pnpm`, ESLint, Ruff, Docker Compose |
+| Tooling | `uv`, `pnpm`, ESLint, Ruff |
 
 ## Current Notes
 

@@ -22,7 +22,8 @@ engine_kwargs: dict[str, Any] = {}
 if is_sqlite_database_url(ASYNC_DATABASE_URL):
     engine_kwargs["connect_args"] = {"timeout": 30}
 else:
-    # Disable connection pooling for serverless PostgreSQL environments like Vercel.
+    # Disable connection pooling for non-SQLite backends so each request opens
+    # a fresh connection — safe for serverless or short-lived process models.
     engine_kwargs["poolclass"] = NullPool
 
 engine = create_async_engine(ASYNC_DATABASE_URL, **engine_kwargs)
