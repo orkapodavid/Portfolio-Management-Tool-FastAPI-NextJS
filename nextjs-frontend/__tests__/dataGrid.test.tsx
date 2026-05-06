@@ -95,6 +95,10 @@ describe("DataGrid", () => {
     window.localStorage.clear();
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it("renders the toolbar (refresh + search) and the grid headers", () => {
     render(
       <DataGrid<Row>
@@ -251,6 +255,44 @@ describe("DataGrid", () => {
     );
     const switchInput = screen.getByLabelText("Auto refresh") as HTMLInputElement;
     expect(switchInput.checked).toBe(false);
+  });
+
+  it("runs the simulator on its own interval when auto-refresh is on", async () => {
+    jest.useFakeTimers();
+    const simulateUpdate = jest.fn((currentRows: Row[]) =>
+      currentRows.map((row) =>
+        row.ticker === "AAPL" ? { ...row, price: row.price + 1 } : row
+      )
+    );
+
+    render(
+      <DataGrid<Row>
+        columns={columns}
+        rows={rows}
+        gridId="positions_grid"
+        showAutoRefresh
+        simulateUpdate={simulateUpdate}
+        simulateUpdateIntervalMs={2_000}
+      />
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(4_500);
+      await Promise.resolve();
+    });
+
+    expect(simulateUpdate).toHaveBeenCalledTimes(2);
+
+    const switchInput = screen.getByLabelText("Auto refresh") as HTMLInputElement;
+    fireEvent.click(switchInput);
+    simulateUpdate.mockClear();
+
+    await act(async () => {
+      jest.advanceTimersByTime(4_500);
+      await Promise.resolve();
+    });
+
+    expect(simulateUpdate).not.toHaveBeenCalled();
   });
 
   it("bumps lastUpdated when isLoading transitions from true to false without an error", () => {

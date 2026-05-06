@@ -106,6 +106,10 @@ type DataGridProps<TRow> = {
   defaultAutoRefreshOff?: boolean;
   /** Polling interval in milliseconds when auto-refresh is on (default 30s). */
   autoRefreshIntervalMs?: number;
+  /** Optional client-side row drift between backend refreshes. */
+  simulateUpdate?: (rows: TRow[]) => TRow[];
+  /** Simulation interval in milliseconds when simulateUpdate is set (default 2s). */
+  simulateUpdateIntervalMs?: number;
   /** Items to render in a Generate dropdown placed first in the toolbar. */
   generateItems?: string[];
   /** Handler invoked with the chosen Generate item label. */
@@ -171,6 +175,8 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   showAutoRefresh = false,
   defaultAutoRefreshOff = false,
   autoRefreshIntervalMs = 30_000,
+  simulateUpdate,
+  simulateUpdateIntervalMs = 2_000,
   generateItems,
   onGenerate,
   toolbarDate,
@@ -185,13 +191,25 @@ export function DataGrid<TRow extends Record<string, unknown>>({
     showAutoRefresh && !defaultAutoRefreshOff
   );
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [displayRows, setDisplayRows] = useState(rows);
   const gridApiRef = useRef<GridReadyEvent["api"] | null>(null);
   const onRefreshRef = useRef(onRefresh);
+  const simulateUpdateRef = useRef(simulateUpdate);
+  const displayRowsRef = useRef(rows);
   const wasLoadingRef = useRef<boolean>(isLoading);
 
   useEffect(() => {
     onRefreshRef.current = onRefresh;
   }, [onRefresh]);
+
+  useEffect(() => {
+    simulateUpdateRef.current = simulateUpdate;
+  }, [simulateUpdate]);
+
+  useEffect(() => {
+    displayRowsRef.current = rows;
+    setDisplayRows(rows);
+  }, [rows]);
 
   useEffect(() => {
     gridApiRef.current?.setGridOption("quickFilterText", searchValue);
@@ -223,6 +241,20 @@ export function DataGrid<TRow extends Record<string, unknown>>({
     }, autoRefreshIntervalMs);
     return () => window.clearInterval(id);
   }, [showAutoRefresh, autoRefreshOn, autoRefreshIntervalMs]);
+
+  useEffect(() => {
+    if (!showAutoRefresh || !autoRefreshOn || !simulateUpdate) return;
+    const id = window.setInterval(() => {
+      const currentRows = displayRowsRef.current;
+      if (currentRows.length === 0) return;
+      const nextRows = simulateUpdateRef.current?.(currentRows);
+      if (!nextRows) return;
+      displayRowsRef.current = nextRows;
+      setDisplayRows(nextRows);
+      setLastUpdated(new Date());
+    }, simulateUpdateIntervalMs);
+    return () => window.clearInterval(id);
+  }, [showAutoRefresh, autoRefreshOn, simulateUpdate, simulateUpdateIntervalMs]);
 
   const storageKey = gridId ? `${STORAGE_PREFIX}${gridId}_state` : "";
   const showLayoutButtons = Boolean(gridId) && !hideLayoutButtons;
@@ -312,12 +344,14 @@ export function DataGrid<TRow extends Record<string, unknown>>({
     }
   };
 
+  const effectiveRows = simulateUpdate ? displayRows : rows;
+
   const hasStableRowIds = useMemo(() => {
-    if (rows.length === 0) return false;
-    const first = rows[0] as Record<string, unknown>;
+    if (effectiveRows.length === 0) return false;
+    const first = effectiveRows[0] as Record<string, unknown>;
     const value = first?.[rowIdKey];
     return value !== undefined && value !== null && value !== "";
-  }, [rows, rowIdKey]);
+  }, [effectiveRows, rowIdKey]);
 
   const getRowId = useMemo(
     () =>
@@ -585,7 +619,7 @@ export function DataGrid<TRow extends Record<string, unknown>>({
           <AgGridReact
             theme={pmtTheme}
             columnDefs={columns}
-            rowData={rows}
+            rowData={effectiveRows}
             defaultColDef={defaultColDef}
             getRowId={getRowId}
             onGridReady={onGridReady}

@@ -7,6 +7,7 @@ import { marketDataGetFxData } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { numberColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { fxDataSimulator } from "@/lib/grid-simulators";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type FxRow = {
@@ -86,7 +87,8 @@ export default function FxDataPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
-      autoRefreshIntervalMs={2_000}
+      simulateUpdate={fxDataSimulator}
+      simulateUpdateIntervalMs={2_000}
       rowIdKey="ticker"
       emptyMessage="No FX rates available."
       searchPlaceholder="Search FX pairs…"

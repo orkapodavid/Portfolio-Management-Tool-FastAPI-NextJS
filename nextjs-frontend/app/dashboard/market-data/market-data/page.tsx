@@ -11,6 +11,7 @@ import {
   textColumn,
 } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { marketDataSimulator } from "@/lib/grid-simulators";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type MarketDataRow = {
@@ -110,7 +111,8 @@ export default function MarketDataPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
-      autoRefreshIntervalMs={2_000}
+      simulateUpdate={marketDataSimulator}
+      simulateUpdateIntervalMs={2_000}
       rowIdKey="ticker"
       emptyMessage="Market data is unavailable."
       searchPlaceholder="Search market data…"
