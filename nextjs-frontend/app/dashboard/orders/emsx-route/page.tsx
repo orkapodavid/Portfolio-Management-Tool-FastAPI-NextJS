@@ -7,6 +7,7 @@ import { ordersGetOrderRoutes } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { numberColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { emsxRouteSimulator } from "@/lib/grid-simulators/orders";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type RouteRow = {
@@ -84,6 +85,7 @@ export default function EmsxRoutePage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={emsxRouteSimulator}
       emptyMessage="No EMSX routes available."
       searchPlaceholder="Search routes…"
     />

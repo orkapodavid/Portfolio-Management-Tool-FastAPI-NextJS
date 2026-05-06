@@ -7,6 +7,7 @@ import { ordersGetOrders } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { emsxOrderSimulator } from "@/lib/grid-simulators/orders";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type OrderRow = {
@@ -92,6 +93,7 @@ export default function EmsxOrderPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={emsxOrderSimulator}
       emptyMessage="No EMSX orders available."
       searchPlaceholder="Search orders…"
     />
