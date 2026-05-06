@@ -199,38 +199,44 @@ describe("DataGrid", () => {
     expect(params.fileName).toMatch(/^positions_\d{8}_\d{4}\.xlsx$/);
   });
 
-  it("auto-refresh status row defaults the switch to ON and fires onRefresh on the interval", async () => {
-    jest.useFakeTimers();
-    const refresh = jest.fn(() => Promise.resolve());
-    render(
-      <DataGrid<Row>
-        columns={columns}
-        rows={rows}
-        gridId="positions_grid"
-        showAutoRefresh
-        autoRefreshIntervalMs={1_000}
-        onRefresh={refresh}
-      />
-    );
+  it.each([
+    { intervalMs: 1_000, elapsedMs: 2_500, expectedCalls: 2 },
+    { intervalMs: 2_000, elapsedMs: 4_500, expectedCalls: 2 },
+  ])(
+    "auto-refresh defaults ON and fires onRefresh every $intervalMs ms",
+    async ({ intervalMs, elapsedMs, expectedCalls }) => {
+      jest.useFakeTimers();
+      const refresh = jest.fn(() => Promise.resolve());
+      render(
+        <DataGrid<Row>
+          columns={columns}
+          rows={rows}
+          gridId="positions_grid"
+          showAutoRefresh
+          autoRefreshIntervalMs={intervalMs}
+          onRefresh={refresh}
+        />
+      );
 
-    const switchInput = screen.getByLabelText("Auto refresh") as HTMLInputElement;
-    expect(switchInput.checked).toBe(true);
+      const switchInput = screen.getByLabelText("Auto refresh") as HTMLInputElement;
+      expect(switchInput.checked).toBe(true);
 
-    await act(async () => {
-      jest.advanceTimersByTime(2_500);
-      await Promise.resolve();
-    });
-    expect(refresh).toHaveBeenCalledTimes(2);
+      await act(async () => {
+        jest.advanceTimersByTime(elapsedMs);
+        await Promise.resolve();
+      });
+      expect(refresh).toHaveBeenCalledTimes(expectedCalls);
 
-    fireEvent.click(switchInput);
-    refresh.mockClear();
-    await act(async () => {
-      jest.advanceTimersByTime(5_000);
-      await Promise.resolve();
-    });
-    expect(refresh).not.toHaveBeenCalled();
-    jest.useRealTimers();
-  });
+      fireEvent.click(switchInput);
+      refresh.mockClear();
+      await act(async () => {
+        jest.advanceTimersByTime(elapsedMs * 2);
+        await Promise.resolve();
+      });
+      expect(refresh).not.toHaveBeenCalled();
+      jest.useRealTimers();
+    }
+  );
 
   it("respects defaultAutoRefreshOff when showAutoRefresh is set", () => {
     render(

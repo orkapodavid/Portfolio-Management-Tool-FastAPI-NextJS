@@ -110,6 +110,7 @@ export default function MarketDataPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      autoRefreshIntervalMs={2_000}
       rowIdKey="ticker"
       emptyMessage="Market data is unavailable."
       searchPlaceholder="Search market data…"

@@ -86,6 +86,7 @@ export default function FxDataPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      autoRefreshIntervalMs={2_000}
       rowIdKey="ticker"
       emptyMessage="No FX rates available."
       searchPlaceholder="Search FX pairs…"
