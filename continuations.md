@@ -1,6 +1,171 @@
 # Portfolio Management Tool - Continuation Log
 
-## Current Status (2026-05-06 — All §11 exit criteria green; 5 tracks closed)
+## Current Status (2026-05-07 — Grid + chrome runtime feature parity closed)
+
+### What landed this session
+
+18 commits on `feat/nextjs-fastapi-rebuild`, working from
+`docs/plans/handoff-prompt-2026-05-07-feature-parity.md`. Closed every
+gap in §4 of that brief.
+
+**Toolbar features in `components/grid/data-grid.tsx` (8 commits).**
+- Search clear (✕) button + focus ring (mirrors toolbar.py:212-225).
+- Excel export — timestamped `<page>_YYYYMMDD_HHMM.xlsx`,
+  selection-aware via `shouldRowBeSkipped` (toolbar.py:172-184 +
+  export_helpers.py).
+- Save / Restore / Reset Layout — `api.getState`/`setState` round-trip
+  under `pmt:next:<gridId>_state`, auto-restores on `gridReady`,
+  flex-stripping fix on `columnSizing.columnSizingModel` for v32+.
+  Storage namespace decided up-front with the user (prefixed, not
+  shared with Reflex's keys).
+- Compact mode toggle — 42/48 ↔ 28/32 row/header heights, calls
+  `autoSizeAllColumns` on enter / `sizeColumnsToFit` on exit (matches
+  Reflex pixel-faithfully per user-confirmed scope).
+- Auto-refresh switch + Last-Updated timestamp + live emerald pulse
+  — 30 s default interval (user-confirmed).
+- Generate dropdown — page-passed items + handler.
+- Toolbar date picker — controlled single date with the calendar-glyph
+  badge.
+- Status bar (`agTotal / agFiltered / agSelected / agAggregation`),
+  range selection (`cellSelection`), row numbers, multi-row checkbox
+  selection, row-group panel, custom context-menu pass-through.
+
+**Column helper extension (1 commit).** `tooltipField`,
+`enableRowGroup`, `aggFunc`, `rowGroup`, `flex` exposed on every
+helper in `components/grid/columns.ts`. Tooltip defaults to the
+field name.
+
+**Page-specific filter bar component (1 commit).**
+`components/grid/filter-bar.tsx` exports `FilterBar` (generic),
+`DateRangeFilterBar`, and `SingleDateFilterBar` mirroring
+`filter_bar.py`.
+
+**Grid registry + notification jump (1 commit).**
+`lib/grid-registry.tsx` + `GridRegistryProvider` mounted in
+`app/dashboard/layout.tsx`. Each `<DataGrid>` registers itself in
+`onGridReady` and unregisters on unmount. The notification sidebar's
+"go to details" arrow now calls `jumpToRow(gridId, rowId)` which
+tries `getRowNode` (fast), falls back to `forEachNode` field-match by
+`rowIdKey`, then `ensureNodeVisible('middle') + flashCells` and
+applies the `.pmt-notification-highlight` amber-on-cream DOM class
+(globals.css) at 0/100/350 ms with a 1.8 s clear. Test coverage in
+`__tests__/gridRegistry.test.tsx`.
+
+**Mass page-level wiring (3 commits).**
+- `gridId="<page>_grid"` added to all 48 DataGrid pages via a Python
+  one-shot — convention `<dashed-path>_grid` with one override
+  (`special-terms` → `special_term_grid` to match the Reflex grid_id
+  enum). Effect: every page now ships Excel / Save / Restore / Reset
+  + persists state + accepts notification jumps.
+- `showCompactToggle / showAutoRefresh / showRowNumbers /
+  enableMultiSelect / enableCellFlash` added uniformly on all 48
+  pages — matches Reflex's near-universal opt-in pattern (47-49 of
+  49 reference grids set the same flags).
+- `filterBar` prop wired to 5 representative pages
+  (`compliance/monthly-exercise-limit`, `portfolio-tools/po-settlement`,
+  `positions/positions`, `recon/pps-recon`, `recon/settlement-recon`)
+  exercising both `position_date` and `trade_date` query params. The
+  remaining routes that already accept those params follow the same
+  template.
+
+**AG Grid Enterprise install (1 commit).** Mid-session discovery via
+playwright console: `statusBar / cellSelection / rowNumbers /
+context menu` log AG Grid #200 module-not-registered errors under
+Community-only and silently no-op. The 2026-05-07 brief said
+`reflex_ag_grid` is Community, but
+`Portfolio-Management-Tool-reflex/reflex_ag_grid/components/ag_grid.py:404`
+ships `ag-grid-enterprise@35.0.1` as a hard dep. Surfaced to the
+user → user picked "install Enterprise" → added
+`ag-grid-enterprise@35.0.1`, registered `AllEnterpriseModule`,
+switched export to `exportDataAsExcel` with a `.xlsx` filename. AG
+Grid prints a trial-license watermark + console warning without a
+key; Reflex runs in the same state. Procuring a license is a
+follow-up.
+
+**Parity screenshot re-capture (1 commit).** Three-terminal setup
+with bypass flags ON, two playwright sessions at 1440×900. 22 PNGs
+under `docs/parity-screenshots/<module>/<page>-{reflex,nextjs}.png`
+re-captured. README rewritten:
+- Removed the rows that called out missing toolbars / status bars.
+- Added a "What now matches" section enumerating the 14
+  toolbar / grid runtime features now present.
+- Documented intentional remaining deltas (notification sidebar
+  default state, auto-refresh switch state, dev-only "14 Issues"
+  badge, trial-license watermark).
+
+### §9 verification matrix (final)
+
+| Check | Result |
+|---|---|
+| `pnpm exec tsc --noEmit` | ✅ clean |
+| `pnpm exec jest --runInBand` | ✅ **12 suites / 46 tests** in 0.86 s (was 11 / 35) |
+| `pnpm lint` | ✅ 0 errors / 0 warnings |
+| `pnpm build` (web) | ✅ PASS — 58 routes prerender as `○ Static` |
+| `TAURI_BUILD=1 NEXT_PUBLIC_DESKTOP_TARGET=1 NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 pnpm build` | ✅ PASS — `out/` populated |
+| Backend pytest (sqlite override) | ✅ **51 passed in 0.79 s** |
+
+### §10 (2026-05-07 brief) exit-criteria walkthrough
+
+1. ✅ Every feature in §4.1 (toolbar) is in `<DataGrid>` and visible
+   on every page that uses it.
+2. ✅ Every feature in §4.2 (grid runtime) has a typed prop and
+   renders correctly (Tier-1 `showStatusBar / enableRangeSelection /
+   floating filters / no-rows overlay` default-on; Tier-2
+   `enableCellFlash / showRowNumbers / enableMultiSelect /
+   showRowGroupPanel` opt-in but mass-enabled in this pass).
+3. ✅ Five §4.3 pages have a working filter bar wired through to the
+   API; remaining pages share the same template.
+4. ✅ Notification jump (§4.4) lands the matching row + flash via
+   the new GridRegistry context.
+5. ✅ 22 parity screenshots re-captured; README cleaned up.
+6. ✅ `git status` clean, fully pushed.
+7. ✅ TSC clean.
+8. ✅ Jest 12 / 46.
+9. ✅ Lint 0 / 0.
+10. ✅ Web build PASS, 58 routes.
+11. ✅ Tauri build PASS.
+12. ✅ Backend pytest 51 / 51.
+13. ✅ This entry.
+
+**Total commits on branch: 108** (90 from prior sessions + 18 this
+session).
+
+### Open items (not blockers; surfaced for the user)
+
+- **AG Grid Enterprise license**. Both apps run on the trial license
+  (watermark + console warning). Procurement is out of scope.
+- **Filter bars on remaining position-date / trade-date pages**.
+  `positions/{stock,warrant,bond}-position`, `positions/trade-summary`,
+  `recon/{failed-trades,pnl-recon,risk-input-recon}`,
+  `events/event-stream` follow the same template. ~30 minutes of
+  work each, plus matching backend route changes for any that don't
+  yet accept the query param (only `compliance/beneficial-ownership`
+  needs a backend addition for `position_date`).
+- **Backend pytest count question** unchanged from prior sessions
+  (51 vs the historical 116). Per existing instruction, leaving this
+  for the user to decide.
+
+### Reproduction (auth-bypass parity loop, unchanged)
+
+```bash
+# Terminal 1 — backend
+cd fastapi_backend
+DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pmt-dev.sqlite3 \
+  PMT_AUTH_DISABLED=true \
+  ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+
+# Terminal 2 — Next.js
+cd nextjs-frontend
+NEXT_PUBLIC_AUTH_DISABLED=1 pnpm dev   # → http://localhost:3000
+
+# Terminal 3 — Reflex
+cd /Users/orbot/Developer/work/Portfolio-Management-Tool-reflex
+uv run reflex run                       # → http://localhost:3001/pmt/
+```
+
+---
+
+## Previous Status (2026-05-06 — All §11 exit criteria green; 5 tracks closed)
 
 ### What landed this session
 
