@@ -104,7 +104,12 @@ type DataGridProps<TRow> = {
   showAutoRefresh?: boolean;
   /** Start with the Auto-Refresh switch off when showAutoRefresh is true. */
   defaultAutoRefreshOff?: boolean;
-  /** Polling interval in milliseconds when auto-refresh is on (default 30s). */
+  /**
+   * Polling interval in milliseconds when auto-refresh is on. Defaults to
+   * 30 s — except when `simulateUpdate` is set, in which case it defaults to
+   * `simulateUpdateIntervalMs` so simulator and backend cadence stay
+   * aligned with Reflex (no "snap-back" once per 30 s).
+   */
   autoRefreshIntervalMs?: number;
   /** Optional client-side row drift between backend refreshes. */
   simulateUpdate?: (rows: TRow[]) => TRow[];
@@ -174,7 +179,7 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   showCompactToggle = false,
   showAutoRefresh = false,
   defaultAutoRefreshOff = false,
-  autoRefreshIntervalMs = 30_000,
+  autoRefreshIntervalMs,
   simulateUpdate,
   simulateUpdateIntervalMs = 2_000,
   generateItems,
@@ -232,15 +237,18 @@ export function DataGrid<TRow extends Record<string, unknown>>({
     }
   };
 
+  const effectiveAutoRefreshInterval =
+    autoRefreshIntervalMs ?? (simulateUpdate ? simulateUpdateIntervalMs : 30_000);
+
   useEffect(() => {
     if (!showAutoRefresh || !autoRefreshOn) return;
     const id = window.setInterval(() => {
       const fn = onRefreshRef.current;
       if (!fn) return;
       void Promise.resolve(fn());
-    }, autoRefreshIntervalMs);
+    }, effectiveAutoRefreshInterval);
     return () => window.clearInterval(id);
-  }, [showAutoRefresh, autoRefreshOn, autoRefreshIntervalMs]);
+  }, [showAutoRefresh, autoRefreshOn, effectiveAutoRefreshInterval]);
 
   useEffect(() => {
     if (!showAutoRefresh || !autoRefreshOn || !simulateUpdate) return;

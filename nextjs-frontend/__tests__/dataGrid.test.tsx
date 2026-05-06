@@ -242,6 +242,62 @@ describe("DataGrid", () => {
     }
   );
 
+  it("polling cadence implicitly matches simulator interval when simulateUpdate is set without an explicit autoRefreshIntervalMs", async () => {
+    jest.useFakeTimers();
+    const refresh = jest.fn(() => Promise.resolve());
+    const simulateUpdate = jest.fn((current: Row[]) => current);
+
+    render(
+      <DataGrid<Row>
+        columns={columns}
+        rows={rows}
+        gridId="positions_grid"
+        showAutoRefresh
+        simulateUpdate={simulateUpdate}
+        simulateUpdateIntervalMs={2_000}
+        onRefresh={refresh}
+      />
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(4_500);
+      await Promise.resolve();
+    });
+
+    // Polling at 30 s default would fire 0 times in 4.5 s; simulator-driven
+    // 2 s cadence should fire 2 times. This proves the implicit drop.
+    expect(refresh).toHaveBeenCalledTimes(2);
+    jest.useRealTimers();
+  });
+
+  it("explicit autoRefreshIntervalMs still wins over the simulator default", async () => {
+    jest.useFakeTimers();
+    const refresh = jest.fn(() => Promise.resolve());
+    const simulateUpdate = jest.fn((current: Row[]) => current);
+
+    render(
+      <DataGrid<Row>
+        columns={columns}
+        rows={rows}
+        gridId="positions_grid"
+        showAutoRefresh
+        autoRefreshIntervalMs={30_000}
+        simulateUpdate={simulateUpdate}
+        simulateUpdateIntervalMs={2_000}
+        onRefresh={refresh}
+      />
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(10_000);
+      await Promise.resolve();
+    });
+
+    // With explicit 30 s polling, no backend tick yet at t=10 s.
+    expect(refresh).not.toHaveBeenCalled();
+    jest.useRealTimers();
+  });
+
   it("respects defaultAutoRefreshOff when showAutoRefresh is set", () => {
     render(
       <DataGrid<Row>
