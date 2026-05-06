@@ -1136,3 +1136,149 @@ Constraints:
 - Keep the generated OpenAPI client sourced from the live backend.
 - Report exact PASS/FAIL counts, not summaries without numbers.
 ```
+
+## 2026-05-07 - Post-Vercel/Docker cleanup verification and dead code sweep
+
+Picked up the branch immediately after `5a61114 chore: remove Docker
+and Vercel deployment surface` and `ab1eaf5 Updates`. Goal: verify
+the cleanup did not regress any check, and sweep the residue the
+cleanup commit missed.
+
+### Phase 1 verification matrix (all green)
+
+| Check | Current | Baseline (gate-close) |
+|---|---|---|
+| `pnpm exec tsc --noEmit --pretty false` | clean (2.21 s) | clean |
+| `pnpm exec jest --runInBand` | 31 suites / 163 tests in 2.043 s | 31 / 163 in 2 s |
+| `pnpm lint` | 0 errors / 0 warnings (1.56 s) | 0 / 0 |
+| `pnpm build` (web) | 59 / 59 static pages, compiled in 4.6 s | 59 / 59 |
+| `pnpm build` (TAURI desktop static export) | 59 / 59 static pages, compiled in 4.6 s | 59 / 59 |
+| Backend pytest (sqlite override) | 187 passed, 2 skipped in 7.80 s | 187 passed, 2 skipped |
+| `cargo check` on `src-tauri/Cargo.toml` | clean (5.45 s) | clean |
+| `node src-tauri/scripts/build-sidecar.mjs` | sidecar built at `pmt-backend-aarch64-apple-darwin` (31.65 s) | green |
+
+No regressions introduced by the Docker/Vercel cleanup commit.
+
+### Phase 2 simplifications shipped (4 focused commits)
+
+The cleanup commit removed the workflows but left several tracked
+artifacts and dev deps that were dead code. One commit per finding:
+
+- `3d1759c chore: remove dead Vercel surface missed by 5a61114` --
+  deleted `fastapi_backend/vercel.json`, `vercel.prod.json`, and the
+  `api/index.py` serverless entry point. Tauri desktop is the only
+  deployment target.
+- `970c315 chore: remove dead fastapi_backend/watcher.py` -- the
+  only caller was `start.sh`, which `5a61114` deleted. Dropped the
+  watchdog dev dep, regenerated `uv.lock` (119 packages), and stripped
+  watcher references from `docs/fastapi_backend/backend-architecture.md`
+  and `backend-development-guide.md`. `requirements.txt` unchanged
+  (watchdog is dev-only and not exported).
+- `8553648 chore: remove dead nextjs-frontend/watcher.js + chokidar
+  dev deps` -- the only caller was the deleted nextjs `start.sh`.
+  `chokidar` and `chokidar-cli` direct deps were watcher.js's only
+  consumers; they remain as transitive deps of `c12`, postcss, and
+  Tailwind.
+- `9731da1 chore: remove tracked stale local-shared-data/openapi.json`
+  -- the docker-compose volume mount target is no longer written by
+  any live process. `OPENAPI_OUTPUT_FILE` in `.env.example` now points
+  directly at `../nextjs-frontend/openapi.json`.
+
+Pushed in two batches (after commits A+B, then C+D). HEAD now at
+`9731da1`, `git status --short --branch` clean, `origin/main`
+in sync.
+
+### Phase 2 surfaces reviewed and intentionally left as-is
+
+- `fastapi_backend/app/database.py` -- `NullPool` branch comment was
+  generalized by `5a61114` to "safe for serverless or short-lived
+  process models," which still reads correctly post-Vercel. Branch is
+  exercised by `.github/workflows/ci.yml`, which spins up a `postgres:17`
+  service and runs pytest with `DATABASE_URL` from secrets pointing at
+  it. Locally with `TEST_DATABASE_URL=sqlite+aiosqlite://...` the
+  branch is not exercised; that is by design.
+- Postgres residue audit -- `.env.example` SQLite default, all docs
+  describe SQLite as the local default with Postgres optional via
+  `DATABASE_URL`, and `runtime.py` maps both backends. CI continues to
+  exercise the Postgres path. Nothing stale.
+- `mkdocs.yml` -- nav targets (README, get-started, additional-settings,
+  technology-selection, deployment, CHANGELOG, contributing, support)
+  all exist; no Docker/Vercel-specific page lingered in the index.
+- `Makefile` -- two test targets remain (`test-backend`, `test-frontend`).
+  The README documents the same commands directly, but the Makefile
+  costs nothing to keep and serves as a discoverability aid; left
+  alone.
+- `.gitignore` -- no entries reference `local-shared-data/`,
+  `shared-data/`, `start.sh`, or any deleted Docker artifact.
+- `package.json` (frontend) -- no scripts referenced docker or
+  start.sh post-cleanup, beyond the chokidar/watcher.js residue
+  shipped in commit C.
+- `.pre-commit-config.yaml` -- the docker-specific config
+  `.pre-commit-config.docker.yaml` was deleted by `5a61114`; the
+  remaining root config has no docker references.
+- `requirements.txt` -- still produced by `uv export` and consumed by
+  `nextjs-frontend/src-tauri/scripts/build-sidecar.mjs` as one of the
+  cache-invalidation hash inputs (alongside `pyproject.toml`,
+  `uv.lock`, `alembic.ini`, and the script itself). Removing the file
+  would force a hash-input change in the sidecar builder; left in
+  place.
+
+### Phase 3 three-service smoke (passed)
+
+Backend was already running on `127.0.0.1:8000` from the user's
+terminal (`runtime: server, database_backend: sqlite`); brought up
+Next.js dev on `localhost:3000` with `NEXT_PUBLIC_AUTH_DISABLED=1`.
+Reflex was not started for this smoke (the brief calls it optional
+for visual parity comparison; not needed here).
+
+`/dashboard/market-data/market-data` exercised via playwright-cli
+chromium session at default viewport:
+
+- Page renders without auth redirect. URL stays on the dashboard
+  route, full top-nav (Market Data through Orders) is present.
+- Grid populates: 12 rows, 78 cells, first-row ticker AAPL, sample
+  prices `bid 182.45 / ask 182.55 / last 182.50`.
+- Auto-refresh flashes are firing: 40 cells with
+  `.ag-cell-data-changed-animation` over an 8-second sample window.
+  (Visible text values in the sample window were stable, which matches
+  the simulator's tendency to push values that round to the same
+  display string; the flash class itself is the load-bearing signal
+  and it is firing.)
+- Notification sidebar opens by default. `pmt:next:notificationSidebarOpen`
+  was unset, sidebar visible with `NOTIFICATIONS` heading and 12
+  cards; counter showed 7 unread.
+- Notification jump path works end-to-end. Clicked "Go to details"
+  on the first card (`PnL Alert`, target `pnl_change_grid` row
+  `AAPL`). At t+0 the handler wrote
+  `pmt:next:pendingHighlight={"gridId":"pnl_change_grid","rowId":"AAPL","rowIdKey":"ticker"}`
+  to `sessionStorage`; at t+600 ms the URL became
+  `/dashboard/pnl/pnl-change`; at t+800 ms two elements
+  carried `.pmt-notification-highlight` on the destination grid and
+  the pending key was cleared.
+
+The 14 console errors observed at page load are the AG Grid
+Enterprise license trial banner (`License Key Not Found`, "All
+features unlocked for trial"), which is the documented expected
+state per `docs/get-started.md` until license procurement is
+reprioritized.
+
+### Residual risk and follow-ups
+
+- `ab1eaf5 Updates` (3 minutes before this session began) bundled the
+  five pre-existing uncommitted documentation modifications
+  (`docs/fastapi_backend/backend-development-guide.md`,
+  `backend-api-reference.md`, `pmt_core_pkg/README.md`,
+  `CHANGELOG.md`, `docs/CHANGELOG.md`) into a single commit with an
+  uninformative subject. The brief asked future agents to commit each
+  coherently or revert; that ship had sailed and pushed before I
+  picked up the work, so I left the history alone (no force-push to
+  `main`). The actual content of the bundled changes still reads
+  correctly against the post-Vercel state.
+- The Phase 1 web build wall time was ~13.5 s for both web and
+  desktop static export, vs ~10 s in older runs. Compile time was
+  4.6 s, so the variance is in collecting/finalising 59 pages. Not
+  treated as a regression.
+- `requirements.txt` is still tracked. It survives now only as a
+  cache-key input for the sidecar builder. If a future agent decides
+  to drop it, they should also drop the entry from
+  `sidecarSourceFiles` in `nextjs-frontend/src-tauri/scripts/build-sidecar.mjs`.
