@@ -2051,9 +2051,24 @@ export type PortfolioToolsGetComingResetsResponses = {
 export type PortfolioToolsGetCbInstallmentsData = {
   body?: never;
   path?: never;
-  query?: never;
+  query?: {
+    /**
+     * Position Date
+     */
+    position_date?: string | null;
+  };
   url: "/api/portfolio-tools/cb-installments";
 };
+
+export type PortfolioToolsGetCbInstallmentsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PortfolioToolsGetCbInstallmentsError =
+  PortfolioToolsGetCbInstallmentsErrors[keyof PortfolioToolsGetCbInstallmentsErrors];
 
 export type PortfolioToolsGetCbInstallmentsResponses = {
   /**

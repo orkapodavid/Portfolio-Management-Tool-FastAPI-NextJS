@@ -161,6 +161,7 @@ import type {
   PortfolioToolsGetComingResetsResponses,
   PortfolioToolsGetCbInstallmentsData,
   PortfolioToolsGetCbInstallmentsResponses,
+  PortfolioToolsGetCbInstallmentsErrors,
   PortfolioToolsGetExcessAmountData,
   PortfolioToolsGetExcessAmountResponses,
   PortfolioToolsGetDealIndicationData,
@@ -1526,7 +1527,7 @@ export const portfolioToolsGetCbInstallments = <
 ) => {
   return (options?.client ?? client).get<
     PortfolioToolsGetCbInstallmentsResponses,
-    unknown,
+    PortfolioToolsGetCbInstallmentsErrors,
     ThrowOnError
   >({
     responseType: "json",
