@@ -49,3 +49,10 @@ async def get_excess_amount(
     user: User = Depends(current_active_user),
 ):
     return await portfolio_tools_service.get_excess_amount()
+
+
+@router.get("/deal-indication")
+async def get_deal_indication(
+    user: User = Depends(current_active_user),
+):
+    return await portfolio_tools_service.get_deal_indication()
