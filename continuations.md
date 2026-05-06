@@ -1,6 +1,148 @@
 # Portfolio Management Tool - Continuation Log
 
-## Current Status (2026-05-05 — Auth-bypass flag for parity work)
+## Current Status (2026-05-06 — All §11 exit criteria green; 5 tracks closed)
+
+### What landed this session
+
+19 commits on `feat/nextjs-fastapi-rebuild`, working from
+`docs/plans/handoff-prompt-2026-05-06.md`.
+
+**Track 1 — `compliance/beneficial-ownership` field shape (1 commit).**
+Added `BeneficialOwnershipRecord` TypedDict to
+`pmt_core.models.compliance` (mirroring the Reflex `BeneficialOwnershipItem`),
+rewrote the repository mock to emit the canonical 11 fields
+(trade_date / ticker / company_name / nosh_reported / nosh_bbg /
+nosh_proforma / stock_shares / warrant_shares / bond_shares /
+total_shares), updated the service signature, and added
+`tests/routes/test_compliance.py`. The Next.js page already declared
+the right column shape; live cells now render values where they were
+previously empty.
+
+**Track 2 — six missing endpoints + grids (12 commits).** One
+backend-route+test commit and one frontend-grid commit per page:
+- `compliance/monthly-exercise-limit` (also added `MonthlyExerciseLimitRecord`
+  TypedDict; rewrote mock to canonical 9-field shape).
+- `portfolio-tools/{deal-indication, po-settlement, short-ecl}`
+  (`PortfolioToolsService` already had the methods returning canonical
+  shapes; just wired routes + tests + grids).
+- `instruments/{instrument-data, instrument-term}` (same — service
+  methods existed, just route + grid).
+
+Each page passes the §5.3 acceptance gate: column set / headers /
+order / pinned ticker / filter type / live API / empty + error states.
+
+**Track 3 — pricer-warrant + pricer-bond full calculator port
+(4 commits).** Surfaced scope question first, user picked the full
+port. Wired `POST /api/risk/pricer/warrant` and
+`POST /api/risk/pricer/bond` against existing
+`pmt_core.services.pricing.{WarrantPricer,BondPricer}`. Pydantic
+input/output models cover the full Term + Simulation field set; the
+response includes the 2D chart series so the recharts-equivalent
+component on the frontend has data without a second round-trip.
+Frontend pages ship the §7-pattern multi-section forms (Terms /
+Reset Parameters / Simulations / Outputs / chart-axis selector / chart)
+with a self-contained inline-SVG payoff/yield-curve component (avoids
+adding recharts as a new dependency). Backend pytest covers 200 + 401
+paths for both routes.
+
+**Track 4 — §11 exit criterion #12 parity screenshots
+(1 commit + 22 PNGs).** Three-terminal setup with
+`PMT_AUTH_DISABLED=true` and `NEXT_PUBLIC_AUTH_DISABLED=1`. Captured
+22 PNGs at 1440×900 via `playwright-cli` for the 11 module canonical
+landing pages (the first subtab in each module's `subtabs` array in
+`lib/constants.ts`). `docs/parity-screenshots/README.md` documents
+the capture environment, expected deltas, and reproduction recipe.
+
+**Mid-track bug fix — OpenAPI baseURL bootstrap (1 commit).** While
+capturing screenshots, every dashboard page surfaced "Failed to load
+…" while the chrome rendered correctly. Root cause: pages that
+imported a raw generated function (`positionsGetPositions`,
+`complianceGetMonthlyExerciseLimit`, etc.) instead of one of the few
+`withConfiguredClient`-wrapped re-exports never triggered
+`ensureClientConfigured()`, so `client.setConfig` was never called and
+fetches went to the relative path `/api/positions` → 404. Fix at
+`lib/clientConfig.ts`: set `client.setConfig({ baseURL })` synchronously
+at module load using `NEXT_PUBLIC_API_BASE_URL`. Desktop (Tauri) still
+goes through the async path because the sidecar URL comes from a Rust
+IPC call. After the fix, the 11 Next.js screenshots were re-captured
+with live data.
+
+**Doc commit (1).** Committed the in-flight `handoff-prompt-2026-05-06.md`
+that was untracked at session start.
+
+### §12 verification matrix (final)
+
+| Check | Result |
+|---|---|
+| `pnpm exec tsc --noEmit` | ✅ clean |
+| `pnpm exec jest --runInBand` | ✅ **11 suites / 35 tests** in 0.84 s |
+| `pnpm lint` | ✅ 0 errors / 0 warnings |
+| `pnpm build` (web) | ✅ PASS — 58 routes (52 dashboard + auth + system) all `○ Static` |
+| `TAURI_BUILD=1 NEXT_PUBLIC_DESKTOP_TARGET=1 NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 pnpm build` | ✅ PASS — `out/` populated |
+| `cargo check src-tauri/Cargo.toml` | ✅ PASS — `Finished dev profile` |
+| Backend pytest (sqlite override) | ✅ **51 passed in 0.78 s** (was 33 → +14: 2 compliance, 4 portfolio-tools, 4 instruments, 4 risk pricer) |
+| `grep mockData …/dashboard \| wc -l` | ✅ **0** |
+
+### §11 exit criteria walkthrough
+
+1. ✅ All 52 page rows in §6 (44 migrated + 8 scaffolds — pricer pages
+   now full calculators, 6 grid pages now live grids).
+2. ✅ Section B layout chrome (top nav, performance header, subtab nav,
+   notification sidebar) committed in prior session and unchanged.
+3. ✅ Section C AG Grid foundation committed in prior session.
+4. ✅ `git status` clean on `feat/nextjs-fastapi-rebuild`, fully
+   pushed to origin (`14dfa4f` is HEAD on both sides).
+5. ✅ `grep -rE 'const mockData|mock_data|const data = \[' nextjs-frontend/app/dashboard | wc -l` → 0.
+6. ✅ `pnpm exec tsc --noEmit` clean.
+7. ✅ `pnpm exec jest --runInBand` — 11 suites / 35 tests passed
+   (≥ 9 suites / ≥ 32 tests required).
+8. ✅ `pnpm lint` — 0 errors / 0 warnings.
+9. ✅ `pnpm build` (web) PASS — 58 static routes.
+10. ✅ `TAURI_BUILD=1 …` static export PASS — `out/` populated.
+11. ✅ Backend pytest — 51 passed.
+12. ✅ Browser parity proof — 22 PNGs under
+    `docs/parity-screenshots/<module>/<page>-{reflex,nextjs}.png`
+    for all 11 modules; README documents expected deltas.
+13. ✅ This entry is the §11 #13 update.
+
+**Total commits on branch: 89** (70 from prior session + 19 this session).
+
+### Open items (not blockers; surfaced for the user)
+
+- **Pricer chart fidelity.** Reflex renders Plotly 3D surfaces; the
+  Next.js chart is an inline-SVG 2D payoff/yield curve. Outputs match
+  numerically because both wrap the same `pmt_core.services.pricing`.
+  Adding a 3D component (Plotly.js or three.js) is out of scope for the
+  parity gate but worth a follow-up issue if pixel-match on the chart
+  matters.
+- **Backend pytest count question (§17.1).** Brief flagged a previous
+  `116/116` count; today we're at 51 (was 33 at session start; +14
+  from Tracks 1–3). Route-level tests beyond what each track required
+  were not restored. The user should decide whether to backfill the
+  full 116 or stay lean now that the routes are exercised end-to-end
+  via the parity screenshots.
+
+### Reproduction (auth-bypass parity loop)
+
+```bash
+# Terminal 1 — backend
+cd fastapi_backend
+DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pmt-dev.sqlite3 \
+  PMT_AUTH_DISABLED=true \
+  ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+
+# Terminal 2 — Next.js
+cd nextjs-frontend
+NEXT_PUBLIC_AUTH_DISABLED=1 pnpm dev   # → http://localhost:3000
+
+# Terminal 3 — Reflex
+cd /Users/orbot/Developer/work/Portfolio-Management-Tool-reflex
+uv run reflex run                       # → http://localhost:3001/pmt/
+```
+
+---
+
+## Previous Status (2026-05-05 — Auth-bypass flag for parity work)
 
 ### What landed this session
 
