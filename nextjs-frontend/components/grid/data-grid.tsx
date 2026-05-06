@@ -12,7 +12,14 @@ import {
   type RowSelectionOptions,
   type StatusPanelDef,
 } from "ag-grid-community";
-import { FileSpreadsheet, RefreshCw, Search, X } from "lucide-react";
+import {
+  FileSpreadsheet,
+  RefreshCw,
+  RotateCcw,
+  Save,
+  Search,
+  X,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -82,6 +89,28 @@ type DataGridProps<TRow> = {
   exportPrefix?: string;
   /** Hide the Excel-export button in the toolbar (default visible when gridId set). */
   hideExcelExport?: boolean;
+  /** Hide the Save/Restore/Reset layout buttons (default visible when gridId set). */
+  hideLayoutButtons?: boolean;
+};
+
+const STORAGE_PREFIX = "pmt:next:";
+
+type SavedGridState = Record<string, unknown> & {
+  columnSizing?: {
+    columnSizingModel?: Array<Record<string, unknown>>;
+  };
+};
+
+const stripFlexFromColumns = (state: SavedGridState): SavedGridState => {
+  const sizing = state.columnSizing?.columnSizingModel;
+  if (Array.isArray(sizing)) {
+    state.columnSizing!.columnSizingModel = sizing.map((col) => {
+      const next = { ...col };
+      delete next.flex;
+      return next;
+    });
+  }
+  return state;
 };
 
 export function DataGrid<TRow extends Record<string, unknown>>({
@@ -107,6 +136,7 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   gridId,
   exportPrefix,
   hideExcelExport = false,
+  hideLayoutButtons = false,
 }: DataGridProps<TRow>) {
   const [searchValue, setSearchValue] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -126,8 +156,56 @@ export function DataGrid<TRow extends Record<string, unknown>>({
     }
   };
 
+  const storageKey = gridId ? `${STORAGE_PREFIX}${gridId}_state` : "";
+  const showLayoutButtons = Boolean(gridId) && !hideLayoutButtons;
+
   const onGridReady = (event: GridReadyEvent) => {
     gridApiRef.current = event.api;
+    if (storageKey && typeof window !== "undefined") {
+      try {
+        const raw = window.localStorage.getItem(storageKey);
+        if (raw) {
+          const state = stripFlexFromColumns(JSON.parse(raw) as SavedGridState);
+          event.api.setState(state as unknown as Parameters<typeof event.api.setState>[0]);
+        }
+      } catch {
+        // Corrupt JSON or AG Grid version drift — ignore and let user re-save.
+      }
+    }
+  };
+
+  const handleSaveLayout = () => {
+    const api = gridApiRef.current;
+    if (!api || !storageKey || typeof window === "undefined") return;
+    try {
+      const state = api.getState();
+      window.localStorage.setItem(storageKey, JSON.stringify(state));
+    } catch {
+      // Quota exceeded or serialization issue — fail silently rather than crash.
+    }
+  };
+
+  const handleRestoreLayout = () => {
+    const api = gridApiRef.current;
+    if (!api || !storageKey || typeof window === "undefined") return;
+    const raw = window.localStorage.getItem(storageKey);
+    if (!raw) return;
+    try {
+      const state = stripFlexFromColumns(JSON.parse(raw) as SavedGridState);
+      api.setState(state as unknown as Parameters<typeof api.setState>[0]);
+    } catch {
+      // Ignore — bad JSON or AG Grid schema mismatch.
+    }
+  };
+
+  const handleResetLayout = () => {
+    const api = gridApiRef.current;
+    if (!api) return;
+    api.resetColumnState();
+    api.setFilterModel(null);
+    if (storageKey && typeof window !== "undefined") {
+      window.localStorage.removeItem(storageKey);
+    }
   };
 
   const getRowId = useMemo(
@@ -229,7 +307,40 @@ export function DataGrid<TRow extends Record<string, unknown>>({
             ) : null}
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">{toolbarEnd}</div>
+        <div className="flex items-center gap-1 shrink-0">
+          {showLayoutButtons ? (
+            <>
+              <button
+                type="button"
+                onClick={handleSaveLayout}
+                title="Save current column widths, filters, and sort to this browser"
+                className="px-2 h-6 bg-white border border-gray-200 text-gray-600 text-[10px] font-bold rounded hover:bg-gray-50 hover:text-blue-600 transition-colors shadow-sm flex items-center"
+              >
+                <Save size={12} />
+                <span className="ml-1">Save</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleRestoreLayout}
+                title="Restore previously saved layout"
+                className="px-2 h-6 bg-white border border-gray-200 text-gray-600 text-[10px] font-bold rounded hover:bg-gray-50 hover:text-blue-600 transition-colors shadow-sm flex items-center"
+              >
+                <RotateCcw size={12} />
+                <span className="ml-1">Restore</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleResetLayout}
+                title="Reset to default columns and clear all filters"
+                className="px-2 h-6 bg-white border border-gray-200 text-gray-500 text-[10px] font-bold rounded hover:bg-gray-50 hover:text-red-600 transition-colors shadow-sm flex items-center"
+              >
+                <X size={12} />
+                <span className="ml-1">Reset</span>
+              </button>
+            </>
+          ) : null}
+          {toolbarEnd}
+        </div>
       </div>
       {errorMessage ? (
         <div className="m-3 rounded border border-red-500/40 bg-red-50 p-3 text-sm text-red-700">
