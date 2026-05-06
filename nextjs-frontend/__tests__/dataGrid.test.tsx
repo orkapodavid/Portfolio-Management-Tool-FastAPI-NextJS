@@ -5,6 +5,9 @@ import { DataGrid } from "@/components/grid/data-grid";
 import { textColumn, currencyColumn, percentColumn } from "@/components/grid/columns";
 
 let lastGridReadyHandler: ((event: { api: GridApiStub }) => void) | null = null;
+let lastGetRowId:
+  | ((params: { data: Record<string, unknown> }) => string)
+  | undefined = undefined;
 
 type GridApiStub = {
   setGridOption: jest.Mock;
@@ -33,12 +36,15 @@ jest.mock("ag-grid-react", () => ({
     columnDefs,
     rowData,
     onGridReady,
+    getRowId,
   }: {
     columnDefs: { headerName: string; field: string }[];
     rowData: Record<string, unknown>[];
     onGridReady?: (event: { api: GridApiStub }) => void;
+    getRowId?: (params: { data: Record<string, unknown> }) => string;
   }) => {
     if (onGridReady) lastGridReadyHandler = onGridReady;
+    lastGetRowId = getRowId;
     return (
       <div data-testid="ag-grid-mock">
         <div data-testid="ag-headers">
@@ -85,6 +91,7 @@ describe("DataGrid", () => {
 
   beforeEach(() => {
     lastGridReadyHandler = null;
+    lastGetRowId = undefined;
     window.localStorage.clear();
   });
 
@@ -262,6 +269,32 @@ describe("DataGrid", () => {
       />
     );
     expect(screen.queryByText("—")).not.toBeInTheDocument();
+  });
+
+  it("provides getRowId when rows have the rowIdKey field (cell flash works)", () => {
+    render(
+      <DataGrid<Row>
+        columns={columns}
+        rows={rows}
+        rowIdKey="ticker"
+      />
+    );
+    expect(lastGetRowId).toBeDefined();
+    expect(lastGetRowId!({ data: { ticker: "AAPL" } })).toBe("AAPL");
+  });
+
+  it("omits getRowId when rows lack the rowIdKey field (avoids id collisions)", () => {
+    type NoIdRow = { underlying: string; price: number };
+    const noIdRows: NoIdRow[] = [
+      { underlying: "Toyota Motor", price: 2876.5 },
+      { underlying: "Sony Group", price: 14234.0 },
+    ];
+    const noIdColumns = [
+      textColumn({ field: "underlying", header: "Underlying" }),
+      currencyColumn({ field: "price", header: "Price" }),
+    ];
+    render(<DataGrid<NoIdRow> columns={noIdColumns} rows={noIdRows} />);
+    expect(lastGetRowId).toBeUndefined();
   });
 
   it("Excel button skips unselected rows when at least one row is selected", () => {

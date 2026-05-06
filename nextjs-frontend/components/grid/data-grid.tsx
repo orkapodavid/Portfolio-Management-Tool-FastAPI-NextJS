@@ -312,10 +312,20 @@ export function DataGrid<TRow extends Record<string, unknown>>({
     }
   };
 
+  const hasStableRowIds = useMemo(() => {
+    if (rows.length === 0) return false;
+    const first = rows[0] as Record<string, unknown>;
+    const value = first?.[rowIdKey];
+    return value !== undefined && value !== null && value !== "";
+  }, [rows, rowIdKey]);
+
   const getRowId = useMemo(
-    () => (params: { data: TRow }) =>
-      String((params.data as Record<string, unknown>)[rowIdKey] ?? ""),
-    [rowIdKey]
+    () =>
+      hasStableRowIds
+        ? (params: { data: TRow }) =>
+            String((params.data as Record<string, unknown>)[rowIdKey])
+        : undefined,
+    [hasStableRowIds, rowIdKey]
   );
 
   const defaultColDef = useMemo<ColDef>(
