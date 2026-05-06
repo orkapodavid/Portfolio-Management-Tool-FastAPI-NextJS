@@ -1,7 +1,6 @@
 """WebSocket endpoint for real-time price streaming (Req 10)."""
 
 import asyncio
-import json
 import random
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
