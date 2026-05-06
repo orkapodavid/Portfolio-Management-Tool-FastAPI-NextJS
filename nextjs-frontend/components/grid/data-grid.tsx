@@ -7,7 +7,10 @@ import {
   ModuleRegistry,
   themeQuartz,
   type ColDef,
+  type GetContextMenuItems,
   type GridReadyEvent,
+  type RowSelectionOptions,
+  type StatusPanelDef,
 } from "ag-grid-community";
 import { RefreshCw, Search } from "lucide-react";
 
@@ -34,6 +37,15 @@ const DEFAULT_COL_DEF: ColDef = {
   flex: 1,
 };
 
+const STANDARD_STATUS_BAR: { statusPanels: StatusPanelDef[] } = {
+  statusPanels: [
+    { statusPanel: "agTotalRowCountComponent", align: "left" },
+    { statusPanel: "agFilteredRowCountComponent", align: "left" },
+    { statusPanel: "agSelectedRowCountComponent", align: "center" },
+    { statusPanel: "agAggregationComponent", align: "right" },
+  ],
+};
+
 type DataGridProps<TRow> = {
   columns: ColDef[];
   rows: TRow[];
@@ -48,6 +60,22 @@ type DataGridProps<TRow> = {
   toolbarStart?: React.ReactNode;
   /** Additional toolbar content rendered after the refresh button. */
   toolbarEnd?: React.ReactNode;
+  /** Show the four-panel status bar at the bottom (default true). */
+  showStatusBar?: boolean;
+  /** Enable click-and-drag cell range selection (default true). */
+  enableRangeSelection?: boolean;
+  /** Flash cells when their value changes — for real-time grids. */
+  enableCellFlash?: boolean;
+  /** Show an auto-numbered row column on the left. */
+  showRowNumbers?: boolean;
+  /** Multi-row selection with checkboxes. */
+  enableMultiSelect?: boolean;
+  /** Show the row-group drop zone above the grid. */
+  showRowGroupPanel?: boolean;
+  /** Initial expansion depth for grouped rows (-1 expands all). */
+  groupDefaultExpanded?: number;
+  /** Custom context-menu builder; receives params from AG Grid. */
+  getContextMenuItems?: GetContextMenuItems;
 };
 
 export function DataGrid<TRow extends Record<string, unknown>>({
@@ -55,13 +83,21 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   rows,
   isLoading = false,
   errorMessage = null,
-  emptyMessage = "No data available.",
+  emptyMessage = "No rows to display",
   onRefresh,
-  searchPlaceholder = "Search…",
+  searchPlaceholder = "Search all columns...",
   className,
   rowIdKey = "id",
   toolbarStart,
   toolbarEnd,
+  showStatusBar = true,
+  enableRangeSelection = true,
+  enableCellFlash = false,
+  showRowNumbers = false,
+  enableMultiSelect = false,
+  showRowGroupPanel = false,
+  groupDefaultExpanded,
+  getContextMenuItems,
 }: DataGridProps<TRow>) {
   const [searchValue, setSearchValue] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -90,6 +126,26 @@ export function DataGrid<TRow extends Record<string, unknown>>({
       String((params.data as Record<string, unknown>)[rowIdKey] ?? ""),
     [rowIdKey]
   );
+
+  const defaultColDef = useMemo<ColDef>(
+    () =>
+      enableCellFlash
+        ? { ...DEFAULT_COL_DEF, enableCellChangeFlash: true }
+        : DEFAULT_COL_DEF,
+    [enableCellFlash]
+  );
+
+  const cellSelection = enableRangeSelection ? true : undefined;
+  const rowSelection = useMemo<RowSelectionOptions | undefined>(
+    () =>
+      enableMultiSelect
+        ? { mode: "multiRow", checkboxes: true, headerCheckbox: true }
+        : undefined,
+    [enableMultiSelect]
+  );
+  const rowNumbers = showRowNumbers ? true : undefined;
+  const rowGroupPanelShow = showRowGroupPanel ? "always" : undefined;
+  const statusBar = showStatusBar ? STANDARD_STATUS_BAR : undefined;
 
   return (
     <div className={cn("flex flex-col h-full min-h-0 w-full bg-white", className)}>
@@ -133,11 +189,18 @@ export function DataGrid<TRow extends Record<string, unknown>>({
             theme={pmtTheme}
             columnDefs={columns}
             rowData={rows}
-            defaultColDef={DEFAULT_COL_DEF}
+            defaultColDef={defaultColDef}
             getRowId={getRowId}
             onGridReady={onGridReady}
             loading={isLoading}
             overlayNoRowsTemplate={`<span style="padding: 10px; color: #6b7280;">${emptyMessage}</span>`}
+            statusBar={statusBar}
+            cellSelection={cellSelection}
+            rowSelection={rowSelection}
+            rowNumbers={rowNumbers}
+            rowGroupPanelShow={rowGroupPanelShow}
+            groupDefaultExpanded={groupDefaultExpanded}
+            getContextMenuItems={getContextMenuItems}
             animateRows
           />
         </div>
