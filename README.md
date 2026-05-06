@@ -1,161 +1,186 @@
 # Portfolio Management Tool
 
-A professional portfolio dashboard built with **Next.js 16** (frontend), **FastAPI** (backend), and a **Tauri v2** desktop shell. Shared business logic lives in `pmt_core_pkg/pmt_core`.
+Portfolio Management Tool is a parity rebuild of the Reflex PMT app on
+**Next.js 16**, **FastAPI**, and **Tauri v2**. Shared business logic and
+mock data live in `pmt_core_pkg/pmt_core`; the Next.js frontend and
+FastAPI backend consume that package directly.
 
-## Architecture
+## Project Layout
 
 ```text
 Portfolio-Management-Tool/
-├── nextjs-frontend/          # Next.js 16 + TypeScript + Tailwind CSS
-│   ├── app/                  # Routes, login/register flows, dashboard pages
-│   ├── components/           # Layout, auth gate, UI primitives
-│   ├── lib/                  # Runtime config, auth/token helpers, utilities
-│   └── src-tauri/            # Tauri v2 desktop shell + sidecar builder
-├── fastapi_backend/          # FastAPI API + desktop sidecar launcher
-│   ├── app/                  # Config, runtime bootstrap, routes, models
-│   └── commands/             # OpenAPI generation + Tauri sidecar entrypoint
-├── pmt_core_pkg/             # Framework-agnostic business logic
-└── docker-compose.yml        # PostgreSQL + Backend + Frontend + MailHog
+├── nextjs-frontend/          # Next.js 16, React 19, AG Grid, Tauri shell
+│   ├── app/                  # App Router pages and generated OpenAPI client
+│   ├── components/           # Dashboard chrome, grids, forms, UI primitives
+│   ├── lib/                  # Runtime config, auth, routes, grid registry
+│   └── src-tauri/            # Tauri v2 app, sidecar scripts, Rust shell
+├── fastapi_backend/          # FastAPI app, auth, OpenAPI, sidecar entrypoint
+│   ├── app/                  # Config, routes, schemas, database setup
+│   └── commands/             # OpenAPI export and Tauri sidecar runner
+├── pmt_core_pkg/             # Framework-agnostic PMT services/repositories
+├── docs/                     # Setup, parity, audit, and planning docs
+└── continuations.md          # Current continuation log and verification notes
 ```
 
-## Modules
+## Current Parity Status
 
-| Module | Description |
-|--------|-------------|
-| **Market Data** | Real-time prices, FX rates, historical data, trading calendar |
-| **Positions** | Stock/Warrant/Bond holdings, trade summary |
-| **P&L** | YTD/MTD/DTD P&L, currency breakdown, full detail |
-| **Risk** | Delta/Gamma/Vega/Theta Greeks, risk measures |
-| **Recon** | PPS, settlement, failed trades, P&L recon |
-| **Compliance** | Restricted list, undertakings, beneficial ownership |
-| **Tools** | Pay-to-hold, stock borrow, resets, installments |
-| **Instruments** | Ticker data, stock screener, special terms |
-| **Events** | Event calendar, event stream, reverse inquiry |
-| **Operations** | Daily procedures, operation processes |
-| **Orders** | EMSX order management, routing |
+Start new parity work from
+`docs/plans/current-parity-rebuild-compact-plan-2026-05-11.md`, not from
+the older handoff prompts.
 
-## Quick Start
+- Branch: `feat/nextjs-fastapi-rebuild`
+- Gate-close implementation HEAD: `82142c9` (later docs-only commits
+  may exist)
+- Milestone B and Milestone C are closed through that implementation
+  head.
+- F-7, F-21, F-23, F-35, and F-36 are closed.
+- F-9, F-27, F-28, and AG Grid Enterprise license procurement are
+  intentional out-of-scope deltas unless reprioritized.
+- Next.js read-only column supersets are intentional where documented.
 
-### Prerequisites
+## Prerequisites
 
-- Node.js 20+ with `pnpm`
-- Python 3.12+ with `uv`
-- Rust toolchain (`rustup`, `cargo`)
-- PostgreSQL 17 for the normal web/backend path, or Docker
+- Node.js 20+ and `pnpm`
+- Python 3.12 and `uv`
+- Rust toolchain (`rustup`, `cargo`) for Tauri work
+- The Reflex reference checkout at
+  `/Users/orbot/Developer/work/Portfolio-Management-Tool-reflex` for
+  parity checks
 
-### Web Development
+Install dependencies once:
 
 ```bash
-# Database
-docker compose up db -d
-
-# Backend
 cd fastapi_backend
-uv sync
-uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uv sync --all-groups
 
-# Frontend
 cd ../nextjs-frontend
 pnpm install
-pnpm dev
 ```
 
-Web frontend: `http://localhost:3000`  
-Backend API: `http://localhost:8000`  
-API docs: `http://localhost:8000/docs`
+## Local Parity Run
 
-### Desktop Development
+Use three terminals. The auth-bypass flags are for local parity work
+only. They must stay OFF in committed env examples and production
+environments.
+
+Terminal A, FastAPI with a local SQLite dev DB:
+
+```bash
+cd fastapi_backend
+DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pmt-dev.sqlite3 \
+  PMT_AUTH_DISABLED=true \
+  ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+Terminal B, Next.js:
 
 ```bash
 cd nextjs-frontend
-pnpm install
-pnpm tauri dev
+NEXT_PUBLIC_AUTH_DISABLED=1 pnpm dev
 ```
 
-What `pnpm tauri dev` does:
-
-- builds or reuses the current-platform sidecar binary
-- runs the Next dev server with desktop env injected
-- launches the Tauri shell
-- starts the local FastAPI sidecar and waits for `/api/health`
-
-### Desktop Static Export Build
+Terminal C, Reflex reference:
 
 ```bash
-TAURI_BUILD=1 NEXT_PUBLIC_DESKTOP_TARGET=1 NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 pnpm --dir nextjs-frontend build
+cd /Users/orbot/Developer/work/Portfolio-Management-Tool-reflex
+uv run reflex run
 ```
 
-### Docker
+Expected URLs:
+
+| Service | URL |
+|---|---|
+| FastAPI | `http://127.0.0.1:8000` |
+| FastAPI docs | `http://127.0.0.1:8000/docs` |
+| Next.js dashboard | `http://localhost:3000/dashboard/` |
+| Reflex reference | `http://localhost:3001/pmt/` |
+
+Health checks:
 
 ```bash
-docker compose up --build
+curl -sS http://127.0.0.1:8000/api/health
+curl -sSI http://127.0.0.1:3000
+curl -sSI http://127.0.0.1:3001/pmt/
 ```
 
-## Tech Stack
+## OpenAPI Client
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS, shadcn/ui |
-| Desktop Shell | Tauri v2, Rust, tauri-plugin-shell |
-| Backend | FastAPI, Python 3.12, SQLAlchemy, asyncpg, aiosqlite |
-| Auth | fastapi-users (JWT) |
-| Business Logic | pmt_core (models, services, repositories) |
-| Database | PostgreSQL 17 (web), SQLite sidecar fallback (desktop) |
-| API Contract | OpenAPI + @hey-api/openapi-ts (auto-generated typed client) |
-| Dev Tools | Docker Compose, uv, pnpm, Cargo, ESLint, Ruff |
+Regenerate the frontend client whenever FastAPI route signatures,
+response models, auth behavior, or generated schemas change. Start the
+backend first, then run:
 
-## Runtime Config
+```bash
+cd nextjs-frontend
+pnpm generate-client
+```
 
-### Frontend env
+Do not hand-edit `nextjs-frontend/app/openapi-client/`; it is generated
+from the live backend schema.
 
-See `nextjs-frontend/.env.example`.
+## Desktop / Tauri
 
-- `NEXT_PUBLIC_API_BASE_URL` is the web API base URL.
-- `NEXT_PUBLIC_DESKTOP_TARGET` and `NEXT_PUBLIC_DESKTOP_API_BASE_URL` are injected automatically by the desktop scripts.
-- `OPENAPI_OUTPUT_FILE` is used for generated client output.
+Tauri uses the Next.js static export in `nextjs-frontend/out` and a
+PyInstaller FastAPI sidecar binary under
+`nextjs-frontend/src-tauri/binaries/`.
 
-### Desktop sidecar defaults
+Desktop static export verification:
 
-- host: `127.0.0.1`
-- port: `18475`
-- app data dir: `~/.portfolio-management-tool`
-- health endpoint: `GET /api/health`
+```bash
+cd nextjs-frontend
+TAURI_BUILD=1 \
+NEXT_PUBLIC_DESKTOP_TARGET=1 \
+NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 \
+pnpm build
+```
 
-Optional desktop overrides:
+Useful desktop commands:
 
-- `PMT_SIDECAR_PORT`
-- `PMT_SIDECAR_HEALTH_TIMEOUT_MS`
-- `PMT_SIDECAR_WORKDIR`
-- `PMT_APP_DATA_DIR`
-- `PMT_DESKTOP_APP_DATA_DIR`
+```bash
+cd nextjs-frontend
+pnpm tauri:sidecar   # build or refresh the FastAPI sidecar binary
+pnpm tauri:dev       # run the Tauri shell in development
+pnpm tauri:build     # produce the desktop bundle
+```
 
-## Auth and Protection
+The desktop sidecar listens on `127.0.0.1:18475` by default and uses a
+local app-data SQLite database.
 
-- Web stores the access token in a browser cookie.
-- Desktop stores the access token in `localStorage`.
-- Dashboard routes are protected by a client auth gate that validates the token via `/users/me`.
-- Login, register, password reset, add-item, and delete-item flows call the FastAPI API directly through the generated OpenAPI client.
+## Verification
 
-## API Endpoints
+Frontend:
 
-All PMT endpoints are under `/api/`:
+```bash
+cd nextjs-frontend
+pnpm exec tsc --noEmit --pretty false
+pnpm exec jest --runInBand
+pnpm lint
+pnpm build
+TAURI_BUILD=1 \
+NEXT_PUBLIC_DESKTOP_TARGET=1 \
+NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 \
+pnpm build
+```
 
-- `GET /api/positions/` - All positions
-- `GET /api/positions/stocks` - Stock positions
-- `GET /api/pnl/changes` - P&L changes
-- `GET /api/pnl/summary` - P&L summary
-- `GET /api/market-data/` - Market data
-- `GET /api/market-data/fx` - FX rates
-- `GET /api/risk/measures` - Risk measures
-- `GET /api/compliance/restricted-list` - Restricted list
-- `GET /api/recon/pps` - PPS reconciliation
-- `GET /api/portfolio-tools/pay-to-hold` - Pay to hold
-- `GET /api/instruments/ticker-data` - Ticker data
-- `GET /api/events/calendar` - Event calendar
-- `GET /api/operations/daily-procedures` - Daily procedures
-- `GET /api/orders/` - EMSX orders
+Backend:
 
-Auth endpoints (from template):
-- `POST /auth/jwt/login` - Login
-- `POST /auth/register` - Register
-- `GET /api/health` - Desktop sidecar readiness
+```bash
+cd fastapi_backend
+TEST_DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pytest-sqlite.sqlite3 \
+  ./.venv/bin/python -m pytest -q
+```
+
+Last known gate-close verification:
+
+- TSC clean.
+- Jest: 28 suites / 157 tests passed in 1.857 s.
+- Lint: 0 errors / 0 warnings.
+- Web build: 59 / 59 static pages generated.
+- Backend pytest: 187 passed, 2 skipped in 9.42 s.
+- Desktop static export: 59 / 59 static pages generated.
+
+## Parity Artifacts
+
+Canonical screenshots and capture instructions live in
+`docs/parity-screenshots/README.md`. Use fresh browser sessions at
+1440x900, capture Reflex and Next.js together, and keep motion evidence
+as `.webm` when still frames cannot prove the behavior.

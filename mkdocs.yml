@@ -1,12 +1,7 @@
-site_name: Next.js FastAPI Template
-site_description: Kickstart scalable apps with our Next.js FastAPI Template. Includes auth, type safety (Zod), hot reload, Docker, and Vercel-ready deployment.
-site_url: https://orkapodavid.github.io/nextjs-fastapi-template/
+site_name: Portfolio Management Tool
+site_description: Portfolio Management Tool parity rebuild with Next.js 16, FastAPI, and Tauri.
 
-repo_name: orkapodavid/nextjs-fastapi-template
-repo_url: https://github.com/orkapodavid/nextjs-fastapi-template/
-edit_uri: blob/main/docs/
-
-copyright: Next.js FastAPI Template
+copyright: Portfolio Management Tool
 
 theme:
   name: material
@@ -78,10 +73,6 @@ plugins:
   - search
 
 extra:
-  social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/orkapodavid/nextjs-fastapi-template/
-      name: Next.js FastAPI Template GitHub
   version:
     provider: mike
   analytics:

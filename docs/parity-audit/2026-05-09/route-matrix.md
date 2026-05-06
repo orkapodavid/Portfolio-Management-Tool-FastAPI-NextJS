@@ -19,6 +19,12 @@ Status legend:
   or more finding IDs.
 - **BLOCKED** — page won't render due to backend/route gap (none).
 
+Current state note: this table is an audit snapshot from 2026-05-09
+and 2026-05-10. Milestone B/C implementation work is now closed through
+HEAD `82142c9`; F-7, F-21, F-23, F-35, and F-36 are closed. F-9,
+F-27, F-28, and AG Grid Enterprise license procurement remain
+intentional out-of-scope deltas unless reprioritized.
+
 | # | Module | Subtab | Browser parity | Code parity | Findings | Walk evidence |
 |---|---|---|---|---|---|---|
 | 1 | market-data | market-data | PASS | PASS | F-2 (overridden, OK) | walk-W1 |
@@ -129,7 +135,7 @@ Across pnl/risk/portfolio-tools/instruments/events/orders the Next.js
 side exposes 1-6 additional columns vs Reflex's default visible set
 (captured per-row above and aggregated in **F-35**). The pattern is
 consistent: Next.js ships everything in `pmt_core` columndefs; Reflex
-hides extras by default. This is a **product decision pending** —
-either Next.js trims to match Reflex, or Reflex's hide list is
-documented as out-of-date and the Next.js superset becomes the spec.
-See **F-35** in findings.md.
+hides extras by default. As of implementation HEAD `82142c9`,
+documented Next.js read-only column supersets are intentional
+enhancements over older Reflex hide lists unless a page-specific audit
+item says otherwise. See **F-35** in findings.md.

@@ -14,7 +14,7 @@ does on the Reflex reference.
 
 Re-captured 2026-05-11 at 1440×900 viewport via `playwright-cli`
 after the Milestone C gate-close pass. All 22 canonical PNGs
-were re-shot against:
+were re-shot against implementation HEAD `82142c9`:
 
 | Service  | Port | Flags |
 |---|---|---|
@@ -30,6 +30,10 @@ AG Grid Enterprise is now installed on the Next.js side
 console prints a "License Key Not Found — All AG Grid Enterprise
 features are unlocked for trial" warning; Reflex runs in the same
 state. Procuring a license is out of scope.
+
+F-27 mobile responsive nav and F-28 Reflex ticker-data divergence are
+also intentional out-of-scope deltas for this pass unless explicitly
+reprioritized.
 
 ## What's covered
 

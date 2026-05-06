@@ -14,6 +14,12 @@ plus added F-30..F-38. Two original entries (F-10, F-12) were
 methodology corrections — see [`route-matrix.md`](./route-matrix.md)
 "Walk methodology corrections" section.
 
+Current state update: Milestone B and C are closed through
+implementation HEAD `82142c9`; later docs-only commits may exist. F-7,
+F-21, F-23, F-35, and F-36 are closed. F-9, F-27, F-28, and AG Grid
+Enterprise license procurement remain intentional out-of-scope deltas
+unless reprioritized.
+
 ## Verification snapshot at audit start (HEAD `5f1c7b9`)
 
 | Check | Result |
@@ -65,12 +71,17 @@ source code touched.
 - **Suggested fix:** new component `components/grid/stock-screener-filter-bar.tsx` exposed via the `filterBar` prop; backend route already accepts the filters.
 - **Risk:** None — additive.
 
-### F-7 — Reset-dates multi-field filter bar missing (High)
+### F-7 — Reset-dates multi-field filter bar missing (High — closed 2026-05-11)
+- **Current status:** closed through implementation HEAD `82142c9`.
+  The Reset Dates multi-field filter bar is wired through FastAPI and
+  the generated OpenAPI client, and `market_price` is hidden from the
+  default visible grid.
 - **Reflex:** `app/components/portfolio_tools/reset_dates_ag_grid.py` filter bar — ticker dropdown, date range, frequency, reset month/day, up/down.
-- **Next.js:** `app/dashboard/portfolio-tools/reset-dates/page.tsx` — bare DataGrid; also has 4 extra columns (Expiry, Latest Reset, Reset Date, Up/Down) plus `market_price` not present in Reflex (probably an enhancement; surface to user before keeping — see F-35).
+- **Next.js at audit time:** `app/dashboard/portfolio-tools/reset-dates/page.tsx` — bare DataGrid; also had 4 extra columns (Expiry, Latest Reset, Reset Date, Up/Down) plus `market_price` not present in Reflex (now resolved through F-35 documentation and the default-visible column change).
 - **Walk evidence (W4):** Reflex DOM `dateInputs=4, selectInputs=5, applyClearBtns=1`; Next.js `dateInputs=5 (toolbar + grid), selectInputs=0, applyClearBtns=0`. Filter contract not satisfied.
 - **Suggested fix:** new `<ResetDatesFilterBar>` wired to existing `pmt_core.repositories.portfolio_tools` query params.
-- **Risk:** Confirm `market_price` is a deliberate addition before the filter wire-up regresses what users see today (rolls into F-35).
+- **Risk:** closed; preserve the documented F-35 column-superset rule
+  if this page changes again.
 
 ### F-8 — Operations grids ship no Rerun/Kill context menu (High)
 - Same Reflex source as F-1 + new walk evidence in F-1 above. Even if the backend POST routes (F-1) were absent, the menu would still need to render and pop a confirmation; today there is no UI affordance.
@@ -170,15 +181,20 @@ source code touched.
 - **Reflex:** `top_navigation.py:31` adds `animate-pulse` on the active-tab underline.
 - **Next.js:** `components/layout/top-navigation.tsx:107-109` does not. (Prior brief noted that animate-pulse was added; the unread-bell badge has it, but the active-tab underline still does not — verified by inspecting `top-navigation.tsx`.)
 
-### F-21 — Notification sidebar default-open state diverges (Low)
+### F-21 — Notification sidebar default-open state diverges (Low — closed 2026-05-11)
 - **Reflex:** sidebar opens on first paint (Reflex's UIState default).
-- **Next.js:** `lib/notifications-context.tsx:91` defaults `isOpen` to `false`.
-- **Status:** Documented as an intentional delta in `docs/parity-screenshots/README.md`. Re-flagging because behavioural difference is visible to the end user; user may want to reconsider.
+- **Next.js at audit time:** `lib/notifications-context.tsx:91`
+  defaulted `isOpen` to `false`.
+- **Current status:** closed through implementation HEAD `82142c9`.
+  Next.js now defaults the sidebar open and persists explicit user
+  toggles under `pmt:next:notificationSidebarOpen`.
 
-### F-23 — Notification sidebar lacks infinite scroll (Low)
+### F-23 — Notification sidebar lacks infinite scroll (Low — closed 2026-05-11)
 - **Reflex:** `notification_sidebar_state.py:81-156` paginates 20 at a time with a sentinel + `load_more_notifications`.
-- **Next.js:** fetches 50 in one go, renders all.
-- **Behaviour:** functionally fine for current dataset; flag in case the notification stream grows.
+- **Next.js at audit time:** fetched 50 in one go and rendered all.
+- **Current status:** closed through implementation HEAD `82142c9`.
+  Next.js now lazy-renders sidebar notifications in 20-card batches
+  using a sentinel with click fallback.
 
 ### F-30 — Auto-refresh switch rendered on Next.js force-refresh-only pages (Low) — NEW (2026-05-10 walk)
 - **Reflex:** `Portfolio-Management-Tool-reflex/app/components/shared/toolbar.py` conditionally renders the Auto Refresh switch based on the per-page mixin's `<module>_auto_refresh` attribute. 13 pages (5 recon + 4 compliance + market-data/{ticker-data, trading-calendar, market-hours} + instruments/ticker-data) have no auto-refresh task and Reflex renders no `[role=switch]` element on them.
@@ -231,7 +247,9 @@ source code touched.
 - **Suggested fix:** add the 3 missing notes to the `NOTES` array. Same array can be exported and reused on the bond page (closes F-10 in the same PR).
 - **Risk:** None — string-only fix.
 
-### F-36 — Portfolio-tools header label abbreviation drift (Very Low) — NEW (2026-05-10 walk)
+### F-36 — Portfolio-tools header label abbreviation drift (Very Low — closed 2026-05-11)
+- **Current status:** closed through implementation HEAD `82142c9`.
+  Portfolio Tools labels now use the longer Reflex wording.
 - **Walk evidence (W4):** seven cases identified across portfolio-tools:
   - `JPM Request Locate` → `JPM Req` (stock-borrow)
   - `BofA Request Locate` → `BofA Req` (stock-borrow)
@@ -240,7 +258,8 @@ source code touched.
   - `Redeemed Amount` → `Redeemed` (cb-installments)
   - `Excess Amount Threshold` → `Threshold` (excess-amount)
   - `First Reset Date` → `First Reset` (reset-dates)
-- **Suggested fix:** decide on a canonical label set (Reflex's longer descriptive labels or Next.js's shorter ones); one-line fix per column.
+- **Suggested fix:** no further fix needed unless labels are
+  deliberately changed again.
 - **Risk:** None — pure label change.
 
 ---
@@ -251,16 +270,18 @@ source code touched.
 
 ---
 
-## Category 5 — Intentional / acceptable deltas (or pending product decision)
+## Category 5 — Intentional / acceptable deltas
 
 - Storage key prefixes (`pmt:next:` vs raw) — namespace decision in 2026-05-07 brief.
 - Pending-highlight key (`pmt:next:pendingHighlight` vs Reflex `__pmtPendingHighlight`) — same namespace decision.
 - Pricer 3-D chart vs inline-SVG payoff (F-9) — `docs/parity-screenshots/README.md` already calls this out.
 - Trial-license watermark — both apps run AG Grid Enterprise without a key (user reconfirmed 2026-05-10).
 - 14-issues red badge — Next 16 dev overlay; vanishes on `pnpm build`.
-- Notification sidebar default-open state (F-21) — documented.
+- Notification sidebar default-open state (F-21) — closed; Next.js now
+  defaults open and stores explicit toggles under
+  `pmt:next:notificationSidebarOpen`.
 
-### F-35 — Cross-cutting "Next.js ahead" column-set drift (Low — pending product decision) — NEW (2026-05-10 walk)
+### F-35 — Cross-cutting "Next.js ahead" column-set drift (Low — intentional where documented)
 - **Walk evidence:** every walked PnL / risk / portfolio-tools / instruments / events / orders grid exposes 1-6 additional columns beyond the Reflex default visible set. The pattern is consistent: Next.js ships everything from `pmt_core` columndefs; Reflex hides extras by default. Concrete deltas captured in `route-matrix.md` (column "Findings" + agent notes).
 - **Affected modules / pages:** at least
   - portfolio-tools (9 pages, +1 to +6 each — see W4 notes for line items, including `market_price` on reset-dates from F-7)
@@ -269,7 +290,12 @@ source code touched.
   - instruments/ticker-data (+3 — `SMkt Cap`, `1D%`, `DTL`)
   - events/event-stream (+5-6 audit columns — `Alerted`, `Recur`, `Created By/Time`, `Updated By/Time`)
   - orders/emsx-order (+4 — `EMSX Amount/Routed/Working/Filled`)
-- **Suggested fix:** product decision pending — either (a) Next.js trims columns to match Reflex (regress to documented spec), or (b) Reflex's hide list is documented as out-of-date and the Next.js superset becomes the canonical column set. Surface to user before any code change.
+- **Current status:** closed through implementation HEAD `82142c9`.
+  Documented Next.js read-only column supersets are intentional
+  enhancements over older Reflex hide lists unless a page-specific
+  audit item says otherwise.
+- **Suggested fix:** no column trimming for documented read-only
+  supersets unless reprioritized.
 - **Risk:** None — read-only column visibility.
 
 ### F-37 — events/event-calendar adds an Apply button absent on Reflex (Low — additive) — NEW (2026-05-10 walk)
@@ -312,7 +338,7 @@ source code touched.
 | 6 | F-31 | High | Risk grid pages missing position-date filter (delta-change + risk-measures) — NEW |
 | 7 | F-8 | High | Operations grids ship no Rerun/Kill context menu UI |
 | 8 | F-6 | High | Stock-screener filter bar missing (3 ranges + multi-select) |
-| 9 | F-7 | High | Reset-dates multi-field filter bar missing |
+| 9 | F-7 | High | Reset-dates multi-field filter bar missing (closed 2026-05-11) |
 | 10 | F-11 + F-32 | High | Pricer-bond + pricer-warrant Pricing Results data tables missing |
 
 Honourable mentions (Medium, just under the cut): F-15 / F-16 (backend
@@ -363,9 +389,7 @@ existing ones (F-10, F-12). Updated order:
    subtractive change).
 8. **F-12** — row-group panel + per-column `enableRowGroup` / `aggFunc`
    on the four PnL + four compliance grids.
-9. **F-6 + F-7** — bespoke filter bars (stock-screener, reset-dates).
-   F-7 also surfaces F-35 (`market_price`) — must clear product
-   decision first.
+9. **F-6** — bespoke stock-screener filter bar. F-7 is closed.
 10. **F-11 + F-32** — pricer-bond + pricer-warrant Pricing Results
     tables (Reflex pattern).
 11. **F-10 + F-33** — pricer-bond + pricer-warrant Notes panels
@@ -373,13 +397,12 @@ existing ones (F-10, F-12). Updated order:
 12. **F-34** — compliance/beneficial-ownership single-date vs
     date-range bar swap.
 13. **F-17** — search debounce.
-14. **F-18 / F-19 / F-20 / F-21 / F-23 / F-24 / F-25 / F-26** — polish
-    pass.
-15. **F-35 + F-36 + F-37 + F-38** — pending product decision /
-    spot-check follow-up. F-35 (column-set drift) is the largest
-    surface and should land last so any column trim doesn't regress
-    intermediate work.
+14. **F-18 / F-19 / F-20 / F-24 / F-25 / F-26** — polish pass. F-21
+    and F-23 are closed.
+15. **F-37 + F-38** — additive decision / spot-check follow-up. F-35
+    and F-36 are closed.
 
 Items F-9 (Plotly 3-D), F-27 (mobile nav), F-28 (Reflex ticker-data
-divergence) are **left as known deltas** per user reconfirmation
-2026-05-10 and should only land if explicitly reprioritised.
+divergence), and AG Grid Enterprise license procurement are
+**intentional out-of-scope deltas** and should only land if explicitly
+reprioritised.

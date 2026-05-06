@@ -1,169 +1,199 @@
-To use this template for your own project:
+# Get Started
 
-1. Create a new repository using this template by following GitHub's [template repository guide](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template#creating-a-repository-from-a-template)
-2. Clone your new repository and navigate to it: `cd your-project-name`
-3. Make sure you have Python 3.12 installed
+This guide is for the current Portfolio Management Tool rebuild on
+`feat/nextjs-fastapi-rebuild`: Next.js 16 frontend, FastAPI backend,
+Tauri desktop shell, and the Reflex reference app used for parity
+checks.
 
-Once completed, proceed to the [Setup](#setup) section below.
+## Prerequisites
 
-## Setup
+- Node.js 20+ and `pnpm`
+- Python 3.12 and `uv`
+- Rust toolchain (`rustup`, `cargo`) for Tauri desktop work
+- Optional: Docker if you need the PostgreSQL/MailHog compose stack
+- Reflex reference checkout:
+  `/Users/orbot/Developer/work/Portfolio-Management-Tool-reflex`
 
-### Installing Required Tools
+Install dependencies:
 
-#### 1. uv
-uv is used to manage Python dependencies in the backend. Install uv by following the [official installation guide](https://docs.astral.sh/uv/getting-started/installation/).
-
-#### 2. Node.js, npm, and pnpm
-To run the frontend, ensure Node.js and npm are installed. Follow the [Node.js installation guide](https://nodejs.org/en/download/).
-After that, install pnpm by running:
 ```bash
-npm install -g pnpm
+cd /Users/orbot/Developer/work/Portfolio-Management-Tool
+
+cd fastapi_backend
+uv sync --all-groups
+
+cd ../nextjs-frontend
+pnpm install
 ```
 
-#### 3. Docker (optional if running without Docker)
-Docker is needed to run the project in a containerized environment. Follow the appropriate installation guide:
+## Environment Files
 
-- [Install Docker for Mac](https://docs.docker.com/docker-for-mac/install/)
-- [Install Docker for Windows](https://docs.docker.com/docker-for-windows/install/)
-- [Get Docker CE for Linux](https://docs.docker.com/install/linux/docker-ce/)
+Committed examples must keep auth bypass OFF:
 
-#### 4. Docker Compose (optional if running without Docker)
-Ensure `docker-compose` is installed. Refer to the [Docker Compose installation guide](https://docs.docker.com/compose/install/).
+- `fastapi_backend/.env.example` documents
+  `# PMT_AUTH_DISABLED=true` as a commented local-only override.
+- `nextjs-frontend/.env.example` sets
+  `NEXT_PUBLIC_AUTH_DISABLED=0`.
 
-### Setting Up Environment Variables
+For normal authenticated local development, copy the examples and fill
+secret keys:
 
-**Backend (`fastapi_backend/.env`):**
+```bash
+cd fastapi_backend
+cp .env.example .env
+python3 -c "import secrets; print(secrets.token_hex(32))"
 
-Copy the `.env.example` files to `.env` and update the variables with your own values.
-   ```bash
-   cd fastapi_backend && cp .env.example .env
-   ```
-You will only need to update the secret keys (`ACCESS_SECRET_KEY`, `RESET_PASSWORD_SECRET_KEY`, `VERIFICATION_SECRET_KEY`). You can use the following command to generate a new secret key for each:
-   ```bash
-   python3 -c "import secrets; print(secrets.token_hex(32))"
-   ```
+cd ../nextjs-frontend
+cp .env.example .env.local
+```
 
-- The DATABASE, MAIL, OPENAPI, CORS, and FRONTEND_URL settings are ready to use locally.
+For parity work, prefer one-command environment overrides instead of
+editing `.env` files.
 
-- The DATABASE and MAIL settings are already configured in Docker Compose if you're using Docker.
+## Three-Service Parity Loop
 
-- The OPENAPI_URL setting is commented out. Uncommenting it will hide the /docs and openapi.json URLs, which is ideal for production.
+Use three terminals. The backend command uses a repo-local SQLite file,
+which avoids requiring PostgreSQL for parity checks.
 
-You can check the .env.example file for more information about the variables.
+Terminal A, FastAPI backend on `127.0.0.1:8000`:
 
-**Frontend (`nextjs-frontend/.env.local`):**
+```bash
+cd fastapi_backend
+DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pmt-dev.sqlite3 \
+  PMT_AUTH_DISABLED=true \
+  ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```
 
-Copy the `.env.example` files to `.env.local`. These values are unlikely to change, so you can leave them as they are.
-   ```bash
-   cd nextjs-frontend && cp .env.example .env.local
-   ```
+Terminal B, Next.js web app on `localhost:3000`:
 
-### Running the Database
+```bash
+cd nextjs-frontend
+NEXT_PUBLIC_AUTH_DISABLED=1 pnpm dev
+```
 
-#### Option A: Using Docker (recommended)
+Terminal C, Reflex reference on `localhost:3001/pmt/`:
 
-Use Docker to run the database to avoid local installation issues. Build and start the database container:
-   ```bash
-   docker compose build db
-   docker compose up -d db
-   ```
-Run the following command to apply database migrations:
-   ```bash
-   make docker-migrate-db
-   ```
+```bash
+cd /Users/orbot/Developer/work/Portfolio-Management-Tool-reflex
+uv run reflex run
+```
 
-#### Option B: Running PostgreSQL locally (without Docker)
+Health checks before browser work:
 
-If you prefer not to use Docker at all, install and run PostgreSQL locally:
+```bash
+curl -sS http://127.0.0.1:8000/api/health
+curl -sSI http://127.0.0.1:3000 | sed -n '1,8p'
+curl -sSI http://127.0.0.1:3001/pmt/ | sed -n '1,8p'
+```
 
-1. **Install PostgreSQL** (e.g. on macOS with Homebrew):
-   ```bash
-   brew install postgresql@17
-   ```
+Expected entry points:
 
-2. **Add PostgreSQL to your PATH** (if keg-only):
-   ```bash
-   echo 'export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"' >> ~/.zshrc
-   source ~/.zshrc
-   ```
+| Service | URL |
+|---|---|
+| Next.js dashboard | `http://localhost:3000/dashboard/` |
+| Reflex reference | `http://localhost:3001/pmt/` |
+| FastAPI | `http://127.0.0.1:8000` |
+| FastAPI docs | `http://127.0.0.1:8000/docs` |
 
-3. **Start the PostgreSQL service**:
-   ```bash
-   brew services start postgresql@17
-   ```
+## OpenAPI Client Regeneration
 
-4. **Create the database user and databases**:
-   ```bash
-   psql -d postgres -c "CREATE ROLE postgres WITH LOGIN SUPERUSER PASSWORD 'password';"
-   createdb -U postgres mydatabase
-   createdb -U postgres testdatabase
-   ```
+When FastAPI routes, response models, auth behavior, or schema output
+change, start the backend and regenerate the frontend client:
 
-5. **Update `TEST_DATABASE_URL` port in `fastapi_backend/.env`**:
+```bash
+cd nextjs-frontend
+pnpm generate-client
+```
 
-   When running locally (without Docker), both the main and test databases share the same PostgreSQL instance on port `5432`. Change the test database URL accordingly:
-   ```
-   TEST_DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/testdatabase
-   ```
-   (The default `.env.example` uses port `5433` for the test database, which is the port mapped by the separate Docker test DB container.)
+This fetches the live backend schema from `/openapi.json`, writes
+`nextjs-frontend/openapi.json`, and regenerates
+`nextjs-frontend/app/openapi-client/`. Do not edit generated client
+files by hand.
 
-6. **Run database migrations**:
-   ```bash
-   cd fastapi_backend && uv run alembic upgrade head
-   ```
+## Desktop / Tauri
 
-### Build the project (without Docker):
-To set the project environment locally, use the following commands:
+The desktop shell packages a static Next.js export plus a FastAPI
+sidecar. Tauri reads the frontend from `nextjs-frontend/out` and the
+sidecar binary from `nextjs-frontend/src-tauri/binaries/`.
 
-#### Backend
+Static export verification:
 
-Navigate to the `fastapi_backend` directory and run:
-   ```bash
-   uv sync
-   ```
+```bash
+cd nextjs-frontend
+TAURI_BUILD=1 \
+NEXT_PUBLIC_DESKTOP_TARGET=1 \
+NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 \
+pnpm build
+```
 
-#### Frontend
-Navigate to the `nextjs-frontend` directory and run:
-   ```bash
-   pnpm install
-   ```
+Desktop commands:
 
-### Build the project (with Docker):
+```bash
+cd nextjs-frontend
+pnpm tauri:sidecar
+pnpm tauri:dev
+pnpm tauri:build
+```
 
-Build the backend and frontend containers:
-   ```bash
-   make docker-build
-   ```
+The sidecar default API URL is `http://127.0.0.1:18475`. Override it
+only when testing desktop startup or packaging behavior.
 
-## Running the Application
+## Verification Commands
 
-**If you are not using Docker:**
+Frontend:
 
-Start the FastAPI server:
-   ```bash
-   make start-backend
-   ```
+```bash
+cd nextjs-frontend
+pnpm exec tsc --noEmit --pretty false
+pnpm exec jest --runInBand
+pnpm lint
+pnpm build
+TAURI_BUILD=1 \
+NEXT_PUBLIC_DESKTOP_TARGET=1 \
+NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 \
+pnpm build
+```
 
-Start the Next.js development server:
-   ```bash
-   make start-frontend
-   ```
+Backend:
 
-**If you are using Docker:**
+```bash
+cd fastapi_backend
+TEST_DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pytest-sqlite.sqlite3 \
+  ./.venv/bin/python -m pytest -q
+```
 
-Start the FastAPI server container:
-   ```bash
-   make docker-start-backend
-   ```
-Start the Next.js development server container:
-   ```bash
-   make docker-start-frontend
-   ```
+Last known gate-close results:
 
-- **Backend**: Access the API at `http://localhost:8000`.
-- **Frontend**: Access the web application at `http://localhost:3000`.
+| Check | Result |
+|---|---|
+| TypeScript | clean |
+| Jest | 28 suites / 157 tests passed in 1.857 s |
+| Lint | 0 errors / 0 warnings |
+| Web build | 59 / 59 static pages generated |
+| Backend pytest | 187 passed, 2 skipped in 9.42 s |
+| Desktop static export | 59 / 59 static pages generated |
 
-## Important Considerations
-- **Environment Variables**: Ensure your `.env` files are up-to-date.
-- **Database Setup**: It is recommended to use Docker to run the database, even when running the backend and frontend locally, to simplify configuration and avoid potential conflicts.
-- **Consistency**: It is **not recommended** to switch between running the project locally and using Docker, as this may cause permission issues or unexpected problems. You can choose one method and stick with it.
+## Parity Screenshots
+
+Canonical evidence lives under `docs/parity-screenshots/`: one Reflex
+and one Next.js PNG for each canonical module landing page. Capture
+fresh browser sessions at 1440x900 and use `.webm` for behavior that
+still screenshots cannot prove, such as live flash or notification
+jump.
+
+See `docs/parity-screenshots/README.md` for the current canonical
+route list, expected deltas, and reproduction steps.
+
+## Troubleshooting
+
+- If `pnpm generate-client` fails, confirm the backend is running and
+  `http://127.0.0.1:8000/openapi.json` responds.
+- If dashboard pages redirect to login during parity work, confirm both
+  `PMT_AUTH_DISABLED=true` and `NEXT_PUBLIC_AUTH_DISABLED=1` are set
+  in the shell commands that started the backend and frontend.
+- If Next.js screenshots show the notification sidebar collapsed, use a
+  fresh browser session or clear the `pmt:next:notificationSidebarOpen`
+  key.
+- If a Tauri build reuses an old sidecar, run `PMT_FORCE_REBUILD_SIDECAR=1 pnpm tauri:sidecar`.
+- If AG Grid reports a missing Enterprise license in development, that
+  is expected until license procurement is reprioritized.

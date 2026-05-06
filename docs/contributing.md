@@ -1,57 +1,90 @@
 # Contributing
 
-We can always use your help to improve Next.js FastAPI Template! Please feel free to tackle existing [issues](https://github.com/orkapodavid/nextjs-fastapi-template/issues). If you have a new idea, please create a thread on [Discussions](https://github.com/orkapodavid/nextjs-fastapi-template/discussions).
+Contributions on `feat/nextjs-fastapi-rebuild` should preserve parity
+with the Reflex reference unless a documented intentional delta says
+otherwise.
 
-Please follow this guide to learn more about how to develop and test the project locally, before opening a pull request.
+## Before You Start
 
-## Local Dev Setup
+1. Read `docs/plans/current-parity-rebuild-compact-plan-2026-05-11.md`.
+2. Check `continuations.md` for the latest landed commits and exact
+   verification results.
+3. Review `docs/parity-screenshots/README.md` before visual or grid
+   changes.
+4. Run `git status --short --branch` and keep unrelated local changes
+   out of your commits.
 
-### Clone the repo
+## Local Setup
 
-```bash
-git clone git@github.com:orkapodavid/nextjs-fastapi-template.git
-```
+Use [Get Started](get-started.md) for dependency installation and the
+three-service parity loop:
 
-Check the [Get Started](get-started.md#setup) page to complete the setup.
+- FastAPI on `127.0.0.1:8000`
+- Next.js on `localhost:3000`
+- Reflex reference on `localhost:3001/pmt/`
 
+The local parity commands may enable `PMT_AUTH_DISABLED=true` and
+`NEXT_PUBLIC_AUTH_DISABLED=1`, but committed env examples must keep
+auth bypass OFF.
 
-## Install pre-commit hooks
+## OpenAPI Changes
 
-Check the [Additional Settings - Install pre-commit hooks](additional-settings.md#pre-commit-setup) section to complete the setup.
-
-
-It's critical to run the pre-commit hooks before pushing your code to follow the project's code style, and avoid linting errors.
-
-## Updating the OpenAPI schema
-
-It's critical to update the OpenAPI schema when you make changes to the FastAPI routes or related files:
-
-Check the [Additional Settings - Manual execution of hot reload commands](additional-settings.md#manual-execution-of-hot-reload-commands) section to run the command.
-
-## Tests
-
-Check the [Additional Settings - Testing](additional-settings.md#testing) section to run the tests.
-
-## Documentation
-
-We use [mkdocs-material](https://squidfunk.github.io/mkdocs-material/) to generate the documentation from markdown files.
-Check the files in the `docs` directory.
-
-To run the documentation locally, you need to run:
+Regenerate the frontend client whenever FastAPI route signatures,
+response models, auth behavior, or generated schema output changes:
 
 ```bash
-uv run mkdocs serve
+cd nextjs-frontend
+pnpm generate-client
 ```
 
-## Release
+Do not hand-edit `nextjs-frontend/app/openapi-client/`.
 
-!!! info
-    The backend and the frontend are versioned together, that is, they should have the same version number.
+## Tests and Builds
 
-To release and publish a new version, follow these steps:
+Run the checks that match your change. For shared behavior, API shape,
+grid runtime, or parity-visible work, run the full relevant set.
 
-1. Update the version in `fastapi_backend/pyproject.toml`, `nextjs-frontend/package.json`.
-2. Update the changelog in `CHANGELOG.md`.
-3. Open a PR with the changes.
-4. Once the PR is merged, run the [Release GitHub Action](https://github.com/orkapodavid/nextjs-fastapi-template/actions/workflows/release.yml) to create a draft release.
-5. Review the draft release, ensure the description has at least the associated changelog entry, and publish it.
+Frontend:
+
+```bash
+cd nextjs-frontend
+pnpm exec tsc --noEmit --pretty false
+pnpm exec jest --runInBand
+pnpm lint
+pnpm build
+TAURI_BUILD=1 \
+NEXT_PUBLIC_DESKTOP_TARGET=1 \
+NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 \
+pnpm build
+```
+
+Backend:
+
+```bash
+cd fastapi_backend
+TEST_DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pytest-sqlite.sqlite3 \
+  ./.venv/bin/python -m pytest -q
+```
+
+Record exact suite counts, route counts, and timings in
+`continuations.md`; do not write only "green".
+
+## Parity Evidence
+
+For visual or interaction changes:
+
+- Compare against Reflex at `http://localhost:3001/pmt/`.
+- Capture fresh 1440x900 browser sessions.
+- Store canonical stills under
+  `docs/parity-screenshots/<module>/<page>-{reflex,nextjs}.png`.
+- Use `.webm` for behaviors still frames cannot prove.
+- Update `docs/parity-screenshots/README.md` when canonical artifacts
+  or intentional deltas change.
+
+## Commit Discipline
+
+- Use one commit per defect or one coherent documentation artifact.
+- Do not bundle unrelated fixes.
+- Keep generated OpenAPI changes in the same commit as the API/client
+  change that requires them.
+- Push every 2-3 commits during long work.

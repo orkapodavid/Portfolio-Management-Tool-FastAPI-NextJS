@@ -1,5 +1,12 @@
 # Support
 
-If you have any questions or need help, feel free to create a thread on [GitHub Discussions](https://github.com/orkapodavid/nextjs-fastapi-template/discussions).
+For setup and parity questions, start with:
 
-In case you're facing a bug, please [check existing issues](https://github.com/orkapodavid/nextjs-fastapi-template/issues) and create a new one if needed.
+- [Get Started](get-started.md)
+- [Current parity rebuild plan](plans/current-parity-rebuild-compact-plan-2026-05-11.md)
+- [Parity screenshots](parity-screenshots/README.md)
+- [Continuation log](../continuations.md)
+
+When reporting a defect, include the affected route, whether Reflex and
+Next.js diverge, the relevant browser/service URLs, and exact
+verification commands with counts or error output.

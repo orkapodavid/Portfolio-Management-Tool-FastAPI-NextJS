@@ -1,6 +1,39 @@
 # Portfolio Management Tool - Continuation Log
 
-## Current Status (2026-05-11 — Milestone C gates closed)
+## Documentation Refresh (2026-05-06 local session)
+
+Updated the human and agent documentation surface for the Next.js 16 +
+FastAPI + Tauri parity rebuild:
+
+- Added repo-root `AGENTS.md` with project layout, verification
+  commands, parity workflow, OpenAPI regeneration rule, auth-bypass
+  safety, `pmt:next:` storage namespace rule, screenshot artifact
+  rules, and one-commit-per-defect discipline.
+- Rewrote root `README.md`, `docs/get-started.md`,
+  `docs/README.md`, `docs/contributing.md`,
+  `docs/additional-settings.md`, `docs/deployment.md`,
+  `docs/technology-selection.md`, `docs/support.md`, and
+  `docs/nextjs-frontend/walkthrough.md` around the current PMT system
+  instead of template-era setup text.
+- Reconciled parity docs so Milestone B/C closure through
+  implementation HEAD `82142c9`, closed findings F-7/F-21/F-23/F-35/F-36,
+  intentional out-of-scope items F-9/F-27/F-28/AG Grid license
+  procurement, and documented Next.js read-only column supersets are
+  explicit.
+
+Verification run during the docs refresh:
+
+| Check | Result |
+|---|---|
+| `git diff --check` | clean |
+| `rg -n "PMT_AUTH_DISABLED=true\|NEXT_PUBLIC_AUTH_DISABLED=1" . --glob '*.env*'` | only commented backend env lines matched; no frontend `=1` env example |
+| `pnpm --dir nextjs-frontend exec tsc --noEmit --pretty false` | clean |
+| Backend pytest with sqlite override | 187 passed, 2 skipped in 10.37 s |
+
+## Current Status (2026-05-11 — Milestone B/C closed through 82142c9)
+
+Implementation parity gates for Milestone B and Milestone C are closed
+through HEAD `82142c9`; later docs-only prompt commits may exist.
 
 ### What landed
 

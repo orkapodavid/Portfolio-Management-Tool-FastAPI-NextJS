@@ -7,7 +7,8 @@ the full historical handoff chain.
 
 - `current-parity-rebuild-compact-plan-2026-05-11.md` - compact
   source of truth for the current Next.js 16 + FastAPI + Tauri parity
-  rebuild state after Milestone C gate close.
+  rebuild state after Milestone C gate close, closed through
+  implementation HEAD `82142c9`.
 
 ## Team Prompts
 

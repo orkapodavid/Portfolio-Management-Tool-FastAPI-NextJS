@@ -1,34 +1,25 @@
-This template streamlines building APIs with [FastAPI](https://fastapi.tiangolo.com/) and dynamic frontends with [Next.js](https://nextjs.org/). It integrates the backend and frontend using [@hey-api/openapi-ts](https://github.com/hey-ai/openapi-ts) to generate a type-safe client, with automated watchers to keep the OpenAPI schema and client updated, ensuring a smooth and synchronized development workflow.  
+# Technology Selection
 
-- [Next.js](https://nextjs.org/): Fast, SEO-friendly frontend framework  
-- [FastAPI](https://fastapi.tiangolo.com/): High-performance Python backend  
-- [SQLAlchemy](https://www.sqlalchemy.org/): Powerful Python SQL toolkit and ORM
-- [PostgreSQL](https://www.postgresql.org/): Advanced open-source relational database
-- [Pydantic](https://docs.pydantic.dev/): Data validation and settings management using Python type annotations
-- [Zod](https://zod.dev/) + [TypeScript](https://www.typescriptlang.org/): End-to-end type safety and schema validation  
-- [fastapi-users](https://fastapi-users.github.io/fastapi-users/): Complete authentication system with:
-    - Secure password hashing by default
-    - JWT (JSON Web Token) authentication
-    - Email-based password recovery
-- [Shadcn/ui](https://ui.shadcn.com/): Beautiful and customizable React components
-- [OpenAPI-fetch](https://github.com/Hey-AI/openapi-fetch): Fully typed client generation from OpenAPI schema  
-- [fastapi-mail](https://sabuhish.github.io/fastapi-mail/): Efficient email handling for FastAPI applications
-- [uv](https://docs.astral.sh/uv/): An extremely fast Python package and project manager
-- [Pytest](https://docs.pytest.org/): Powerful Python testing framework
-- Code Quality Tools:
-    - [Ruff](https://github.com/astral-sh/ruff): Fast Python linter
-    - [ESLint](https://eslint.org/): JavaScript/TypeScript code quality
-- Hot reload watchers:  
-    - Backend: [Watchdog](https://github.com/gorakhargosh/watchdog) for monitoring file changes  
-    - Frontend: [Chokidar](https://github.com/paulmillr/chokidar) for live updates  
-- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/): Consistent environments for development and production
-- [MailHog](https://github.com/mailhog/MailHog): Email server for development
-- [Pre-commit hooks](https://pre-commit.com/): Enforce code quality with automated checks  
-- [OpenAPI JSON schema](https://swagger.io/specification/): Centralized API documentation and client generation  
+Portfolio Management Tool currently uses:
 
-### Pending Implementation
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS |
+| Grid runtime | AG Grid Community/Enterprise 35.0.1 |
+| Desktop | Tauri v2, Rust, PyInstaller FastAPI sidecar |
+| Backend | FastAPI, Pydantic, SQLAlchemy, fastapi-users |
+| Business logic | `pmt_core_pkg/pmt_core` shared services and repositories |
+| Databases | SQLite for local parity/desktop; PostgreSQL for composed web environments |
+| API contract | OpenAPI + `@hey-api/openapi-ts` generated TypeScript client |
+| Testing | Pytest for backend; Jest and React Testing Library for frontend |
+| Tooling | `uv`, `pnpm`, ESLint, Ruff, Docker Compose |
 
-- [fastapi-azure-auth](https://github.com/intility/fastapi-azure-auth) ([docs](https://intility.github.io/fastapi-azure-auth/)): Azure AD / Entra ID authentication for FastAPI — single- and multi-tenant support, token validation, and RBAC via Azure  
-- [SQLite](https://www.sqlite.org/): Lightweight embedded database for local development and lightweight deployments  
+## Current Notes
 
-With this setup, you'll save time and maintain a seamless connection between your backend and frontend, boosting productivity and reliability.
+- Next.js is pinned to 16.0.8 in `nextjs-frontend/package.json`.
+- The frontend client is regenerated with `pnpm generate-client` from a
+  running FastAPI backend.
+- AG Grid Enterprise is installed for parity with Reflex. License
+  procurement remains out of scope unless reprioritized.
+- SQLite is the default documented path for local parity checks because
+  it avoids requiring a PostgreSQL service.
