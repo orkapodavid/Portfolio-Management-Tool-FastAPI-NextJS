@@ -167,6 +167,8 @@ import type {
   InstrumentsGetStockScreenerResponses,
   InstrumentsGetSpecialTermsData,
   InstrumentsGetSpecialTermsResponses,
+  InstrumentsGetInstrumentDataData,
+  InstrumentsGetInstrumentDataResponses,
   EventsGetEventCalendarData,
   EventsGetEventCalendarResponses,
   EventsGetEventCalendarErrors,
@@ -1625,6 +1627,31 @@ export const instrumentsGetSpecialTerms = <
       },
     ],
     url: "/api/instruments/special-terms",
+    ...options,
+  });
+};
+
+/**
+ * Get Instrument Data
+ */
+export const instrumentsGetInstrumentData = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<InstrumentsGetInstrumentDataData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    InstrumentsGetInstrumentDataResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/instruments/instrument-data",
     ...options,
   });
 };

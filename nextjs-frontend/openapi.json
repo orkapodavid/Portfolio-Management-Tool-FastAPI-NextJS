@@ -2704,6 +2704,30 @@
         ]
       }
     },
+    "/api/instruments/instrument-data": {
+      "get": {
+        "tags": [
+          "instruments"
+        ],
+        "summary": "Get Instrument Data",
+        "operationId": "instruments-get_instrument_data",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/api/events/calendar": {
       "get": {
         "tags": [
