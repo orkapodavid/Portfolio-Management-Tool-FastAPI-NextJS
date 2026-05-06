@@ -1,11 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { operationsGetDailyProcedures } from "@/app/clientService";
+import {
+  operationsGetDailyProcedures,
+  operationsKillProcess,
+  operationsRerunProcess,
+} from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { dateColumn, textColumn } from "@/components/grid/columns";
+import { getOperationsContextMenuItems } from "@/components/operations/operations-context-menu";
 import { getAuthToken } from "@/lib/auth/token-storage";
 import { getApiData, getApiError } from "@/lib/utils";
 
@@ -77,6 +82,33 @@ export default function DailyProceduresPage() {
     void load();
   }, [load]);
 
+  const contextMenu = useMemo(
+    () =>
+      getOperationsContextMenuItems({
+        onRerun: async ({ id, process_name }) => {
+          const token = getAuthToken();
+          if (!token) return;
+          await operationsRerunProcess({
+            headers: { Authorization: `Bearer ${token}` },
+            path: { process_id: id },
+            body: { process_name },
+          });
+          void load();
+        },
+        onKill: async ({ id, process_name }) => {
+          const token = getAuthToken();
+          if (!token) return;
+          await operationsKillProcess({
+            headers: { Authorization: `Bearer ${token}` },
+            path: { process_id: id },
+            body: { process_name },
+          });
+          void load();
+        },
+      }),
+    [load],
+  );
+
   return (
     <DataGrid<DailyProcedureRow>
       gridId="daily_procedures_grid"
@@ -92,6 +124,7 @@ export default function DailyProceduresPage() {
       onRefresh={load}
       emptyMessage="No daily procedures available."
       searchPlaceholder="Search procedures…"
+      getContextMenuItems={contextMenu}
     />
   );
 }
