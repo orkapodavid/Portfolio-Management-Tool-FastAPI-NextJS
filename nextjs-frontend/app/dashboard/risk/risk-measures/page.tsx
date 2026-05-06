@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { riskGetRiskMeasures } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
+import { SingleDateFilterBar } from "@/components/grid/filter-bar";
 import { textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
 import { getApiData, getApiError } from "@/lib/utils";
@@ -52,40 +53,58 @@ export default function RiskMeasuresPage() {
   const [rows, setRows] = useState<RiskMeasureRow[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [draftDate, setDraftDate] = useState("");
+  const [appliedDate, setAppliedDate] = useState("");
 
-  const load = useCallback(async () => {
-    setIsLoading(true);
-    const token = getAuthToken();
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-    const response = await riskGetRiskMeasures({
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const error = getApiError(response);
-    if (error) {
-      const status = getStatus(error);
-      if (status === 401 || status === 403) {
+  const load = useCallback(
+    async (date: string) => {
+      setIsLoading(true);
+      const token = getAuthToken();
+      if (!token) {
         router.replace("/login");
         return;
       }
-      setErrorMessage("Failed to load risk measures.");
+      const response = await riskGetRiskMeasures({
+        headers: { Authorization: `Bearer ${token}` },
+        query: date ? { trade_date: date } : undefined,
+      });
+      const error = getApiError(response);
+      if (error) {
+        const status = getStatus(error);
+        if (status === 401 || status === 403) {
+          router.replace("/login");
+          return;
+        }
+        setErrorMessage("Failed to load risk measures.");
+        setIsLoading(false);
+        return;
+      }
+      setRows((getApiData(response) as RiskMeasureRow[]) ?? []);
+      setErrorMessage(null);
       setIsLoading(false);
-      return;
-    }
-    setRows((getApiData(response) as RiskMeasureRow[]) ?? []);
-    setErrorMessage(null);
-    setIsLoading(false);
-  }, [router]);
+    },
+    [router]
+  );
 
   useEffect(() => {
-    void load();
+    void load("");
   }, [load]);
+
+  const onApply = () => {
+    setAppliedDate(draftDate);
+    void load(draftDate);
+  };
+
+  const onClear = () => {
+    setDraftDate("");
+    setAppliedDate("");
+    void load("");
+  };
 
   return (
     <DataGrid<RiskMeasureRow>
       gridId="risk_measures_grid"
+      rowIdKey="ticker"
       showCompactToggle
       showAutoRefresh
       showRowNumbers
@@ -95,10 +114,19 @@ export default function RiskMeasuresPage() {
       rows={rows}
       isLoading={isLoading}
       errorMessage={errorMessage}
-      onRefresh={load}
-      rowIdKey="ticker"
+      onRefresh={() => load(appliedDate)}
       emptyMessage="No risk measures available."
       searchPlaceholder="Search risk measures…"
+      filterBar={
+        <SingleDateFilterBar
+          label="Position Date"
+          value={draftDate}
+          onChange={setDraftDate}
+          onApply={onApply}
+          onClear={onClear}
+          hasActiveFilters={Boolean(appliedDate)}
+        />
+      }
     />
   );
 }
