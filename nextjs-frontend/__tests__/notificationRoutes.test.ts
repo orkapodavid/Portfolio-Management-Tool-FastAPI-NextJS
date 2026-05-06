@@ -28,6 +28,17 @@ describe("notification routes", () => {
     expect(slugifyNotificationRoute({ module, subtab })).toBe(expected);
   });
 
+  it.each([
+    ["Instruments", "Special Term", "/dashboard/instruments/special-terms"],
+    [
+      "Operations",
+      "Daily Procedure Check",
+      "/dashboard/operations/daily-procedures",
+    ],
+  ])("aliases Reflex slug %s / %s to %s", (module, subtab, expected) => {
+    expect(slugifyNotificationRoute({ module, subtab })).toBe(expected);
+  });
+
   it("returns Reflex-compatible row id keys for notification targets", () => {
     expect(getNotificationRowIdKey("pnl_change_grid")).toBe("ticker");
     expect(getNotificationRowIdKey("pnl_currency_grid")).toBe("currency");

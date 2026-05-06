@@ -10,6 +10,11 @@ const MODULE_SLUG_OVERRIDES: Record<string, string> = {
   recon: "recon",
 };
 
+const SUBTAB_SLUG_OVERRIDES: Record<string, string> = {
+  "special-term": "special-terms",
+  "daily-procedure-check": "daily-procedures",
+};
+
 const GRID_ROW_ID_KEYS: Record<string, string> = {
   market_data_grid: "ticker",
   fx_data_grid: "ticker",
@@ -58,7 +63,8 @@ const resolveSubtab = (
   module: (typeof MODULES)[number] | undefined,
   value: string
 ) => {
-  const slug = slugifySegment(value);
+  const rawSlug = slugifySegment(value);
+  const slug = SUBTAB_SLUG_OVERRIDES[rawSlug] ?? rawSlug;
   return module?.subtabs.find(
     (subtab) => subtab.id === slug || slugifySegment(subtab.label) === slug
   );
@@ -73,8 +79,10 @@ export function slugifyNotificationRoute({
   const resolvedModule = resolveModule(moduleLabel);
   const resolvedModuleSlug = resolvedModule?.id ?? moduleSlug(moduleLabel);
   const resolvedSubtab = resolveSubtab(resolvedModule, subtabLabel);
-  const resolvedSubtabSlug =
-    resolvedSubtab?.id ?? slugifySegment(subtabLabel);
+  const fallbackSubtabSlug = slugifySegment(subtabLabel);
+  const aliasedFallbackSubtabSlug =
+    SUBTAB_SLUG_OVERRIDES[fallbackSubtabSlug] ?? fallbackSubtabSlug;
+  const resolvedSubtabSlug = resolvedSubtab?.id ?? aliasedFallbackSubtabSlug;
   return `/dashboard/${resolvedModuleSlug}/${resolvedSubtabSlug}`;
 }
 
