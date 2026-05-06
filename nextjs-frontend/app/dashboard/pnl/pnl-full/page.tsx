@@ -8,6 +8,7 @@ import { DataGrid } from "@/components/grid/data-grid";
 import { SingleDateFilterBar } from "@/components/grid/filter-bar";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { pnlFullSimulator } from "@/lib/grid-simulators/pnl";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type PnlFullRow = {
@@ -109,6 +110,7 @@ export default function PnlFullPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={() => load(appliedDate)}
+      simulateUpdate={pnlFullSimulator}
       emptyMessage="No P&L data available."
       searchPlaceholder="Search P&L…"
       filterBar={

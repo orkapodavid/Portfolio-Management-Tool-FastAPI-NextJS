@@ -8,6 +8,7 @@ import { DataGrid } from "@/components/grid/data-grid";
 import { SingleDateFilterBar } from "@/components/grid/filter-bar";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { pnlCurrencySimulator } from "@/lib/grid-simulators/pnl";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type PnlCurrencyRow = {
@@ -112,6 +113,7 @@ export default function PnlCurrencyPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={() => load(appliedDate)}
+      simulateUpdate={pnlCurrencySimulator}
       emptyMessage="No currency P&L entries available."
       searchPlaceholder="Search P&L by currency…"
       filterBar={

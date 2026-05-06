@@ -8,6 +8,7 @@ import { DataGrid } from "@/components/grid/data-grid";
 import { SingleDateFilterBar } from "@/components/grid/filter-bar";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { pnlSummarySimulator } from "@/lib/grid-simulators/pnl";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type PnlSummaryRow = {
@@ -112,6 +113,7 @@ export default function PnlSummaryPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={() => load(appliedDate)}
+      simulateUpdate={pnlSummarySimulator}
       emptyMessage="No P&L summary entries available."
       searchPlaceholder="Search P&L summary…"
       filterBar={
