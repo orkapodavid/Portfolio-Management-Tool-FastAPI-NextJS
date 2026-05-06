@@ -6,6 +6,14 @@ import { useRouter } from "next/navigation";
 import { marketDataGetHistoricalData } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import {
+  HistoricalDataFilterBar,
+  buildHistoricalDataQuery,
+  createEmptyHistoricalDataFilters,
+  getHistoricalTickerOptions,
+  hasHistoricalDataFilters,
+  type HistoricalDataFilterState,
+} from "@/components/grid/historical-data-filter-bar";
+import {
   dateColumn,
   numberColumn,
   percentColumn,
@@ -50,38 +58,68 @@ const getStatus = (e: unknown): number | undefined => {
 export default function HistoricalDataPage() {
   const router = useRouter();
   const [rows, setRows] = useState<HistoricalRow[]>([]);
+  const [availableTickers, setAvailableTickers] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [draftFilters, setDraftFilters] = useState<HistoricalDataFilterState>(
+    createEmptyHistoricalDataFilters
+  );
+  const [appliedFilters, setAppliedFilters] =
+    useState<HistoricalDataFilterState>(createEmptyHistoricalDataFilters);
 
-  const load = useCallback(async () => {
-    setIsLoading(true);
-    const token = getAuthToken();
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-    const response = await marketDataGetHistoricalData({
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const error = getApiError(response);
-    if (error) {
-      const status = getStatus(error);
-      if (status === 401 || status === 403) {
+  const load = useCallback(
+    async (filters: HistoricalDataFilterState) => {
+      setIsLoading(true);
+      const token = getAuthToken();
+      if (!token) {
         router.replace("/login");
         return;
       }
-      setErrorMessage("Failed to load historical data.");
+      const response = await marketDataGetHistoricalData({
+        headers: { Authorization: `Bearer ${token}` },
+        query: buildHistoricalDataQuery(filters),
+      });
+      const error = getApiError(response);
+      if (error) {
+        const status = getStatus(error);
+        if (status === 401 || status === 403) {
+          router.replace("/login");
+          return;
+        }
+        setErrorMessage("Failed to load historical data.");
+        setIsLoading(false);
+        return;
+      }
+      const nextRows = (getApiData(response) as HistoricalRow[]) ?? [];
+      setRows(nextRows);
+      setAvailableTickers((current) =>
+        current.length === 0 || !hasHistoricalDataFilters(filters)
+          ? getHistoricalTickerOptions(nextRows)
+          : current
+      );
+      setErrorMessage(null);
       setIsLoading(false);
-      return;
-    }
-    setRows((getApiData(response) as HistoricalRow[]) ?? []);
-    setErrorMessage(null);
-    setIsLoading(false);
-  }, [router]);
+    },
+    [router]
+  );
 
   useEffect(() => {
-    void load();
+    void load(createEmptyHistoricalDataFilters());
   }, [load]);
+
+  const onApply = () => {
+    setAppliedFilters(draftFilters);
+    void load(draftFilters);
+  };
+
+  const onClear = () => {
+    const emptyFilters = createEmptyHistoricalDataFilters();
+    setDraftFilters(emptyFilters);
+    setAppliedFilters(emptyFilters);
+    void load(emptyFilters);
+  };
+
+  const hasActive = hasHistoricalDataFilters(appliedFilters);
 
   return (
     <DataGrid<HistoricalRow>
@@ -95,11 +133,21 @@ export default function HistoricalDataPage() {
       rows={rows}
       isLoading={isLoading}
       errorMessage={errorMessage}
-      onRefresh={load}
+      onRefresh={() => load(appliedFilters)}
       simulateUpdate={historicalDataSimulator}
       simulateUpdateIntervalMs={5_000}
       emptyMessage="No historical data available."
       searchPlaceholder="Search history…"
+      filterBar={
+        <HistoricalDataFilterBar
+          value={draftFilters}
+          availableTickers={availableTickers}
+          hasActiveFilters={hasActive}
+          onChange={setDraftFilters}
+          onApply={onApply}
+          onClear={onClear}
+        />
+      }
     />
   );
 }
