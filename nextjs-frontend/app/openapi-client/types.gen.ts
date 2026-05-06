@@ -2139,9 +2139,24 @@ export type InstrumentsGetStockScreenerResponses = {
 export type InstrumentsGetSpecialTermsData = {
   body?: never;
   path?: never;
-  query?: never;
+  query?: {
+    /**
+     * Pos Date
+     */
+    pos_date?: string | null;
+  };
   url: "/api/instruments/special-terms";
 };
+
+export type InstrumentsGetSpecialTermsErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type InstrumentsGetSpecialTermsError =
+  InstrumentsGetSpecialTermsErrors[keyof InstrumentsGetSpecialTermsErrors];
 
 export type InstrumentsGetSpecialTermsResponses = {
   /**

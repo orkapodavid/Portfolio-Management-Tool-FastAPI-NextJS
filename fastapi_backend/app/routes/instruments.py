@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from typing import Optional
+
+from fastapi import APIRouter, Depends, Query
 
 from app.database import User
 from app.users import current_active_user
@@ -25,9 +27,12 @@ async def get_stock_screener(
 
 @router.get("/special-terms")
 async def get_special_terms(
+    pos_date: Optional[str] = Query(default=None),
     user: User = Depends(current_active_user),
 ):
-    return await instruments_service.get_special_terms()
+    return await instruments_service.get_special_terms(
+        position_date=pos_date or ""
+    )
 
 
 @router.get("/instrument-data")

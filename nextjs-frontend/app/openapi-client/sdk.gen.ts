@@ -175,6 +175,7 @@ import type {
   InstrumentsGetStockScreenerResponses,
   InstrumentsGetSpecialTermsData,
   InstrumentsGetSpecialTermsResponses,
+  InstrumentsGetSpecialTermsErrors,
   InstrumentsGetInstrumentDataData,
   InstrumentsGetInstrumentDataResponses,
   InstrumentsGetInstrumentTermData,
@@ -1689,7 +1690,7 @@ export const instrumentsGetSpecialTerms = <
 ) => {
   return (options?.client ?? client).get<
     InstrumentsGetSpecialTermsResponses,
-    unknown,
+    InstrumentsGetSpecialTermsErrors,
     ThrowOnError
   >({
     responseType: "json",

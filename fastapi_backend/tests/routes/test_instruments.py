@@ -27,6 +27,20 @@ class TestInstrumentsSimpleListRoutes:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
+class TestInstrumentsSpecialTerms:
+    @pytest.mark.asyncio(loop_scope="function")
+    async def test_accepts_pos_date_query(
+        self, test_client, authenticated_user
+    ):
+        response = await test_client.get(
+            "/api/instruments/special-terms",
+            headers=authenticated_user["headers"],
+            params={"pos_date": "2026-04-15"},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert isinstance(response.json(), list)
+
+
 class TestInstrumentsInstrumentData:
     @pytest.mark.asyncio(loop_scope="function")
     async def test_returns_canonical_shape(self, test_client, authenticated_user):
