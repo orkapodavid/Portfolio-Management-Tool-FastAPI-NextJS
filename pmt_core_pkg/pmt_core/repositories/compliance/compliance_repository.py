@@ -1,6 +1,6 @@
 from typing import Any, List
 from pmt_core.repositories.common import DatabaseRepository
-from pmt_core.models import ComplianceRecord
+from pmt_core.models import BeneficialOwnershipRecord, ComplianceRecord
 from pmt_core.models.common import ComplianceType
 import logging
 import random
@@ -68,30 +68,46 @@ class ComplianceRepository(DatabaseRepository):
             ]
         return []
 
-    async def get_beneficial_ownership(self, position_date: str = None) -> List[ComplianceRecord]:
-        """Get beneficial ownership data."""
+    async def get_beneficial_ownership(
+        self, position_date: str = None
+    ) -> List[BeneficialOwnershipRecord]:
+        """Get beneficial ownership data.
+
+        Mirrors `BeneficialOwnershipItem` from the Reflex reference: the
+        grid expects trade-date / ticker / company / NOSH (reported, BBG,
+        proforma) / shares (stock, warrant, bond, total). Numeric fields
+        are returned as comma-formatted strings to match the Reflex
+        renderer.
+        """
         if self.mock_mode:
-            logger.info(f"Returning mock beneficial ownership data for date={position_date}")
+            logger.info(
+                f"Returning mock beneficial ownership data for date={position_date}"
+            )
             tickers = ["AAPL", "TSLA", "NVDA", "AMD", "META", "GOOGL"]
-            return [
-                ComplianceRecord(
-                    id=i + 1,
-                    ticker=tickers[i % len(tickers)],
-                    company_name=f"{tickers[i % len(tickers)]} Inc.",
-                    compliance_type=ComplianceType.BENEFICIAL_OWNERSHIP.value,
-                    in_emsx=None,
-                    firm_block=None,
-                    compliance_start="2026-01-01",
-                    nda_end=None,
-                    mnpi_end=None,
-                    wc_end=None,
-                    undertaking_expiry=None,
-                    account=None,
-                    undertaking_type=None,
-                    undertaking_details=None,
+            today = (position_date or datetime.now().strftime("%Y-%m-%d"))
+            records: List[BeneficialOwnershipRecord] = []
+            for i in range(10):
+                stock = (i + 1) * 250_000
+                warrant = (i + 1) * 50_000
+                bond = (i + 1) * 25_000
+                total = stock + warrant + bond
+                nosh = (i + 1) * 5_000_000
+                records.append(
+                    BeneficialOwnershipRecord(
+                        id=i + 1,
+                        trade_date=today,
+                        ticker=tickers[i % len(tickers)],
+                        company_name=f"{tickers[i % len(tickers)]} Inc.",
+                        nosh_reported=f"{nosh:,}",
+                        nosh_bbg=f"{nosh + 100_000:,}",
+                        nosh_proforma=f"{nosh + 50_000:,}",
+                        stock_shares=f"{stock:,}",
+                        warrant_shares=f"{warrant:,}",
+                        bond_shares=f"{bond:,}",
+                        total_shares=f"{total:,}",
+                    )
                 )
-                for i in range(10)
-            ]
+            return records
         return []
 
     async def get_monthly_exercise_limits(self, position_date: str = None) -> List[dict[str, Any]]:

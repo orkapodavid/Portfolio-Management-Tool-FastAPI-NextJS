@@ -14,6 +14,7 @@ from pmt_core.models import (
     MarketDataRecord,
     OrderRecord,
     ComplianceRecord,
+    BeneficialOwnershipRecord,
     RiskRecord,
     # Enums
     InstrumentType,
@@ -44,6 +45,7 @@ __all__ = [
     "MarketDataRecord",
     "OrderRecord",
     "ComplianceRecord",
+    "BeneficialOwnershipRecord",
     "RiskRecord",
     # Enums
     "InstrumentType",

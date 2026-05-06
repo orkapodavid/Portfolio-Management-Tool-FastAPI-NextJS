@@ -1,7 +1,7 @@
 from typing import List, Optional
 from pmt_core.repositories.compliance import ComplianceRepository
 from pmt_core.repositories.protocols import ComplianceRepositoryProtocol
-from pmt_core.models import ComplianceRecord
+from pmt_core.models import BeneficialOwnershipRecord, ComplianceRecord
 import logging
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ class ComplianceService:
 
     async def get_beneficial_ownership(
         self, position_date: str = None
-    ) -> List[ComplianceRecord]:
+    ) -> List[BeneficialOwnershipRecord]:
         """Get beneficial ownership."""
         return await self.repository.get_beneficial_ownership(
             position_date=position_date
