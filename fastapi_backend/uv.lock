@@ -1050,7 +1050,6 @@ dev = [
     { name = "pytest-mock" },
     { name = "python-dotenv" },
     { name = "ruff" },
-    { name = "watchdog" },
 ]
 
 [package.metadata]
@@ -1080,7 +1079,6 @@ dev = [
     { name = "pytest-mock", specifier = ">=3.14.0,<4" },
     { name = "python-dotenv", specifier = ">=1.0.1,<2" },
     { name = "ruff", specifier = ">=0.1.0,<0.2" },
-    { name = "watchdog", specifier = ">=5.0.3,<6" },
 ]
 
 [[package]]

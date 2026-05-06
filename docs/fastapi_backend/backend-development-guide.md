@@ -310,11 +310,6 @@ Re-run `pnpm generate-client` whenever:
 - A new router is mounted in `main.py`.
 - A `pmt_core` TypedDict referenced by a response model changes shape.
 
-`watcher.py` does the same job locally during `start.sh`-driven dev
-sessions: it runs mypy and re-exports the JSON schema to
-`OPENAPI_OUTPUT_FILE` whenever `app/main.py`, `app/schemas.py`, or any
-file under `app/routes/` is saved.
-
 ---
 
 ## Development Workflow Summary

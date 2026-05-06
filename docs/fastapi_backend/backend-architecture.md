@@ -42,7 +42,6 @@ fastapi_backend/
 │   └── run_tauri_sidecar.py        # Entry point used by the PyInstaller sidecar
 ├── alembic_migrations/    # Alembic environment + revision scripts
 ├── tests/                 # pytest-asyncio suite
-├── watcher.py             # Watches app/ and re-exports the OpenAPI schema
 ├── alembic.ini            # Alembic configuration
 └── pyproject.toml         # Dependencies and tool config
 ```
@@ -279,9 +278,7 @@ client.
 1. **Live schema** - `GET /openapi.json` is served by FastAPI itself.
 2. **Export script** - `uv run python -m commands.generate_openapi_schema`
    writes the schema to `OPENAPI_OUTPUT_FILE`.
-3. **Auto regeneration during dev** - `watcher.py` watches `app/` and
-   re-runs the export when relevant files change.
-4. **Frontend consumption** - `pnpm generate-client` (run from
+3. **Frontend consumption** - `pnpm generate-client` (run from
    `nextjs-frontend/`) pulls the live schema and regenerates
    `app/openapi-client/`. Do not hand-edit those files.
 
