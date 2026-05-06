@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import {
   GridRegistryProvider,
+  PENDING_HIGHLIGHT_STORAGE_KEY,
   useGridRegistry,
   type GridApiLike,
   type RowNodeLike,
@@ -28,6 +29,10 @@ const buildApi = (overrides: Partial<GridApiLike> = {}) => {
 };
 
 describe("GridRegistry", () => {
+  beforeEach(() => {
+    window.sessionStorage.clear();
+  });
+
   it("returns null outside a provider", () => {
     const { result } = renderHook(() => useGridRegistry());
     expect(result.current).toBeNull();
@@ -87,5 +92,26 @@ describe("GridRegistry", () => {
       jumped = result.current!.jumpToRow("missing_grid", "x");
     });
     expect(jumped).toBe(false);
+  });
+
+  it("executes and clears a pending sessionStorage highlight when the grid registers", () => {
+    const { api, node } = buildApi();
+    window.sessionStorage.setItem(
+      PENDING_HIGHLIGHT_STORAGE_KEY,
+      JSON.stringify({
+        gridId: "pnl_change_grid",
+        rowId: "row-AAPL",
+        rowIdKey: "ticker",
+      })
+    );
+    const { result } = renderHook(() => useGridRegistry(), { wrapper });
+
+    act(() => {
+      result.current!.register("pnl_change_grid", { api, rowIdKey: "ticker" });
+    });
+
+    expect(api.ensureNodeVisible).toHaveBeenCalledWith(node, "middle");
+    expect(api.flashCells).toHaveBeenCalledWith({ rowNodes: [node] });
+    expect(window.sessionStorage.getItem(PENDING_HIGHLIGHT_STORAGE_KEY)).toBeNull();
   });
 });

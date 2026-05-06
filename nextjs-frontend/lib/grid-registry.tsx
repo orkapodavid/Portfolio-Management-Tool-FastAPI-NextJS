@@ -35,20 +35,44 @@ type GridRegistryContextValue = {
   jumpToRow: (gridId: string, rowId: string) => boolean;
 };
 
+type PendingHighlight = {
+  gridId: string;
+  rowId: string;
+  rowIdKey?: string;
+};
+
+export const PENDING_HIGHLIGHT_STORAGE_KEY = "pmt:next:pendingHighlight";
+
 const GridRegistryContext = createContext<GridRegistryContextValue | null>(null);
+
+const normalizePendingHighlight = (value: unknown): PendingHighlight | null => {
+  if (typeof value !== "object" || value === null) return null;
+  const pending = value as Record<string, unknown>;
+  const gridId = pending.gridId ?? pending.grid_id;
+  const rowId = pending.rowId ?? pending.row_id;
+  const rowIdKey = pending.rowIdKey ?? pending.row_id_key;
+  if (typeof gridId !== "string" || typeof rowId !== "string") return null;
+  return {
+    gridId,
+    rowId,
+    rowIdKey: typeof rowIdKey === "string" ? rowIdKey : undefined,
+  };
+};
+
+const readPendingHighlight = (): PendingHighlight | null => {
+  if (typeof window === "undefined") return null;
+  const raw = window.sessionStorage.getItem(PENDING_HIGHLIGHT_STORAGE_KEY);
+  if (!raw) return null;
+  try {
+    return normalizePendingHighlight(JSON.parse(raw));
+  } catch {
+    window.sessionStorage.removeItem(PENDING_HIGHLIGHT_STORAGE_KEY);
+    return null;
+  }
+};
 
 export function GridRegistryProvider({ children }: { children: ReactNode }) {
   const registry = useRef<Map<string, Registration>>(new Map());
-
-  const register = useCallback((gridId: string, entry: Registration) => {
-    registry.current.set(gridId, entry);
-    return () => {
-      const existing = registry.current.get(gridId);
-      if (existing && existing.api === entry.api) {
-        registry.current.delete(gridId);
-      }
-    };
-  }, []);
 
   const jumpToRow = useCallback((gridId: string, rowId: string) => {
     const entry = registry.current.get(gridId);
@@ -91,6 +115,50 @@ export function GridRegistryProvider({ children }: { children: ReactNode }) {
 
     return true;
   }, []);
+
+  const register = useCallback(
+    (gridId: string, entry: Registration) => {
+      registry.current.set(gridId, entry);
+
+      let retryId: number | null = null;
+      if (typeof window !== "undefined") {
+        const startedAt = Date.now();
+        const tryPendingHighlight = () => {
+          const pending = readPendingHighlight();
+          if (!pending || pending.gridId !== gridId) return false;
+          if (jumpToRow(pending.gridId, pending.rowId)) {
+            window.sessionStorage.removeItem(PENDING_HIGHLIGHT_STORAGE_KEY);
+            if (retryId !== null) {
+              window.clearInterval(retryId);
+              retryId = null;
+            }
+            return false;
+          }
+          if (Date.now() - startedAt > 10_000 && retryId !== null) {
+            window.clearInterval(retryId);
+            retryId = null;
+            return false;
+          }
+          return true;
+        };
+
+        if (tryPendingHighlight()) {
+          retryId = window.setInterval(tryPendingHighlight, 200);
+        }
+      }
+
+      return () => {
+        if (retryId !== null) {
+          window.clearInterval(retryId);
+        }
+        const existing = registry.current.get(gridId);
+        if (existing && existing.api === entry.api) {
+          registry.current.delete(gridId);
+        }
+      };
+    },
+    [jumpToRow]
+  );
 
   const value = useMemo<GridRegistryContextValue>(
     () => ({ register, jumpToRow }),

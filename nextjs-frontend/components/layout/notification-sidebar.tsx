@@ -1,9 +1,17 @@
 "use client";
 
 import { ArrowRight, BellOff, Check, CircleX, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
-import { useGridRegistry } from "@/lib/grid-registry";
+import {
+  PENDING_HIGHLIGHT_STORAGE_KEY,
+  useGridRegistry,
+} from "@/lib/grid-registry";
+import {
+  getNotificationRowIdKey,
+  slugifyNotificationRoute,
+} from "@/lib/notification-routes";
 import { cn } from "@/lib/utils";
 import {
   type NotificationItem,
@@ -142,6 +150,7 @@ export function NotificationSidebar() {
     markRead,
     dismiss,
   } = useNotifications();
+  const router = useRouter();
 
   const visibleNotifications = useMemo(() => {
     if (filter === "all") return notifications;
@@ -150,8 +159,24 @@ export function NotificationSidebar() {
 
   const registry = useGridRegistry();
   const handleGoToDetails = (notification: NotificationItem) => {
-    if (!registry || !notification.gridId || !notification.rowId) return;
-    registry.jumpToRow(notification.gridId, notification.rowId);
+    if (!notification.gridId || !notification.rowId) return;
+    markRead(notification.id);
+
+    const jumped = registry?.jumpToRow(notification.gridId, notification.rowId);
+    if (jumped) return;
+
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem(
+        PENDING_HIGHLIGHT_STORAGE_KEY,
+        JSON.stringify({
+          gridId: notification.gridId,
+          rowId: notification.rowId,
+          rowIdKey: getNotificationRowIdKey(notification.gridId),
+        })
+      );
+    }
+
+    router.push(slugifyNotificationRoute(notification));
   };
 
   return (
