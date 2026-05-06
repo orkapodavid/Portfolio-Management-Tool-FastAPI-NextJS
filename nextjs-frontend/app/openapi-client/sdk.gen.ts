@@ -124,6 +124,9 @@ import type {
   ComplianceGetUndertakingsResponses,
   ComplianceGetBeneficialOwnershipData,
   ComplianceGetBeneficialOwnershipResponses,
+  ComplianceGetMonthlyExerciseLimitData,
+  ComplianceGetMonthlyExerciseLimitResponses,
+  ComplianceGetMonthlyExerciseLimitErrors,
   ReconciliationGetPpsReconData,
   ReconciliationGetPpsReconResponses,
   ReconciliationGetPpsReconErrors,
@@ -1173,6 +1176,31 @@ export const complianceGetBeneficialOwnership = <
       },
     ],
     url: "/api/compliance/beneficial-ownership",
+    ...options,
+  });
+};
+
+/**
+ * Get Monthly Exercise Limit
+ */
+export const complianceGetMonthlyExerciseLimit = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<ComplianceGetMonthlyExerciseLimitData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    ComplianceGetMonthlyExerciseLimitResponses,
+    ComplianceGetMonthlyExerciseLimitErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/compliance/monthly-exercise-limit",
     ...options,
   });
 };

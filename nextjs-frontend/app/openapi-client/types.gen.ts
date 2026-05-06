@@ -1444,6 +1444,35 @@ export type ComplianceGetBeneficialOwnershipResponses = {
   200: unknown;
 };
 
+export type ComplianceGetMonthlyExerciseLimitData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Position Date
+     */
+    position_date?: string | null;
+  };
+  url: "/api/compliance/monthly-exercise-limit";
+};
+
+export type ComplianceGetMonthlyExerciseLimitErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type ComplianceGetMonthlyExerciseLimitError =
+  ComplianceGetMonthlyExerciseLimitErrors[keyof ComplianceGetMonthlyExerciseLimitErrors];
+
+export type ComplianceGetMonthlyExerciseLimitResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
 export type ReconciliationGetPpsReconData = {
   body?: never;
   path?: never;

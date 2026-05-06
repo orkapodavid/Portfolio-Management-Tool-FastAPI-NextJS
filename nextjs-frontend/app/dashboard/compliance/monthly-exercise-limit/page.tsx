@@ -1,23 +1,89 @@
 "use client";
 
-import { Construction } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { complianceGetMonthlyExerciseLimit } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type MonthlyExerciseLimitRow = {
+  id: number;
+  underlying: string;
+  ticker: string;
+  company_name: string;
+  sec_type: string;
+  original_nosh: string;
+  original_quantity: string;
+  monthly_exercised_quantity: string;
+  monthly_exercised_pct: string;
+  monthly_sal: string;
+};
+
+const columns = [
+  textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
+  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
+  textColumn({ field: "sec_type", header: "Sec Type", minWidth: 90 }),
+  textColumn({ field: "original_nosh", header: "Original Nosh", minWidth: 110, align: "right" }),
+  textColumn({ field: "original_quantity", header: "Original Quantity", minWidth: 120, align: "right" }),
+  textColumn({ field: "monthly_exercised_quantity", header: "Monthly Exercised Qty", minWidth: 150, align: "right" }),
+  textColumn({ field: "monthly_exercised_pct", header: "Monthly Exercised %", minWidth: 130, align: "right" }),
+  textColumn({ field: "monthly_sal", header: "Monthly Sal", minWidth: 100, align: "right" }),
+];
+
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
 export default function MonthlyExerciseLimitPage() {
+  const router = useRouter();
+  const [rows, setRows] = useState<MonthlyExerciseLimitRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await complianceGetMonthlyExerciseLimit({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load monthly exercise limit.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as MonthlyExerciseLimitRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-white">
-      <Construction size={48} className="text-gray-300 mb-4" />
-      <h1 className="text-sm font-black text-gray-600 uppercase tracking-widest">
-        Monthly Exercise Limit
-      </h1>
-      <p className="mt-2 max-w-md text-center text-[11px] font-medium text-gray-500">
-        Reflex grid columns: underlying / ticker / company_name / sec_type /
-        original_nosh / original_quantity / monthly_exercised_quantity /
-        monthly_exercised_pct / monthly_sal. Awaits the
-        <code className="mx-1 px-1 py-0.5 bg-gray-100 rounded text-[10px]">
-          GET /api/compliance/monthly-exercise-limit
-        </code>
-        endpoint (§8 in the handoff brief).
-      </p>
-    </div>
+    <DataGrid<MonthlyExerciseLimitRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No monthly exercise limit entries available."
+      searchPlaceholder="Search monthly exercise limit…"
+    />
   );
 }
