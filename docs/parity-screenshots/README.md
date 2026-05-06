@@ -12,8 +12,10 @@ does on the Reflex reference.
 
 ## Capture environment
 
-Re-captured 2026-05-07 at 1440×900 viewport via `playwright-cli`
-against:
+Re-captured 2026-05-08 at 1440×900 viewport via `playwright-cli`
+(market-data, positions, pnl, risk pages re-shot to capture the new
+Auto Refresh ON default + Last Updated populated on mount; the other 7
+pairs are unchanged from the 2026-05-07 pass) against:
 
 | Service  | Port | Flags |
 |---|---|---|
@@ -113,10 +115,11 @@ Reviewers should expect:
   panel).
 
 ### Grids
-- **Auto Refresh switch state**: Reflex captures often show the switch
-  toggled ON; Next.js captures show it OFF (state is per-session and
-  defaults off). Both ports implement the same 30 s setInterval +
-  pulse animation when on.
+- **Auto Refresh switch state**: both Reflex and Next.js now default
+  Auto Refresh ON (Reflex initialises `<module>_auto_refresh: bool =
+  True` in each mixin; Next.js sets the wrapper-level default to true
+  whenever `showAutoRefresh` is set). The emerald pulse animates and
+  Last Updated populates immediately on first load.
 - **Headers, order, alignment, filter types** match — both use the
   same `pmt_core` data shapes. Pinned `ticker` columns appear on the
   left in both.
