@@ -1,5 +1,68 @@
 # Portfolio Management Tool - Continuation Log
 
+## Current Status (2026-05-11 — Milestone C independent polish pass)
+
+### What landed
+
+Closed the Milestone B loose end, then completed the independent
+Milestone C items that did not require product decisions:
+
+- `ff0a58a fix(grid): debounce search quick filter updates` added the
+  300 ms quick-filter debounce and coverage.
+- `67516da fix(grid-registry): retry pending highlights for 15 seconds`
+  extended pending notification-highlight retry coverage.
+- `3777571 fix(grid): hide auto refresh on calm pages` removed the
+  Auto Refresh chrome from 13 non-live pages.
+- `b9bdf03 feat(grid): enable row grouping on pnl and compliance grids`
+  restored the Reflex row-group panel and grouping metadata on PnL and
+  compliance grids.
+- `113a4bc feat(events): add position-date filter on reverse-inquiry`
+  added the missing Reverse Inquiry Position Date filter bar.
+- `526dd6f style(chrome): align notification and toolbar polish with Reflex`
+  tightened notification animation, subtab overflow, and toolbar date
+  input polish.
+- `d64ab03 feat(risk): add pricer pricing results and full notes`
+  restored the pricer pricing-result tables and full note text, while
+  leaving the out-of-scope Plotly 3-D chart untouched.
+- `abe7fef feat(instruments): add stock-screener filter bar` added the
+  Reflex-style Stock Screener filter bar and client-side filtering.
+- `dd1c013 docs(parity-screenshots): re-capture 22 canonical screenshots after Milestone C`
+  re-shot the 22 canonical Reflex/Next.js screenshot pairs at 1440x900.
+
+Visual QA: a contact sheet of the 22 refreshed captures was inspected.
+The captures are nonblank and framed correctly. The visible remaining
+deltas are known/gated: Reflex's notification sidebar is open while
+Next.js remains collapsed, and the Next.js dev overlay badge appears
+in dev screenshots.
+
+### Product gates still blocked
+
+These were asked before the dependent tracks and remain unimplemented
+pending user direction:
+
+- F-7: keep the Next.js `market_price` reset-dates column or remove it
+  for strict Reflex parity.
+- F-21: make the notification sidebar default open like Reflex or keep
+  the current collapsed default.
+- F-23: port notification infinite scroll now or defer it.
+- F-35/F-36: trim Next.js column-set supersets to Reflex or document
+  them as intentional enhancements.
+
+Out-of-scope items stayed untouched: F-9 Plotly 3-D pricer chart,
+F-27 mobile responsive nav, F-28 Reflex ticker-data divergence, and AG
+Grid Enterprise license procurement.
+
+### Verification
+
+| Check | Result |
+|---|---|
+| `pnpm exec tsc --noEmit` | clean |
+| `pnpm exec jest --runInBand` | 25 suites / 152 tests passed in 1.828 s |
+| `pnpm lint` | 0 errors / 0 warnings |
+| Backend pytest with sqlite override | 186 passed, 2 skipped in 8.61 s |
+| `pnpm build` | PASS — 59 / 59 static pages generated |
+| Desktop static export (`TAURI_BUILD=1 NEXT_PUBLIC_DESKTOP_TARGET=1 ... pnpm build`) | PASS — 59 / 59 static pages generated |
+
 ## Current Status (2026-05-11 — Milestone B simulator rollout closed)
 
 ### What landed

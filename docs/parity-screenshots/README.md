@@ -12,8 +12,8 @@ does on the Reflex reference.
 
 ## Capture environment
 
-Re-captured 2026-05-08 at 1440×900 viewport via `playwright-cli`
-after the live-flash + notification-jump pass. All 22 canonical PNGs
+Re-captured 2026-05-11 at 1440×900 viewport via `playwright-cli`
+after the Milestone C independent polish pass. All 22 canonical PNGs
 were re-shot against:
 
 | Service  | Port | Flags |
@@ -116,6 +116,27 @@ feature-parity pass those have been closed:
   row-id key (`ticker`, `currency`, `underlying`, etc.) as an override
   when matching rows, so notifications still work on pages whose
   DataGrid row identity falls back to `id`.
+
+## What now matches (closed in 2026-05-11 Milestone C pass)
+
+- **Search typing feel** — grid quick-filter updates are debounced by
+  300 ms, matching Reflex's less jumpy search behaviour.
+- **Pending notification jumps** — cross-page pending highlights retry
+  for 15 s while async row data settles.
+- **Calm pages** — non-live Recon, Compliance, Instrument, and
+  Market Data reference pages no longer show the Auto Refresh chrome.
+- **Row grouping** — PnL and Compliance grids expose the row-group
+  panel and column grouping metadata Reflex users expect.
+- **Reverse Inquiry filter bar** — the page now has its Reflex
+  Position Date filter.
+- **Chrome polish** — notification entry animation, subtab overflow,
+  and toolbar date-input styling align more closely with Reflex.
+- **Pricer detail** — pricer result tables and full note copy are back
+  on Warrant and Bond pricer pages; the out-of-scope Plotly 3-D chart
+  remains intentionally deferred.
+- **Stock Screener filters** — the Reflex-style filter bar is present
+  with client-side filtering while the generated OpenAPI client still
+  exposes no server query params for that route.
 
 ## Expected deltas (intentional, not regressions)
 
