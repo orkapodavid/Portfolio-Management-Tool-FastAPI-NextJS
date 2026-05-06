@@ -1,11 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { instrumentsGetStockScreener } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { textColumn } from "@/components/grid/columns";
+import {
+  StockScreenerFilterBar,
+  createEmptyStockScreenerFilters,
+  filterStockScreenerRows,
+  getStockScreenerCountries,
+  hasStockScreenerFilters,
+} from "@/components/grid/stock-screener-filter-bar";
 import { getAuthToken } from "@/lib/auth/token-storage";
 import { stockScreenerSimulator } from "@/lib/grid-simulators/instruments";
 import { getApiData, getApiError } from "@/lib/utils";
@@ -27,22 +34,58 @@ type ScreenerRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   textColumn({ field: "dtl10", header: "DTL10", minWidth: 80, align: "right" }),
   textColumn({ field: "company", header: "Company", minWidth: 150 }),
   textColumn({ field: "country", header: "Country", minWidth: 90 }),
   textColumn({ field: "industry", header: "Industry", minWidth: 100 }),
-  textColumn({ field: "last_price", header: "Last Price", minWidth: 100, align: "right" }),
-  textColumn({ field: "mkt_cap_loc", header: "Market Cap (MM LOC)", minWidth: 150, align: "right" }),
-  textColumn({ field: "mkt_cap_usd", header: "Market Cap (MM USD)", minWidth: 150, align: "right" }),
-  textColumn({ field: "adv_3m", header: "ADV 3M", minWidth: 90, align: "right" }),
-  textColumn({ field: "adv_3m_usd", header: "$ADV 3M", minWidth: 110, align: "right" }),
-  textColumn({ field: "locate_qty_mm", header: "Locate Qty (MM)", minWidth: 120, align: "right" }),
+  textColumn({
+    field: "last_price",
+    header: "Last Price",
+    minWidth: 100,
+    align: "right",
+  }),
+  textColumn({
+    field: "mkt_cap_loc",
+    header: "Market Cap (MM LOC)",
+    minWidth: 150,
+    align: "right",
+  }),
+  textColumn({
+    field: "mkt_cap_usd",
+    header: "Market Cap (MM USD)",
+    minWidth: 150,
+    align: "right",
+  }),
+  textColumn({
+    field: "adv_3m",
+    header: "ADV 3M",
+    minWidth: 90,
+    align: "right",
+  }),
+  textColumn({
+    field: "adv_3m_usd",
+    header: "$ADV 3M",
+    minWidth: 110,
+    align: "right",
+  }),
+  textColumn({
+    field: "locate_qty_mm",
+    header: "Locate Qty (MM)",
+    minWidth: 120,
+    align: "right",
+  }),
   textColumn({ field: "locate_f", header: "Locate F", minWidth: 90 }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -51,6 +94,12 @@ export default function StockScreenerPage() {
   const [rows, setRows] = useState<ScreenerRow[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [draftFilters, setDraftFilters] = useState(
+    createEmptyStockScreenerFilters,
+  );
+  const [appliedFilters, setAppliedFilters] = useState(
+    createEmptyStockScreenerFilters,
+  );
 
   const load = useCallback(async () => {
     setIsLoading(true);
@@ -82,6 +131,29 @@ export default function StockScreenerPage() {
     void load();
   }, [load]);
 
+  const availableCountries = useMemo(
+    () => getStockScreenerCountries(rows),
+    [rows],
+  );
+  const filteredRows = useMemo(
+    () => filterStockScreenerRows(rows, appliedFilters),
+    [rows, appliedFilters],
+  );
+  const hasActiveFilters = hasStockScreenerFilters(appliedFilters);
+
+  const onApplyFilters = () => {
+    setAppliedFilters({
+      ...draftFilters,
+      countries: [...draftFilters.countries],
+    });
+  };
+
+  const onClearFilters = () => {
+    const emptyFilters = createEmptyStockScreenerFilters();
+    setDraftFilters(emptyFilters);
+    setAppliedFilters(createEmptyStockScreenerFilters());
+  };
+
   return (
     <DataGrid<ScreenerRow>
       gridId="stock_screener_grid"
@@ -91,7 +163,7 @@ export default function StockScreenerPage() {
       enableMultiSelect
       enableCellFlash
       columns={columns}
-      rows={rows}
+      rows={filteredRows}
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
@@ -99,6 +171,16 @@ export default function StockScreenerPage() {
       rowIdKey="ticker"
       emptyMessage="No stock screener entries available."
       searchPlaceholder="Search screener…"
+      filterBar={
+        <StockScreenerFilterBar
+          value={draftFilters}
+          availableCountries={availableCountries}
+          hasActiveFilters={hasActiveFilters}
+          onChange={setDraftFilters}
+          onApply={onApplyFilters}
+          onClear={onClearFilters}
+        />
+      }
     />
   );
 }
