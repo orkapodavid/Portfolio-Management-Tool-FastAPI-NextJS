@@ -36,3 +36,22 @@ class TestPerformance:
     async def test_unauthorized(self, test_client):
         response = await test_client.get("/api/performance/portfolio-holdings")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.asyncio(loop_scope="function")
+    async def test_get_top_movers(self, test_client, authenticated_user):
+        response = await test_client.get(
+            "/api/performance/top-movers",
+            headers=authenticated_user["headers"],
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert isinstance(response.json(), list)
+
+    @pytest.mark.asyncio(loop_scope="function")
+    async def test_kpi_unauthorized(self, test_client):
+        response = await test_client.get("/api/performance/kpi")
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    @pytest.mark.asyncio(loop_scope="function")
+    async def test_top_movers_unauthorized(self, test_client):
+        response = await test_client.get("/api/performance/top-movers")
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
