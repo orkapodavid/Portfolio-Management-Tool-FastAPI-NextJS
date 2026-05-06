@@ -1815,6 +1815,20 @@ export type InstrumentsGetInstrumentDataResponses = {
   200: unknown;
 };
 
+export type InstrumentsGetInstrumentTermData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/instruments/instrument-term";
+};
+
+export type InstrumentsGetInstrumentTermResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
 export type EventsGetEventCalendarData = {
   body?: never;
   path?: never;

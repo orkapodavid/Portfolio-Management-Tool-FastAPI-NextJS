@@ -2728,6 +2728,30 @@
         ]
       }
     },
+    "/api/instruments/instrument-term": {
+      "get": {
+        "tags": [
+          "instruments"
+        ],
+        "summary": "Get Instrument Term",
+        "operationId": "instruments-get_instrument_term",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/api/events/calendar": {
       "get": {
         "tags": [
