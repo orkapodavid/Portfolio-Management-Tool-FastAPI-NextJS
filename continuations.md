@@ -1,6 +1,99 @@
 # Portfolio Management Tool - Continuation Log
 
-## Current Status (2026-05-07 — Grid + chrome runtime feature parity closed)
+## Current Status (2026-05-08 — Live-data feel parity + filter-bar mop-up + pytest restore)
+
+### What landed this session
+
+10 commits on `feat/nextjs-fastapi-rebuild`, working from the resume
+prompt that called out (1) Auto Refresh + cell flash parity,
+(2) filter-bar mop-up on the remaining position-date / trade-date
+pages, (3) backend pytest coverage decision.
+
+**Auto Refresh + cell flash (2 commits).**
+- `components/grid/data-grid.tsx`: default `autoRefreshOn` to `true`
+  whenever `showAutoRefresh` is set, mirroring Reflex's per-mixin
+  `<module>_auto_refresh: bool = True`. New `defaultAutoRefreshOff`
+  prop for opt-out. `lastUpdated` now bumps via an `isLoading
+  true→false` watcher so the emerald pulse + timestamp render
+  immediately on first load (was "—" until manual refresh). Removed
+  the redundant bumps from `handleRefresh` and the polling tick
+  (single source of truth).
+- Cell flash: `getRowId` was unconditionally returning `"undefined"`
+  for pages whose data lacks `id` (e.g. `pnl-summary`), collapsing
+  every row onto the same id and silently breaking AG Grid's
+  reconciliation pipeline. Fixed by detecting whether
+  `rows[0][rowIdKey]` is present and only providing `getRowId` when
+  it is — AG Grid then falls back to internal index-based matching,
+  which fires cell flash correctly on same-length / same-order
+  updates.
+- Tests: `__tests__/dataGrid.test.tsx` now covers default-on switch,
+  `defaultAutoRefreshOff`, `lastUpdated` bump, and
+  `getRowId`-presence detection. Jest 12/50 in 1.007 s (was 12/46).
+
+**Filter-bar mop-up (4 commits, 9 pages, 1 backend route).**
+- `positions/{stock-position, warrant-position, bond-positions}` —
+  position_date.
+- `recon/{failed-trades, pnl-recon, risk-input-recon}` — trade_date.
+- `positions/trade-summary` and `events/event-calendar` —
+  start_date + end_date via `DateRangeFilterBar`.
+- `compliance/beneficial-ownership` — added the `position_date`
+  query param to `fastapi_backend/app/routes/compliance.py` (service
+  + repo already accepted it), regenerated the OpenAPI client,
+  applied the SingleDateFilterBar template. Added a passing pytest
+  for the new filtered-response path.
+- `events/event-stream` was on the original brief list but Reflex
+  doesn't render a per-page filter bar there either — skipped to
+  preserve parity (no regression).
+
+**Backend pytest restoration (1 commit, +123 cases).**
+User picked "Restore full coverage" via AskUserQuestion. Added
+parametrize-driven 200 + 401 coverage for every route handler that
+lacked a companion test:
+- `test_pnl.py` — 5 endpoints (changes/summary/currency/full/kpi)
+- `test_positions.py` — 5 endpoints
+- `test_reconciliation.py` — 5 endpoints
+- `test_risk_get.py` — 3 GET endpoints + invalid-date rejection
+- `test_events.py` — 3 endpoints (calendar/stream/reverse-inquiry)
+- `test_market_data.py` — 10 endpoints incl. category enum + invalid
+  rejection, date-range, ticker filters, stock/{symbol} family
+- `test_operations.py`, `test_orders.py` — 2 each
+- `test_health.py` — unauthenticated health
+- Extended existing `test_instruments`, `test_compliance`,
+  `test_portfolio_tools`, `test_performance` with the 3+2+6+2
+  endpoints they were missing.
+
+Backend pytest: **175 passed, 2 skipped in 7.82 s** (was 52/52 in
+0.81 s after this session's beneficial-ownership addition; 51/51
+baseline at session start).
+
+**Parity screenshot recapture (1 commit).** Re-shot the 4 grids
+called out in the resume prompt (market-data/market-data,
+positions/positions, pnl/pnl-change, risk/delta-change) with
+auto-refresh ON on both apps. `docs/parity-screenshots/README.md`
+updated to drop the now-stale "switch off by default" delta and note
+the unchanged 7 pairs.
+
+### Verification matrix (final)
+
+| Check | Result |
+|---|---|
+| `pnpm exec tsc --noEmit` | ✅ clean |
+| `pnpm exec jest --runInBand` | ✅ **12 suites / 50 tests** in 1.007 s (was 12 / 46) |
+| `pnpm lint` | ✅ 0 errors / 0 warnings |
+| `pnpm build` (web) | ✅ PASS — 59 static routes |
+| `TAURI_BUILD=1 NEXT_PUBLIC_DESKTOP_TARGET=1 … pnpm build` | ✅ PASS — `out/` populated |
+| Backend pytest (sqlite override) | ✅ **175 passed, 2 skipped in 7.82 s** (was 52 / 52) |
+
+### Open items
+
+- **AG Grid Enterprise license** — both apps still run on the trial
+  license (watermark + console warning). User-owned procurement.
+- **Mobile target** — no mobile scaffold yet; out of scope unless
+  reprioritised.
+
+---
+
+## Previous Status (2026-05-07 — Grid + chrome runtime feature parity closed)
 
 ### What landed this session
 
