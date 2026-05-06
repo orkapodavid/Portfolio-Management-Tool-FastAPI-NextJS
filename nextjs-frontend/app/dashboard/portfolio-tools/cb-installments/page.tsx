@@ -27,21 +27,61 @@ type CbInstallmentRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
   textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
-  dateColumn({ field: "installment_date", header: "Installment Date", minWidth: 130 }),
-  textColumn({ field: "total_amount", header: "Total Amount", minWidth: 110, align: "right" }),
-  textColumn({ field: "outstanding", header: "Outstanding", minWidth: 110, align: "right" }),
-  textColumn({ field: "redeemed", header: "Redeemed", minWidth: 100, align: "right" }),
-  textColumn({ field: "deferred", header: "Deferred", minWidth: 100, align: "right" }),
-  textColumn({ field: "converted", header: "Converted", minWidth: 100, align: "right" }),
-  textColumn({ field: "installment_amount", header: "Installment Amount", minWidth: 140, align: "right" }),
+  dateColumn({
+    field: "installment_date",
+    header: "Installment Date",
+    minWidth: 130,
+  }),
+  textColumn({
+    field: "total_amount",
+    header: "Total Amount",
+    minWidth: 110,
+    align: "right",
+  }),
+  textColumn({
+    field: "outstanding",
+    header: "Outstanding Amount",
+    minWidth: 140,
+    align: "right",
+  }),
+  textColumn({
+    field: "redeemed",
+    header: "Redeemed Amount",
+    minWidth: 130,
+    align: "right",
+  }),
+  textColumn({
+    field: "deferred",
+    header: "Deferred",
+    minWidth: 100,
+    align: "right",
+  }),
+  textColumn({
+    field: "converted",
+    header: "Converted",
+    minWidth: 100,
+    align: "right",
+  }),
+  textColumn({
+    field: "installment_amount",
+    header: "Installment Amount",
+    minWidth: 140,
+    align: "right",
+  }),
   textColumn({ field: "period", header: "Period", minWidth: 90 }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -80,7 +120,7 @@ export default function CbInstallmentsPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

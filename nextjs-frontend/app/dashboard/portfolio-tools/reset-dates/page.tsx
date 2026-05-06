@@ -43,11 +43,23 @@ const columns = [
   textColumn({ field: "sec_type", header: "Sec Type", minWidth: 90 }),
   textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
   dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
-  dateColumn({ field: "first_reset", header: "First Reset", minWidth: 110 }),
-  dateColumn({ field: "expiry", header: "Expiry", minWidth: 100 }),
-  dateColumn({ field: "latest_reset", header: "Latest Reset", minWidth: 110 }),
+  dateColumn({
+    field: "first_reset",
+    header: "First Reset Date",
+    minWidth: 130,
+  }),
+  dateColumn({ field: "expiry", header: "Expiry Date", minWidth: 110 }),
+  dateColumn({
+    field: "latest_reset",
+    header: "Latest Reset Date",
+    minWidth: 130,
+  }),
   dateColumn({ field: "reset_date", header: "Reset Date", minWidth: 100 }),
-  textColumn({ field: "reset_up_down", header: "Up / Down", minWidth: 100 }),
+  textColumn({
+    field: "reset_up_down",
+    header: "Reset Up/Down",
+    minWidth: 120,
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {

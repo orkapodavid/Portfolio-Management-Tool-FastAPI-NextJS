@@ -24,19 +24,39 @@ type ComingResetRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   textColumn({ field: "deal_num", header: "Deal Num", minWidth: 90 }),
   textColumn({ field: "detail_id", header: "Detail ID", minWidth: 90 }),
   textColumn({ field: "account", header: "Account", minWidth: 120 }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
-  dateColumn({ field: "announce_date", header: "Announce Date", minWidth: 110 }),
+  dateColumn({
+    field: "announce_date",
+    header: "Announcement Date",
+    minWidth: 130,
+  }),
   dateColumn({ field: "closing_date", header: "Closing Date", minWidth: 110 }),
-  textColumn({ field: "cal_days", header: "Cal Days", minWidth: 90, align: "right" }),
-  textColumn({ field: "biz_days", header: "Biz Days", minWidth: 90, align: "right" }),
+  textColumn({
+    field: "cal_days",
+    header: "Cal Days",
+    minWidth: 90,
+    align: "right",
+  }),
+  textColumn({
+    field: "biz_days",
+    header: "Biz Days",
+    minWidth: 90,
+    align: "right",
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

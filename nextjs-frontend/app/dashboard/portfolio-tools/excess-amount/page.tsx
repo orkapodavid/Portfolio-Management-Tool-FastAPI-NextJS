@@ -25,19 +25,40 @@ type ExcessAmountRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   textColumn({ field: "deal_num", header: "Deal Num", minWidth: 90 }),
   textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
-  textColumn({ field: "warrants", header: "Warrants", minWidth: 100, align: "right" }),
-  textColumn({ field: "excess_amount", header: "Excess Amount", minWidth: 120, align: "right" }),
-  textColumn({ field: "threshold", header: "Threshold", minWidth: 100, align: "right" }),
+  textColumn({
+    field: "warrants",
+    header: "Warrants",
+    minWidth: 100,
+    align: "right",
+  }),
+  textColumn({
+    field: "excess_amount",
+    header: "Excess Amount",
+    minWidth: 120,
+    align: "right",
+  }),
+  textColumn({
+    field: "threshold",
+    header: "Excess Amount Threshold",
+    minWidth: 160,
+    align: "right",
+  }),
   textColumn({ field: "cb_redeem", header: "CB Redeem", minWidth: 100 }),
   textColumn({ field: "redeem", header: "Redeem", minWidth: 90 }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -76,7 +97,7 @@ export default function ExcessAmountPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

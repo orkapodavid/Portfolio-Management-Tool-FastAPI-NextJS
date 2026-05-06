@@ -23,18 +23,39 @@ type StockBorrowRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
-  textColumn({ field: "jpm_req", header: "JPM Req", minWidth: 100, align: "right" }),
+  textColumn({
+    field: "jpm_req",
+    header: "JPM Request Locate",
+    minWidth: 140,
+    align: "right",
+  }),
   textColumn({ field: "jpm_firm", header: "JPM Firm", minWidth: 100 }),
-  textColumn({ field: "borrow_rate", header: "Borrow Rate", minWidth: 110, align: "right" }),
-  textColumn({ field: "bofa_req", header: "BofA Req", minWidth: 100, align: "right" }),
+  textColumn({
+    field: "borrow_rate",
+    header: "Borrow Rate",
+    minWidth: 110,
+    align: "right",
+  }),
+  textColumn({
+    field: "bofa_req",
+    header: "BofA Request Locate",
+    minWidth: 150,
+    align: "right",
+  }),
   textColumn({ field: "bofa_firm", header: "BofA Firm", minWidth: 100 }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
