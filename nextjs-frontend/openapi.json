@@ -2721,6 +2721,29 @@
         ],
         "summary": "Get Excess Amount",
         "operationId": "portfolio-tools-get_excess_amount",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "position_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Position Date"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -2729,13 +2752,18 @@
                 "schema": {}
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
-        },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
+        }
       }
     },
     "/api/portfolio-tools/deal-indication": {

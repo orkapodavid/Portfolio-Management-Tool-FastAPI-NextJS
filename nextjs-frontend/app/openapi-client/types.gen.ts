@@ -2080,9 +2080,24 @@ export type PortfolioToolsGetCbInstallmentsResponses = {
 export type PortfolioToolsGetExcessAmountData = {
   body?: never;
   path?: never;
-  query?: never;
+  query?: {
+    /**
+     * Position Date
+     */
+    position_date?: string | null;
+  };
   url: "/api/portfolio-tools/excess-amount";
 };
+
+export type PortfolioToolsGetExcessAmountErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PortfolioToolsGetExcessAmountError =
+  PortfolioToolsGetExcessAmountErrors[keyof PortfolioToolsGetExcessAmountErrors];
 
 export type PortfolioToolsGetExcessAmountResponses = {
   /**
