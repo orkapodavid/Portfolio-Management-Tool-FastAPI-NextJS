@@ -1752,9 +1752,24 @@ export type ComplianceGetUndertakingsResponses = {
 export type ComplianceGetBeneficialOwnershipData = {
   body?: never;
   path?: never;
-  query?: never;
+  query?: {
+    /**
+     * Position Date
+     */
+    position_date?: string | null;
+  };
   url: "/api/compliance/beneficial-ownership";
 };
+
+export type ComplianceGetBeneficialOwnershipErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type ComplianceGetBeneficialOwnershipError =
+  ComplianceGetBeneficialOwnershipErrors[keyof ComplianceGetBeneficialOwnershipErrors];
 
 export type ComplianceGetBeneficialOwnershipResponses = {
   /**

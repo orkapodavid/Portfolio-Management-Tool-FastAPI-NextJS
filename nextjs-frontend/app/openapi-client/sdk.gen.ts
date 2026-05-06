@@ -130,6 +130,7 @@ import type {
   ComplianceGetUndertakingsResponses,
   ComplianceGetBeneficialOwnershipData,
   ComplianceGetBeneficialOwnershipResponses,
+  ComplianceGetBeneficialOwnershipErrors,
   ComplianceGetMonthlyExerciseLimitData,
   ComplianceGetMonthlyExerciseLimitResponses,
   ComplianceGetMonthlyExerciseLimitErrors,
@@ -1245,7 +1246,7 @@ export const complianceGetBeneficialOwnership = <
 ) => {
   return (options?.client ?? client).get<
     ComplianceGetBeneficialOwnershipResponses,
-    unknown,
+    ComplianceGetBeneficialOwnershipErrors,
     ThrowOnError
   >({
     responseType: "json",
