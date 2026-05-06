@@ -12,7 +12,7 @@ import {
   type RowSelectionOptions,
   type StatusPanelDef,
 } from "ag-grid-community";
-import { RefreshCw, Search, X } from "lucide-react";
+import { FileSpreadsheet, RefreshCw, Search, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -76,6 +76,12 @@ type DataGridProps<TRow> = {
   groupDefaultExpanded?: number;
   /** Custom context-menu builder; receives params from AG Grid. */
   getContextMenuItems?: GetContextMenuItems;
+  /** Identifier used for export filename + state-persistence storage key. */
+  gridId?: string;
+  /** Override the export filename prefix (defaults to gridId without `_grid`). */
+  exportPrefix?: string;
+  /** Hide the Excel-export button in the toolbar (default visible when gridId set). */
+  hideExcelExport?: boolean;
 };
 
 export function DataGrid<TRow extends Record<string, unknown>>({
@@ -98,6 +104,9 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   showRowGroupPanel = false,
   groupDefaultExpanded,
   getContextMenuItems,
+  gridId,
+  exportPrefix,
+  hideExcelExport = false,
 }: DataGridProps<TRow>) {
   const [searchValue, setSearchValue] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -135,6 +144,28 @@ export function DataGrid<TRow extends Record<string, unknown>>({
     [enableCellFlash]
   );
 
+  const filenamePrefix = exportPrefix ?? (gridId ? gridId.replace(/_grid$/, "") : "");
+  const showExcelButton = Boolean(gridId) && !hideExcelExport;
+
+  const handleExportExcel = () => {
+    const api = gridApiRef.current;
+    if (!api) return;
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const dd = String(now.getDate()).padStart(2, "0");
+    const hh = String(now.getHours()).padStart(2, "0");
+    const min = String(now.getMinutes()).padStart(2, "0");
+    const fileName = `${filenamePrefix || "export"}_${yyyy}${mm}${dd}_${hh}${min}`;
+    const hasSelection = api.getSelectedRows().length > 0;
+    api.exportDataAsCsv({
+      fileName: `${fileName}.csv`,
+      shouldRowBeSkipped: hasSelection
+        ? (params) => !params.node.isSelected()
+        : undefined,
+    });
+  };
+
   const cellSelection = enableRangeSelection ? true : undefined;
   const rowSelection = useMemo<RowSelectionOptions | undefined>(
     () =>
@@ -152,6 +183,17 @@ export function DataGrid<TRow extends Record<string, unknown>>({
       <div className="flex items-center justify-between gap-2 px-3 py-1.5 bg-[#F9F9F9] border-b border-gray-200 shrink-0 h-[40px]">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           {toolbarStart}
+          {showExcelButton ? (
+            <button
+              type="button"
+              onClick={handleExportExcel}
+              title="Export visible rows (or selected rows) to a timestamped CSV"
+              className="px-3 h-6 bg-white border border-gray-200 text-gray-600 text-[10px] font-bold uppercase tracking-widest rounded hover:bg-gray-50 hover:text-green-600 transition-colors shadow-sm flex items-center"
+            >
+              <FileSpreadsheet size={12} />
+              <span className="ml-1.5">Excel</span>
+            </button>
+          ) : null}
           <button
             type="button"
             aria-label="Refresh"
