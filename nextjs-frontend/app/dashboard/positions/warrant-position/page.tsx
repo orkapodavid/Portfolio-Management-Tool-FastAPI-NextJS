@@ -8,6 +8,7 @@ import { DataGrid } from "@/components/grid/data-grid";
 import { SingleDateFilterBar } from "@/components/grid/filter-bar";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { warrantPositionSimulator } from "@/lib/grid-simulators/positions";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type WarrantPositionRow = {
@@ -110,6 +111,7 @@ export default function WarrantPositionPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={() => load(appliedDate)}
+      simulateUpdate={warrantPositionSimulator}
       emptyMessage="No warrant positions available."
       searchPlaceholder="Search warrants…"
       filterBar={

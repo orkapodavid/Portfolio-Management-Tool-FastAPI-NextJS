@@ -12,6 +12,7 @@ import {
   textColumn,
 } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { positionsSimulator } from "@/lib/grid-simulators/positions";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type PositionRow = {
@@ -116,6 +117,7 @@ export default function PositionsPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={() => load(appliedDate)}
+      simulateUpdate={positionsSimulator}
       emptyMessage="No positions available."
       searchPlaceholder="Search positions…"
       filterBar={

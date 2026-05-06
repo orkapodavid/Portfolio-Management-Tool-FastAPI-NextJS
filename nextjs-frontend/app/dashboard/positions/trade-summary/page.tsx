@@ -12,6 +12,7 @@ import {
   textColumn,
 } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { tradeSummarySimulator } from "@/lib/grid-simulators/positions";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type TradeSummaryRow = {
@@ -124,6 +125,7 @@ export default function TradeSummaryPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={() => load(appliedRange)}
+      simulateUpdate={tradeSummarySimulator}
       emptyMessage="No trade summary entries available."
       searchPlaceholder="Search trade summary…"
       filterBar={

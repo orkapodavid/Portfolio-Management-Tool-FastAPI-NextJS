@@ -12,6 +12,7 @@ import {
   textColumn,
 } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { stockPositionSimulator } from "@/lib/grid-simulators/positions";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type StockPositionRow = {
@@ -114,6 +115,7 @@ export default function StockPositionPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={() => load(appliedDate)}
+      simulateUpdate={stockPositionSimulator}
       emptyMessage="No stock positions available."
       searchPlaceholder="Search stock positions…"
       filterBar={
