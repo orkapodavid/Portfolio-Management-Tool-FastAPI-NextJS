@@ -192,7 +192,7 @@ describe("DataGrid", () => {
     expect(params.fileName).toMatch(/^positions_\d{8}_\d{4}\.xlsx$/);
   });
 
-  it("auto-refresh status row toggles its switch and fires onRefresh on the interval", async () => {
+  it("auto-refresh status row defaults the switch to ON and fires onRefresh on the interval", async () => {
     jest.useFakeTimers();
     const refresh = jest.fn(() => Promise.resolve());
     render(
@@ -207,8 +207,6 @@ describe("DataGrid", () => {
     );
 
     const switchInput = screen.getByLabelText("Auto refresh") as HTMLInputElement;
-    expect(switchInput.checked).toBe(false);
-    fireEvent.click(switchInput);
     expect(switchInput.checked).toBe(true);
 
     await act(async () => {
@@ -225,6 +223,45 @@ describe("DataGrid", () => {
     });
     expect(refresh).not.toHaveBeenCalled();
     jest.useRealTimers();
+  });
+
+  it("respects defaultAutoRefreshOff when showAutoRefresh is set", () => {
+    render(
+      <DataGrid<Row>
+        columns={columns}
+        rows={rows}
+        gridId="positions_grid"
+        showAutoRefresh
+        defaultAutoRefreshOff
+        onRefresh={() => Promise.resolve()}
+      />
+    );
+    const switchInput = screen.getByLabelText("Auto refresh") as HTMLInputElement;
+    expect(switchInput.checked).toBe(false);
+  });
+
+  it("bumps lastUpdated when isLoading transitions from true to false without an error", () => {
+    const { rerender } = render(
+      <DataGrid<Row>
+        columns={columns}
+        rows={[]}
+        gridId="positions_grid"
+        showAutoRefresh
+        isLoading
+      />
+    );
+    expect(screen.getByText("—")).toBeInTheDocument();
+
+    rerender(
+      <DataGrid<Row>
+        columns={columns}
+        rows={rows}
+        gridId="positions_grid"
+        showAutoRefresh
+        isLoading={false}
+      />
+    );
+    expect(screen.queryByText("—")).not.toBeInTheDocument();
   });
 
   it("Excel button skips unselected rows when at least one row is selected", () => {

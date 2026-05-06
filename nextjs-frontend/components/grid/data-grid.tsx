@@ -102,6 +102,8 @@ type DataGridProps<TRow> = {
   showCompactToggle?: boolean;
   /** Show the Last-Updated / Auto-Refresh status row above the toolbar. */
   showAutoRefresh?: boolean;
+  /** Start with the Auto-Refresh switch off when showAutoRefresh is true. */
+  defaultAutoRefreshOff?: boolean;
   /** Polling interval in milliseconds when auto-refresh is on (default 30s). */
   autoRefreshIntervalMs?: number;
   /** Items to render in a Generate dropdown placed first in the toolbar. */
@@ -167,6 +169,7 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   hideLayoutButtons = false,
   showCompactToggle = false,
   showAutoRefresh = false,
+  defaultAutoRefreshOff = false,
   autoRefreshIntervalMs = 30_000,
   generateItems,
   onGenerate,
@@ -178,10 +181,13 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   const [searchValue, setSearchValue] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCompact, setIsCompact] = useState(false);
-  const [autoRefreshOn, setAutoRefreshOn] = useState(false);
+  const [autoRefreshOn, setAutoRefreshOn] = useState(
+    showAutoRefresh && !defaultAutoRefreshOff
+  );
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const gridApiRef = useRef<GridReadyEvent["api"] | null>(null);
   const onRefreshRef = useRef(onRefresh);
+  const wasLoadingRef = useRef<boolean>(isLoading);
 
   useEffect(() => {
     onRefreshRef.current = onRefresh;
@@ -191,12 +197,18 @@ export function DataGrid<TRow extends Record<string, unknown>>({
     gridApiRef.current?.setGridOption("quickFilterText", searchValue);
   }, [searchValue]);
 
+  useEffect(() => {
+    if (wasLoadingRef.current && !isLoading && errorMessage === null) {
+      setLastUpdated(new Date());
+    }
+    wasLoadingRef.current = isLoading;
+  }, [isLoading, errorMessage]);
+
   const handleRefresh = async () => {
     if (!onRefresh) return;
     setIsRefreshing(true);
     try {
       await onRefresh();
-      setLastUpdated(new Date());
     } finally {
       setIsRefreshing(false);
     }
@@ -207,9 +219,7 @@ export function DataGrid<TRow extends Record<string, unknown>>({
     const id = window.setInterval(() => {
       const fn = onRefreshRef.current;
       if (!fn) return;
-      void Promise.resolve(fn()).then(() => {
-        setLastUpdated(new Date());
-      });
+      void Promise.resolve(fn());
     }, autoRefreshIntervalMs);
     return () => window.clearInterval(id);
   }, [showAutoRefresh, autoRefreshOn, autoRefreshIntervalMs]);
