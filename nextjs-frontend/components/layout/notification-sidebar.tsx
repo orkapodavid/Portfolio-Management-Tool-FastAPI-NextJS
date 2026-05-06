@@ -49,7 +49,7 @@ function AlertCard({
   return (
     <div
       className={cn(
-        "p-3 rounded-md border-l-4 shadow-sm hover:shadow-md transition-all duration-300",
+        "p-3 rounded-md border-l-4 shadow-sm hover:shadow-md transition-all duration-300 animate-in slide-in-from-right fade-in",
         TYPE_BG[notification.type],
         TYPE_BORDER[notification.type],
         opacity

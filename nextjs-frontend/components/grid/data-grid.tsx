@@ -559,7 +559,7 @@ export function DataGrid<TRow extends Record<string, unknown>>({
                 aria-label="Date"
                 value={toolbarDate ?? ""}
                 onChange={(event) => onToolbarDateChange(event.target.value)}
-                className="flex-1 bg-transparent text-[11px] font-semibold text-gray-700 outline-none px-2.5 h-full cursor-pointer"
+                className="flex-1 bg-transparent text-[11px] font-semibold text-gray-700 outline-none px-2.5 h-full cursor-pointer appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
               />
               <div className="flex items-center justify-center pr-2">
                 <ChevronDown size={12} className="text-gray-400 group-hover:text-blue-500 transition-colors" />

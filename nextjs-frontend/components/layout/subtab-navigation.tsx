@@ -19,7 +19,7 @@ export function SubtabNavigation() {
 
   return (
     <div
-      className="flex flex-row items-center bg-white border-b border-gray-200 px-2 pt-0.5 overflow-x-auto no-scrollbar shrink-0 w-full max-w-full flex-nowrap"
+      className="flex flex-row items-center bg-white border-b border-gray-200 px-2 pt-0.5 overflow-hidden no-scrollbar shrink-0 w-full max-w-full flex-nowrap"
       style={{ height: LAYOUT.SUBTAB_HEIGHT }}
     >
       {activeModule.subtabs.map((subtab) => {
