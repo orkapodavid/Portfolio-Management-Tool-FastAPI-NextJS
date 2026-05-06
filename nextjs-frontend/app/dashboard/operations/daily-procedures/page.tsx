@@ -12,6 +12,7 @@ import { DataGrid } from "@/components/grid/data-grid";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getOperationsContextMenuItems } from "@/components/operations/operations-context-menu";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { dailyProceduresSimulator } from "@/lib/grid-simulators/operations";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type DailyProcedureRow = {
@@ -122,6 +123,7 @@ export default function DailyProceduresPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={dailyProceduresSimulator}
       emptyMessage="No daily procedures available."
       searchPlaceholder="Search procedures…"
       getContextMenuItems={contextMenu}
