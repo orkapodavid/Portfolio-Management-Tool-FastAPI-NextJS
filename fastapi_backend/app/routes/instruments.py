@@ -28,3 +28,10 @@ async def get_special_terms(
     user: User = Depends(current_active_user),
 ):
     return await instruments_service.get_special_terms()
+
+
+@router.get("/instrument-data")
+async def get_instrument_data(
+    user: User = Depends(current_active_user),
+):
+    return await instruments_service.get_instrument_data()
