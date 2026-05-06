@@ -16,6 +16,7 @@ import {
   FileSpreadsheet,
   RefreshCw,
   RotateCcw,
+  Rows3,
   Save,
   Search,
   X,
@@ -91,7 +92,14 @@ type DataGridProps<TRow> = {
   hideExcelExport?: boolean;
   /** Hide the Save/Restore/Reset layout buttons (default visible when gridId set). */
   hideLayoutButtons?: boolean;
+  /** Show the Compact mode toggle button. */
+  showCompactToggle?: boolean;
 };
+
+const COMPACT_ROW_HEIGHT = 28;
+const COMPACT_HEADER_HEIGHT = 32;
+const NORMAL_ROW_HEIGHT = 42;
+const NORMAL_HEADER_HEIGHT = 48;
 
 const STORAGE_PREFIX = "pmt:next:";
 
@@ -137,9 +145,11 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   exportPrefix,
   hideExcelExport = false,
   hideLayoutButtons = false,
+  showCompactToggle = false,
 }: DataGridProps<TRow>) {
   const [searchValue, setSearchValue] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isCompact, setIsCompact] = useState(false);
   const gridApiRef = useRef<GridReadyEvent["api"] | null>(null);
 
   useEffect(() => {
@@ -205,6 +215,24 @@ export function DataGrid<TRow extends Record<string, unknown>>({
     api.setFilterModel(null);
     if (storageKey && typeof window !== "undefined") {
       window.localStorage.removeItem(storageKey);
+    }
+  };
+
+  const handleCompactToggle = () => {
+    const api = gridApiRef.current;
+    if (!api) return;
+    const next = !isCompact;
+    setIsCompact(next);
+    if (next) {
+      api.setGridOption("rowHeight", COMPACT_ROW_HEIGHT);
+      api.setGridOption("headerHeight", COMPACT_HEADER_HEIGHT);
+      api.resetRowHeights();
+      api.autoSizeAllColumns();
+    } else {
+      api.setGridOption("rowHeight", NORMAL_ROW_HEIGHT);
+      api.setGridOption("headerHeight", NORMAL_HEADER_HEIGHT);
+      api.resetRowHeights();
+      api.sizeColumnsToFit();
     }
   };
 
@@ -308,6 +336,25 @@ export function DataGrid<TRow extends Record<string, unknown>>({
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0">
+          {showCompactToggle ? (
+            <>
+              <button
+                type="button"
+                onClick={handleCompactToggle}
+                title="Toggle compact rows + auto-fit columns"
+                className={cn(
+                  "px-2 h-6 text-[10px] font-bold rounded shadow-sm flex items-center transition-colors border",
+                  isCompact
+                    ? "bg-violet-100 text-violet-700 border-violet-300"
+                    : "bg-white border-gray-200 text-gray-600 hover:bg-violet-50 hover:text-violet-600"
+                )}
+              >
+                <Rows3 size={12} />
+                <span className="ml-1">{isCompact ? "Compact ✓" : "Compact"}</span>
+              </button>
+              {showLayoutButtons ? <div className="w-px h-4 bg-gray-300 mx-1" /> : null}
+            </>
+          ) : null}
           {showLayoutButtons ? (
             <>
               <button
