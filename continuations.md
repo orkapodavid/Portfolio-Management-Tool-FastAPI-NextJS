@@ -1,6 +1,6 @@
 # Portfolio Management Tool - Continuation Log
 
-## Current Status (2026-05-11 — Milestone C independent polish pass)
+## Current Status (2026-05-11 — Milestone C gates closed)
 
 ### What landed
 
@@ -28,27 +28,37 @@ Milestone C items that did not require product decisions:
   Reflex-style Stock Screener filter bar and client-side filtering.
 - `dd1c013 docs(parity-screenshots): re-capture 22 canonical screenshots after Milestone C`
   re-shot the 22 canonical Reflex/Next.js screenshot pairs at 1440x900.
-- `feat(notifications): lazy-render sidebar alerts on scroll` closes
+- `45a31a0 feat(notifications): lazy-render sidebar alerts on scroll` closes
   F-23 by rendering sidebar notifications in 20-card batches with an
   IntersectionObserver sentinel and click fallback.
+- `e614af9 fix(reset-dates): hide market price column for parity`
+  removed the non-Reflex `market_price` column from the default Reset
+  Dates grid while leaving the field available in row data.
+- `94dd4a0 feat(reset-dates): add multi-field filter bar` added the
+  Reflex ticker/date/frequency/month/day/up-down filter contract,
+  backend query params, regenerated OpenAPI client, and focused
+  frontend/backend tests.
+- `f957ccc fix(notifications): default sidebar open with stored preference`
+  matches Reflex's default-open sidebar while persisting user toggles
+  under `pmt:next:notificationSidebarOpen`.
+- `fddcc06 style(portfolio-tools): normalize column labels with Reflex`
+  closed F-36 label abbreviation drift on Portfolio Tools pages.
 
 Visual QA: a contact sheet of the 22 refreshed captures was inspected.
-The captures are nonblank and framed correctly. The visible remaining
-deltas are known/gated: Reflex's notification sidebar is open while
-Next.js remains collapsed, and the Next.js dev overlay badge appears
-in dev screenshots.
+The captures are nonblank and framed correctly. Re-shoot after the
+final verification pass captures the default-open notification sidebar
+and Reset Dates filter bar.
 
-### Product gates still blocked
+### Product gates closed
 
-These were asked before the dependent tracks and remain unimplemented
-pending user direction:
-
-- F-7: keep the Next.js `market_price` reset-dates column or remove it
-  for strict Reflex parity.
-- F-21: make the notification sidebar default open like Reflex or keep
-  the current collapsed default.
-- F-35/F-36: trim Next.js column-set supersets to Reflex or document
-  them as intentional enhancements.
+- F-7: `market_price` is hidden from the default Reset Dates grid and
+  the Reflex multi-field filter bar is wired end to end.
+- F-21: notification sidebar now defaults open and stores explicit
+  user toggles under `pmt:next:notificationSidebarOpen`.
+- F-23: notification sidebar lazy-renders 20 cards at a time.
+- F-35: Next.js read-only column supersets are documented as an
+  intentional enhancement over older Reflex hide lists.
+- F-36: Portfolio Tools labels now use the longer Reflex text.
 
 Out-of-scope items stayed untouched: F-9 Plotly 3-D pricer chart,
 F-27 mobile responsive nav, F-28 Reflex ticker-data divergence, and AG
@@ -59,7 +69,7 @@ Grid Enterprise license procurement.
 | Check | Result |
 |---|---|
 | `pnpm exec tsc --noEmit` | clean |
-| `pnpm exec jest --runInBand` | 25 suites / 152 tests passed in 1.828 s |
+| `pnpm exec jest --runInBand` | 26 suites / 153 tests passed in 1.653 s |
 | `pnpm lint` | 0 errors / 0 warnings |
 | Backend pytest with sqlite override | 186 passed, 2 skipped in 8.61 s |
 | `pnpm build` | PASS — 59 / 59 static pages generated |

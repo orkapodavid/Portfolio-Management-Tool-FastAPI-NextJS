@@ -129,11 +129,19 @@ feature-parity pass those have been closed:
   panel and column grouping metadata Reflex users expect.
 - **Reverse Inquiry filter bar** — the page now has its Reflex
   Position Date filter.
+- **Reset Dates filter bar** — ticker, start/end date, frequency,
+  reset month/day, and up/down filters are wired through FastAPI and
+  the generated OpenAPI client.
 - **Chrome polish** — notification entry animation, subtab overflow,
   and toolbar date-input styling align more closely with Reflex.
+- **Notification sidebar default** — the sidebar defaults open like
+  Reflex and persists explicit user toggles under
+  `pmt:next:notificationSidebarOpen`.
 - **Notification infinite scroll** — the sidebar fetches a bounded
   notification set and renders 20 cards initially, with the same
   scroll-sentinel / fallback load-more pattern Reflex uses.
+- **Portfolio Tools labels** — abbreviated headers called out in F-36
+  now use the longer Reflex labels.
 - **Pricer detail** — pricer result tables and full note copy are back
   on Warrant and Bond pricer pages; the out-of-scope Plotly 3-D chart
   remains intentionally deferred.
@@ -160,10 +168,10 @@ Reviewers should expect:
   endpoint, same unread-count behaviour, same "go to details" jump.
 - **Subtab nav**: same labels, same active-tab blue underline + bold
   styling. Hover state isn't visible in static captures.
-- **Notification sidebar default state**: Reflex's captures show the
-  sidebar opened by default; Next.js's captures show it collapsed
-  (the bell is unread-bagged on both — clicking opens the same
-  panel).
+- **Notification sidebar default state**: both Reflex and Next.js now
+  open the notification sidebar by default. Next.js preserves explicit
+  user toggles in `pmt:next:notificationSidebarOpen`, so a browser
+  profile that previously collapsed it will keep that preference.
 
 ### Grids
 - **Auto Refresh switch state**: both Reflex and Next.js now default
@@ -171,9 +179,15 @@ Reviewers should expect:
   True` in each mixin; Next.js sets the wrapper-level default to true
   whenever `showAutoRefresh` is set). The emerald pulse animates and
   Last Updated populates immediately on first load.
-- **Headers, order, alignment, filter types** match — both use the
-  same `pmt_core` data shapes. Pinned `ticker` columns appear on the
-  left in both.
+- **Canonical headers, order, alignment, filter types** match — both
+  use the same `pmt_core` data shapes. Pinned `ticker` columns appear
+  on the left in both.
+- **Next.js column supersets** are intentional where present. The
+  Next.js rebuild exposes additional read-only `pmt_core` fields on
+  some PnL, Risk, Portfolio Tools, Instruments, Events, and Orders
+  grids; Reflex's default hide lists are older and narrower. Treat
+  those supersets as an enhancement unless a page-specific audit item
+  says otherwise.
 - **Row heights** are within ~5 px (both apps default to the AG Grid
   Quartz theme on port 3001 / 3000 respectively).
 - **Column auto-fit**: Reflex and Next.js both stretch the rightmost
