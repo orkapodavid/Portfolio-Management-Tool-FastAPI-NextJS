@@ -7,6 +7,7 @@ import { eventsGetReverseInquiries } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { reverseInquirySimulator } from "@/lib/grid-simulators/events";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type ReverseInquiryRow = {
@@ -84,6 +85,7 @@ export default function ReverseInquiryPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={reverseInquirySimulator}
       emptyMessage="No reverse inquiries available."
       searchPlaceholder="Search reverse inquiries…"
     />

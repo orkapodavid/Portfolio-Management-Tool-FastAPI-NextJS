@@ -8,6 +8,7 @@ import { DataGrid } from "@/components/grid/data-grid";
 import { DateRangeFilterBar } from "@/components/grid/filter-bar";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { eventCalendarSimulator } from "@/lib/grid-simulators/events";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type EventCalendarRow = {
@@ -110,6 +111,7 @@ export default function EventCalendarPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={() => load(appliedRange)}
+      simulateUpdate={eventCalendarSimulator}
       emptyMessage="No event calendar entries available."
       searchPlaceholder="Search events…"
       filterBar={

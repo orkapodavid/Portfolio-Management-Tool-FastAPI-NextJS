@@ -7,6 +7,7 @@ import { eventsGetEventStream } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { dateColumn, textColumn } from "@/components/grid/columns";
 import { getAuthToken } from "@/lib/auth/token-storage";
+import { eventStreamSimulator } from "@/lib/grid-simulators/events";
 import { getApiData, getApiError } from "@/lib/utils";
 
 type EventStreamRow = {
@@ -96,6 +97,7 @@ export default function EventStreamPage() {
       isLoading={isLoading}
       errorMessage={errorMessage}
       onRefresh={load}
+      simulateUpdate={eventStreamSimulator}
       emptyMessage="No event stream entries available."
       searchPlaceholder="Search event stream…"
     />
