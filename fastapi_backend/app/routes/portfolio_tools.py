@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Depends
+from typing import Optional
+
+from fastapi import APIRouter, Depends, Query
 
 from app.database import User
 from app.users import current_active_user
@@ -56,3 +58,13 @@ async def get_deal_indication(
     user: User = Depends(current_active_user),
 ):
     return await portfolio_tools_service.get_deal_indication()
+
+
+@router.get("/po-settlement")
+async def get_po_settlement(
+    position_date: Optional[str] = Query(default=None),
+    user: User = Depends(current_active_user),
+):
+    return await portfolio_tools_service.get_po_settlement(
+        position_date=position_date
+    )
