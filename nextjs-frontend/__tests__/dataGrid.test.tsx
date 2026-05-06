@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 import { DataGrid } from "@/components/grid/data-grid";
@@ -186,6 +186,41 @@ describe("DataGrid", () => {
     expect(api.exportDataAsCsv).toHaveBeenCalled();
     const params = api.exportDataAsCsv.mock.calls[0][0];
     expect(params.fileName).toMatch(/^positions_\d{8}_\d{4}\.csv$/);
+  });
+
+  it("auto-refresh status row toggles its switch and fires onRefresh on the interval", async () => {
+    jest.useFakeTimers();
+    const refresh = jest.fn(() => Promise.resolve());
+    render(
+      <DataGrid<Row>
+        columns={columns}
+        rows={rows}
+        gridId="positions_grid"
+        showAutoRefresh
+        autoRefreshIntervalMs={1_000}
+        onRefresh={refresh}
+      />
+    );
+
+    const switchInput = screen.getByLabelText("Auto refresh") as HTMLInputElement;
+    expect(switchInput.checked).toBe(false);
+    fireEvent.click(switchInput);
+    expect(switchInput.checked).toBe(true);
+
+    await act(async () => {
+      jest.advanceTimersByTime(2_500);
+      await Promise.resolve();
+    });
+    expect(refresh).toHaveBeenCalledTimes(2);
+
+    fireEvent.click(switchInput);
+    refresh.mockClear();
+    await act(async () => {
+      jest.advanceTimersByTime(5_000);
+      await Promise.resolve();
+    });
+    expect(refresh).not.toHaveBeenCalled();
+    jest.useRealTimers();
   });
 
   it("Excel button skips unselected rows when at least one row is selected", () => {

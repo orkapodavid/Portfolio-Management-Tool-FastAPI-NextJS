@@ -13,6 +13,7 @@ import {
   type StatusPanelDef,
 } from "ag-grid-community";
 import {
+  Clock,
   FileSpreadsheet,
   RefreshCw,
   RotateCcw,
@@ -94,6 +95,10 @@ type DataGridProps<TRow> = {
   hideLayoutButtons?: boolean;
   /** Show the Compact mode toggle button. */
   showCompactToggle?: boolean;
+  /** Show the Last-Updated / Auto-Refresh status row above the toolbar. */
+  showAutoRefresh?: boolean;
+  /** Polling interval in milliseconds when auto-refresh is on (default 30s). */
+  autoRefreshIntervalMs?: number;
 };
 
 const COMPACT_ROW_HEIGHT = 28;
@@ -146,11 +151,20 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   hideExcelExport = false,
   hideLayoutButtons = false,
   showCompactToggle = false,
+  showAutoRefresh = false,
+  autoRefreshIntervalMs = 30_000,
 }: DataGridProps<TRow>) {
   const [searchValue, setSearchValue] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCompact, setIsCompact] = useState(false);
+  const [autoRefreshOn, setAutoRefreshOn] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const gridApiRef = useRef<GridReadyEvent["api"] | null>(null);
+  const onRefreshRef = useRef(onRefresh);
+
+  useEffect(() => {
+    onRefreshRef.current = onRefresh;
+  }, [onRefresh]);
 
   useEffect(() => {
     gridApiRef.current?.setGridOption("quickFilterText", searchValue);
@@ -161,10 +175,23 @@ export function DataGrid<TRow extends Record<string, unknown>>({
     setIsRefreshing(true);
     try {
       await onRefresh();
+      setLastUpdated(new Date());
     } finally {
       setIsRefreshing(false);
     }
   };
+
+  useEffect(() => {
+    if (!showAutoRefresh || !autoRefreshOn) return;
+    const id = window.setInterval(() => {
+      const fn = onRefreshRef.current;
+      if (!fn) return;
+      void Promise.resolve(fn()).then(() => {
+        setLastUpdated(new Date());
+      });
+    }, autoRefreshIntervalMs);
+    return () => window.clearInterval(id);
+  }, [showAutoRefresh, autoRefreshOn, autoRefreshIntervalMs]);
 
   const storageKey = gridId ? `${STORAGE_PREFIX}${gridId}_state` : "";
   const showLayoutButtons = Boolean(gridId) && !hideLayoutButtons;
@@ -284,8 +311,55 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   const rowGroupPanelShow = showRowGroupPanel ? "always" : undefined;
   const statusBar = showStatusBar ? STANDARD_STATUS_BAR : undefined;
 
+  const formattedLastUpdated = lastUpdated
+    ? lastUpdated.toLocaleTimeString(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      })
+    : "—";
+
   return (
     <div className={cn("flex flex-col h-full min-h-0 w-full bg-white", className)}>
+      {showAutoRefresh ? (
+        <div className="flex items-center justify-between px-4 py-1.5 bg-gradient-to-r from-slate-50/95 via-white/90 to-slate-50/95 border-b border-slate-200/60 text-[11px] font-medium w-full shadow-sm shrink-0">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center">
+              <div className="relative w-2 h-2 mr-2.5">
+                {autoRefreshOn ? (
+                  <>
+                    <div className="absolute inset-0 bg-emerald-400 rounded-full animate-ping opacity-75" />
+                    <div className="relative w-2 h-2 bg-emerald-500 rounded-full" />
+                  </>
+                ) : (
+                  <div className="w-2 h-2 bg-gray-300 rounded-full" />
+                )}
+              </div>
+              <Clock size={12} className="text-slate-400 mr-1.5" />
+              <span className="text-slate-400 mr-1.5">Last Updated</span>
+              <span className="font-mono font-semibold text-slate-600 bg-gradient-to-r from-slate-100 to-gray-100 px-2 py-0.5 rounded border border-slate-200/60">
+                {formattedLastUpdated}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center bg-white/60 border border-slate-200/60 rounded-lg px-2.5 py-1 shadow-sm cursor-pointer">
+              <span className="text-slate-500 font-medium mr-2.5 select-none">
+                Auto Refresh
+              </span>
+              <input
+                type="checkbox"
+                checked={autoRefreshOn}
+                onChange={(event) => setAutoRefreshOn(event.target.checked)}
+                aria-label="Auto refresh"
+                className="appearance-none w-7 h-4 rounded-full bg-gray-300 checked:bg-gradient-to-r checked:from-emerald-500 checked:to-teal-500 relative transition-colors cursor-pointer
+                  before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:w-3 before:h-3 before:rounded-full before:bg-white before:transition-transform
+                  checked:before:translate-x-3"
+              />
+            </label>
+          </div>
+        </div>
+      ) : null}
       <div className="flex items-center justify-between gap-2 px-3 py-1.5 bg-[#F9F9F9] border-b border-gray-200 shrink-0 h-[40px]">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           {toolbarStart}
