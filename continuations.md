@@ -1,5 +1,41 @@
 # Portfolio Management Tool - Continuation Log
 
+## Current Status (2026-05-11 — Milestone B simulator rollout closed)
+
+### What landed
+
+Closed the orphaned Milestone B events work that was left unstaged
+after the B5 reset:
+
+- `7b1d868 feat(events): add client-side simulators for live cell flash`
+  added `eventCalendarSimulator`, `eventStreamSimulator`, and
+  `reverseInquirySimulator`, plus tests and `simulateUpdate` wiring on
+  the three events pages.
+- `acc78af docs(plans): handoff brief for finishing Milestone B and running Milestone C`
+  committed the 2026-05-11 handoff brief.
+- `e598e95 docs(parity-screenshots): re-capture 22 canonical screenshots after Milestone B`
+  re-shot all canonical module screenshot pairs at 1440x900 with
+  backend, Next.js, and Reflex healthy under the auth-bypass parity
+  setup.
+
+Sanity check: `orders/emsx-order` already had
+`simulateUpdate={emsxOrderSimulator}` wired on its `<DataGrid>`.
+
+### Verification
+
+| Check | Result |
+|---|---|
+| `pnpm --dir nextjs-frontend exec tsc --noEmit` | clean |
+| `pnpm --dir nextjs-frontend exec jest --runInBand __tests__/eventsSimulators.test.ts` | 1 suite / 8 tests passed in 0.293 s |
+| `pnpm exec tsc --noEmit` | clean |
+| `pnpm exec jest --runInBand` | 24 suites / 147 tests passed in 1.58 s |
+| `pnpm lint` | 0 errors / 0 warnings |
+| `pnpm build` | PASS — 59 / 59 static pages generated |
+| Backend pytest with sqlite override | 186 passed, 2 skipped in 8.53 s |
+
+Branch was pushed through `acc78af` before the screenshot refresh;
+push `e598e95` after this continuation entry lands.
+
 ## Current Status (2026-05-08 — Live flash + notification jump parity closed)
 
 ### What landed this session
