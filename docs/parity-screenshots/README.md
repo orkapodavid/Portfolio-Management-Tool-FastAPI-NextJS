@@ -13,9 +13,8 @@ does on the Reflex reference.
 ## Capture environment
 
 Re-captured 2026-05-08 at 1440×900 viewport via `playwright-cli`
-(market-data, positions, pnl, risk pages re-shot to capture the new
-Auto Refresh ON default + Last Updated populated on mount; the other 7
-pairs are unchanged from the 2026-05-07 pass) against:
+after the live-flash + notification-jump pass. All 22 canonical PNGs
+were re-shot against:
 
 | Service  | Port | Flags |
 |---|---|---|
@@ -49,6 +48,13 @@ state. Procuring a license is out of scope.
 | `events` | `event-calendar` | `events/event-calendar-{reflex,nextjs}.png` |
 | `operations` | `daily-procedures` | `operations/daily-procedures-{reflex,nextjs}.png` |
 | `orders` | `emsx-order` | `orders/emsx-order-{reflex,nextjs}.png` |
+
+Motion artifacts for the UX that cannot be proven in still frames:
+
+| Scenario | Files |
+|---|---|
+| Market Data live flash cadence | `market-data/market-data-{reflex,nextjs}-flash.webm` |
+| Next.js notification cross-page jump | `notification-jump.webm` |
 
 ## What now matches (closed in 2026-05-07 pass)
 
@@ -89,6 +95,27 @@ feature-parity pass those have been closed:
   details" arrow (`ArrowRight` icon) scrolls + flash-highlights the
   matching grid row, via the new `GridRegistryProvider` mounted in
   `app/dashboard/layout.tsx`.
+
+## What now matches (closed in 2026-05-08 flash/jump pass)
+
+- **Market Data / FX live cadence** — the Next.js grid wrapper keeps
+  backend polling on its 30 s default while opt-in page simulators
+  mutate 1-5 rows every 2 s, matching Reflex's client-side
+  `simulate_*_update` mixins and driving AG Grid cell flash.
+- **Cross-page notification jump** — the sidebar now resolves
+  `module` + `subtab` through `lib/constants.ts`, stores
+  `pmt:next:pendingHighlight` in `sessionStorage` when the target
+  grid is not mounted, then lets `GridRegistryProvider` pick it up on
+  grid registration and retry through async row loading.
+- **Sticky notification highlight** — the row highlight is re-applied
+  every 200 ms for 1.8 s so AG Grid virtualization, scrolling, or row
+  DOM replacement cannot drop it early. The sticky highlight colour now
+  mirrors Reflex's blue/purple `.notification-highlight`; AG Grid's
+  default yellow cell flash is unchanged.
+- **Payload row-id keys** — notification jumps use the payload's grid
+  row-id key (`ticker`, `currency`, `underlying`, etc.) as an override
+  when matching rows, so notifications still work on pages whose
+  DataGrid row identity falls back to `id`.
 
 ## Expected deltas (intentional, not regressions)
 

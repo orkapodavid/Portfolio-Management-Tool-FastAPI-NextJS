@@ -1,5 +1,85 @@
 # Portfolio Management Tool - Continuation Log
 
+## Current Status (2026-05-08 — Live flash + notification jump parity closed)
+
+### What landed this session
+
+5 commits on `feat/nextjs-fastapi-rebuild`, working from
+`docs/plans/handoff-prompt-2026-05-08-flash-and-jump.md`.
+
+**Live-data feel (2 commits).**
+- `bd3b5bc feat(grid): expose per-page autoRefreshIntervalMs and tune market-data to 2s`
+  added explicit 2 s cadence coverage in the DataGrid polling test and
+  temporarily tuned Market Data / FX pages for the live cadence.
+- `284dde8 feat(grid): client-side row simulator drives cell flash between refreshes`
+  added `lib/grid-simulators.ts` plus `simulateUpdate` /
+  `simulateUpdateIntervalMs` DataGrid props. Market Data and FX now
+  simulate 1-5 row updates every 2 s while backend refresh falls back
+  to the wrapper's 30 s default. Playwright DOM sampling on
+  `/dashboard/market-data/market-data` showed `last_price` values
+  changing on alternating 2 s ticks with AG Grid flash classes present.
+
+**Notification jump (3 commits).**
+- `fa85db8 feat(notifications): cross-page jump-to-row via sessionStorage handoff`
+  added `lib/notification-routes.ts`, slug resolution through
+  `lib/constants.ts`, `pmt:next:pendingHighlight`, and mount-time
+  pending-highlight pickup with short retry through async row loading.
+- `b1172d9 fix(grid-registry): re-apply sticky notification highlight every 200ms during scroll`
+  replaced the one-shot 0/100/350 ms highlight reapply with a tracked
+  200 ms interval for 1.8 s and matched Reflex's sticky highlight CSS.
+- `adaca02 fix(notifications): honor payload row id keys when jumping`
+  fixed the manual-test gap where notifications target `ticker=AAPL`
+  but some pages register DataGrid with the default `id` row key.
+  `jumpToRow` now accepts the notification row-id key override.
+
+### Browser parity evidence
+
+- Re-captured all 22 canonical parity PNGs under
+  `docs/parity-screenshots/`.
+- Added flash videos:
+  `docs/parity-screenshots/market-data/market-data-reflex-flash.webm`
+  (464 KB) and
+  `docs/parity-screenshots/market-data/market-data-nextjs-flash.webm`
+  (240 KB).
+- Added
+  `docs/parity-screenshots/notification-jump.webm` (370 KB), showing
+  Next.js market-data → PnL cross-page jump.
+- Manual Next.js notification checks:
+  same-page PnL jump highlighted 2 row DOM sections for `AAPL`, showed
+  12 AG Grid flash-classed cells, and left pending storage null.
+  Cross-page cold market-data → PnL did the same after URL change to
+  `/dashboard/pnl/pnl-change`. Cross-page warm PnL → positions changed
+  URL to `/dashboard/positions/positions`, highlighted 2 row DOM
+  sections for `TKR0`, showed 11 flash-classed cells, and cleared
+  pending storage.
+
+### Verification matrix
+
+| Check | Result |
+|---|---|
+| `pnpm exec tsc --noEmit` | ✅ clean |
+| `pnpm exec jest --runInBand` | ✅ **13 suites / 69 tests** in 1.062 s |
+| `pnpm lint` | ✅ 0 errors / 0 warnings |
+| `pnpm build` (web) | ✅ PASS — 59 static routes |
+| Backend pytest (sqlite override) | ✅ **175 passed, 2 skipped in 8.44 s** |
+
+Desktop static export was not rerun in this pass because no
+`src-tauri/` files changed.
+
+### Exit criteria walkthrough
+
+1. ✅ `:3000/dashboard/market-data/market-data` flashes continuously
+   at the Reflex 2 s cadence with Auto Refresh ON.
+2. ✅ Notification clicks navigate to the target page when needed and
+   flash + sticky-highlight the matching row for ~1.8 s.
+3. ✅ Same-page, cross-page cold, and cross-page warm notification
+   scenarios passed in Playwright.
+4. ✅ Verification matrix green with exact counts above.
+5. ✅ Commits pushed through `adaca02`.
+6. ✅ `continuations.md` and parity README updated.
+7. ✅ Flash and notification-jump videos added under
+   `docs/parity-screenshots/`.
+
 ## Current Status (2026-05-08 — Live-data feel parity + filter-bar mop-up + pytest restore)
 
 ### What landed this session
