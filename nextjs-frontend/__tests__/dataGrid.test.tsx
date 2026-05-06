@@ -205,18 +205,35 @@ describe("DataGrid", () => {
     expect(restored.columnSizing.columnSizingModel[0]).not.toHaveProperty("flex");
   });
 
-  it("clears storage and resets columns/filters when Reset is clicked", () => {
+  it("clears storage, grid filters, and toolbar search when Reset is clicked", async () => {
+    jest.useFakeTimers();
     const api = buildGridApi();
     window.localStorage.setItem(
       "pmt:next:positions_grid_state",
       JSON.stringify({ columnSizing: { columnSizingModel: [] } })
     );
-    render(<DataGrid<Row> columns={columns} rows={rows} gridId="positions_grid" />);
+    render(
+      <DataGrid<Row>
+        columns={columns}
+        rows={rows}
+        gridId="positions_grid"
+        searchPlaceholder="Find…"
+      />
+    );
     lastGridReadyHandler!({ api });
+
+    const input = screen.getByPlaceholderText("Find…") as HTMLInputElement;
+    fireEvent.change(input, { target: { value: "AAPL" } });
+    await act(async () => {
+      jest.advanceTimersByTime(300);
+    });
+    expect(api.setGridOption).toHaveBeenLastCalledWith("quickFilterText", "AAPL");
 
     fireEvent.click(screen.getByRole("button", { name: /reset/i }));
     expect(api.resetColumnState).toHaveBeenCalled();
     expect(api.setFilterModel).toHaveBeenCalledWith(null);
+    expect(input.value).toBe("");
+    expect(api.setGridOption).toHaveBeenLastCalledWith("quickFilterText", "");
     expect(window.localStorage.getItem("pmt:next:positions_grid_state")).toBeNull();
   });
 

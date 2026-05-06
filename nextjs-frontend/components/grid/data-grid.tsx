@@ -333,6 +333,8 @@ export function DataGrid<TRow extends Record<string, unknown>>({
     if (!api) return;
     api.resetColumnState();
     api.setFilterModel(null);
+    setSearchValue("");
+    api.setGridOption("quickFilterText", "");
     if (storageKey && typeof window !== "undefined") {
       window.localStorage.removeItem(storageKey);
     }
