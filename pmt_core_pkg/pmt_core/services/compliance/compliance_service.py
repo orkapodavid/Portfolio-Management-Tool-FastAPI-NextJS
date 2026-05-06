@@ -1,7 +1,11 @@
 from typing import List, Optional
 from pmt_core.repositories.compliance import ComplianceRepository
 from pmt_core.repositories.protocols import ComplianceRepositoryProtocol
-from pmt_core.models import BeneficialOwnershipRecord, ComplianceRecord
+from pmt_core.models import (
+    BeneficialOwnershipRecord,
+    ComplianceRecord,
+    MonthlyExerciseLimitRecord,
+)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -34,7 +38,9 @@ class ComplianceService:
             position_date=position_date
         )
 
-    async def get_monthly_exercise_limit(self, position_date: str = None) -> List[dict]:
+    async def get_monthly_exercise_limit(
+        self, position_date: str = None
+    ) -> List[MonthlyExerciseLimitRecord]:
         """Get monthly exercise limits."""
         return await self.repository.get_monthly_exercise_limits(
             position_date=position_date

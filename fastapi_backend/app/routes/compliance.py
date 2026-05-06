@@ -30,3 +30,13 @@ async def get_beneficial_ownership(
     user: User = Depends(current_active_user),
 ):
     return await compliance_service.get_beneficial_ownership()
+
+
+@router.get("/monthly-exercise-limit")
+async def get_monthly_exercise_limit(
+    position_date: Optional[str] = Query(default=None),
+    user: User = Depends(current_active_user),
+):
+    return await compliance_service.get_monthly_exercise_limit(
+        position_date=position_date
+    )

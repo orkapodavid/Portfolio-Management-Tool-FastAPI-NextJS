@@ -11,7 +11,11 @@ from pmt_core.models.positions import PositionRecord
 from pmt_core.models.pnl import PnLRecord
 from pmt_core.models.market_data import MarketDataRecord
 from pmt_core.models.orders import OrderRecord
-from pmt_core.models.compliance import BeneficialOwnershipRecord, ComplianceRecord
+from pmt_core.models.compliance import (
+    BeneficialOwnershipRecord,
+    ComplianceRecord,
+    MonthlyExerciseLimitRecord,
+)
 from pmt_core.models.risk import RiskRecord
 
 # Common enum imports (new structure)
@@ -34,6 +38,7 @@ __all__ = [
     "OrderRecord",
     "ComplianceRecord",
     "BeneficialOwnershipRecord",
+    "MonthlyExerciseLimitRecord",
     "RiskRecord",
     # Enums
     "InstrumentType",

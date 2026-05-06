@@ -61,3 +61,26 @@ class BeneficialOwnershipRecord(TypedDict):
     warrant_shares: str
     bond_shares: str
     total_shares: str
+
+
+class MonthlyExerciseLimitRecord(TypedDict):
+    """
+    Monthly exercise limit data structure.
+
+    Aligned with: MonthlyExerciseLimitItem from the reflex
+    `app/states/compliance/types.py`. The grid headers (Underlying /
+    Ticker / Company / Sec Type / Original Nosh / Original Quantity /
+    Monthly Exercised Qty / Monthly Exercised % / Monthly Sal) come
+    straight from this shape.
+    """
+
+    id: int
+    underlying: str
+    ticker: str
+    company_name: str
+    sec_type: str
+    original_nosh: str
+    original_quantity: str
+    monthly_exercised_quantity: str
+    monthly_exercised_pct: str
+    monthly_sal: str

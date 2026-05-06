@@ -1,6 +1,10 @@
 from typing import Any, List
 from pmt_core.repositories.common import DatabaseRepository
-from pmt_core.models import BeneficialOwnershipRecord, ComplianceRecord
+from pmt_core.models import (
+    BeneficialOwnershipRecord,
+    ComplianceRecord,
+    MonthlyExerciseLimitRecord,
+)
 from pmt_core.models.common import ComplianceType
 import logging
 import random
@@ -110,26 +114,40 @@ class ComplianceRepository(DatabaseRepository):
             return records
         return []
 
-    async def get_monthly_exercise_limits(self, position_date: str = None) -> List[dict[str, Any]]:
-        """Get monthly exercise limits data."""
+    async def get_monthly_exercise_limits(
+        self, position_date: str = None
+    ) -> List[MonthlyExerciseLimitRecord]:
+        """Get monthly exercise limits data.
+
+        Mirrors `MonthlyExerciseLimitItem` from the Reflex reference. The
+        grid expects underlying / ticker / company / sec_type plus the
+        original-NOSH/quantity columns and the monthly exercised
+        quantity, percent, and SAL.
+        """
         if self.mock_mode:
-            logger.info(f"Returning mock monthly exercise limits data for date={position_date}")
+            logger.info(
+                f"Returning mock monthly exercise limits data for date={position_date}"
+            )
             tickers = ["AAPL", "TSLA", "NVDA", "META"]
-            return [
-                {
-                    "id": i + 1,
-                    "deal_num": f"DEAL{i + 1:03d}",
-                    "underlying": tickers[i % len(tickers)],  # Required for row_id_key
-                    "ticker": tickers[i % len(tickers)],
-                    "company_name": f"{tickers[i % len(tickers)]} Inc.",
-                    "month": f"2026-{(i % 12) + 1:02d}",
-                    "exercise_limit": f"{(i + 1) * 10000:,}",
-                    "exercised_qty": f"{(i + 1) * 5000:,}",
-                    "remaining_qty": f"{(i + 1) * 5000:,}",
-                    "limit_type": ["Soft", "Hard"][i % 2],
-                    "original_quantity": "100M",
-                    "monthly_sal": "10%",
-                }
-                for i in range(8)
-            ]
+            sec_types = ["Warrant", "Convertible", "Warrant", "Convertible"]
+            records: List[MonthlyExerciseLimitRecord] = []
+            for i in range(8):
+                original_qty = (i + 1) * 1_000_000
+                exercised = original_qty // 10
+                pct = (exercised / original_qty) * 100
+                records.append(
+                    MonthlyExerciseLimitRecord(
+                        id=i + 1,
+                        underlying=tickers[i % len(tickers)],
+                        ticker=tickers[i % len(tickers)],
+                        company_name=f"{tickers[i % len(tickers)]} Inc.",
+                        sec_type=sec_types[i % len(sec_types)],
+                        original_nosh=f"{(i + 1) * 5_000_000:,}",
+                        original_quantity=f"{original_qty:,}",
+                        monthly_exercised_quantity=f"{exercised:,}",
+                        monthly_exercised_pct=f"{pct:.2f}%",
+                        monthly_sal=f"{exercised // 4:,}",
+                    )
+                )
+            return records
         return []
