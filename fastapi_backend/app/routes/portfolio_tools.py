@@ -68,3 +68,10 @@ async def get_po_settlement(
     return await portfolio_tools_service.get_po_settlement(
         position_date=position_date
     )
+
+
+@router.get("/short-ecl")
+async def get_short_ecl(
+    user: User = Depends(current_active_user),
+):
+    return await portfolio_tools_service.get_short_ecl()

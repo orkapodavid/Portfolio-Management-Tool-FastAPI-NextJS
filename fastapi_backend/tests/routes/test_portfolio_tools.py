@@ -68,3 +68,36 @@ class TestPortfolioToolsPoSettlement:
     async def test_unauthorized(self, test_client):
         response = await test_client.get("/api/portfolio-tools/po-settlement")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+class TestPortfolioToolsShortEcl:
+    @pytest.mark.asyncio(loop_scope="function")
+    async def test_returns_canonical_shape(self, test_client, authenticated_user):
+        response = await test_client.get(
+            "/api/portfolio-tools/short-ecl",
+            headers=authenticated_user["headers"],
+        )
+        assert response.status_code == status.HTTP_200_OK
+        body = response.json()
+        assert isinstance(body, list)
+        assert body, "expected mock data"
+        first = body[0]
+        for field in (
+            "id",
+            "trade_date",
+            "ticker",
+            "company_name",
+            "pos_loc",
+            "account",
+            "short_position",
+            "nosh",
+            "short_ownership",
+            "last_volume",
+            "short_pos_truncated",
+        ):
+            assert field in first, f"missing {field}"
+
+    @pytest.mark.asyncio(loop_scope="function")
+    async def test_unauthorized(self, test_client):
+        response = await test_client.get("/api/portfolio-tools/short-ecl")
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
