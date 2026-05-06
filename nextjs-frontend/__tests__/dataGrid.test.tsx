@@ -11,7 +11,7 @@ type GridApiStub = {
   getState: jest.Mock;
   setState: jest.Mock;
   getSelectedRows: jest.Mock;
-  exportDataAsCsv: jest.Mock;
+  exportDataAsExcel: jest.Mock;
   resetColumnState: jest.Mock;
   setFilterModel: jest.Mock;
 };
@@ -21,7 +21,7 @@ const buildGridApi = (overrides: Partial<GridApiStub> = {}): GridApiStub => ({
   getState: jest.fn(() => ({ columnSizing: { columnSizingModel: [{ colId: "ticker", width: 100, flex: 1 }] } })),
   setState: jest.fn(),
   getSelectedRows: jest.fn(() => []),
-  exportDataAsCsv: jest.fn(),
+  exportDataAsExcel: jest.fn(),
   resetColumnState: jest.fn(),
   setFilterModel: jest.fn(),
   ...overrides,
@@ -64,6 +64,10 @@ jest.mock("ag-grid-community", () => ({
   AllCommunityModule: {},
   ModuleRegistry: { registerModules: jest.fn() },
   themeQuartz: { withParams: jest.fn().mockReturnValue({}) },
+}));
+
+jest.mock("ag-grid-enterprise", () => ({
+  AllEnterpriseModule: {},
 }));
 
 describe("DataGrid", () => {
@@ -177,15 +181,15 @@ describe("DataGrid", () => {
     expect(window.localStorage.getItem("pmt:next:positions_grid_state")).toBeNull();
   });
 
-  it("Excel button calls exportDataAsCsv with a timestamped filename", () => {
+  it("Excel button calls exportDataAsExcel with a timestamped .xlsx filename", () => {
     const api = buildGridApi();
     render(<DataGrid<Row> columns={columns} rows={rows} gridId="positions_grid" />);
     lastGridReadyHandler!({ api });
 
     fireEvent.click(screen.getByRole("button", { name: /excel/i }));
-    expect(api.exportDataAsCsv).toHaveBeenCalled();
-    const params = api.exportDataAsCsv.mock.calls[0][0];
-    expect(params.fileName).toMatch(/^positions_\d{8}_\d{4}\.csv$/);
+    expect(api.exportDataAsExcel).toHaveBeenCalled();
+    const params = api.exportDataAsExcel.mock.calls[0][0];
+    expect(params.fileName).toMatch(/^positions_\d{8}_\d{4}\.xlsx$/);
   });
 
   it("auto-refresh status row toggles its switch and fires onRefresh on the interval", async () => {
@@ -229,7 +233,7 @@ describe("DataGrid", () => {
     lastGridReadyHandler!({ api });
 
     fireEvent.click(screen.getByRole("button", { name: /excel/i }));
-    const params = api.exportDataAsCsv.mock.calls[0][0];
+    const params = api.exportDataAsExcel.mock.calls[0][0];
     expect(typeof params.shouldRowBeSkipped).toBe("function");
     expect(
       params.shouldRowBeSkipped({ node: { isSelected: () => true } })

@@ -12,6 +12,7 @@ import {
   type RowSelectionOptions,
   type StatusPanelDef,
 } from "ag-grid-community";
+import { AllEnterpriseModule } from "ag-grid-enterprise";
 import {
   CalendarDays,
   ChevronDown,
@@ -29,7 +30,7 @@ import {
 import { useGridRegistry, type GridApiLike } from "@/lib/grid-registry";
 import { cn } from "@/lib/utils";
 
-ModuleRegistry.registerModules([AllCommunityModule]);
+ModuleRegistry.registerModules([AllCommunityModule, AllEnterpriseModule]);
 
 const pmtTheme = themeQuartz.withParams({
   fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
@@ -329,8 +330,8 @@ export function DataGrid<TRow extends Record<string, unknown>>({
     const min = String(now.getMinutes()).padStart(2, "0");
     const fileName = `${filenamePrefix || "export"}_${yyyy}${mm}${dd}_${hh}${min}`;
     const hasSelection = api.getSelectedRows().length > 0;
-    api.exportDataAsCsv({
-      fileName: `${fileName}.csv`,
+    api.exportDataAsExcel({
+      fileName: `${fileName}.xlsx`,
       shouldRowBeSkipped: hasSelection
         ? (params) => !params.node.isSelected()
         : undefined,
