@@ -79,6 +79,9 @@ curl -sSI http://127.0.0.1:3000 | sed -n '1,8p'
 curl -sSI http://127.0.0.1:3001/pmt/ | sed -n '1,8p'
 ```
 
+For Windows PowerShell and non-Docker human setup commands, keep
+`docs/get-started.md` in sync with the POSIX examples above.
+
 ## OpenAPI Regeneration
 
 - Never hand-edit `nextjs-frontend/app/openapi-client/`.

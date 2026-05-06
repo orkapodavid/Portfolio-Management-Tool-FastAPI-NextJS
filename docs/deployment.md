@@ -24,6 +24,15 @@ DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pmt-dev.sqlite3 \
   ./.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
+Windows PowerShell:
+
+```powershell
+cd fastapi_backend
+$backendPath = (Get-Location).Path -replace '\\', '/'
+$env:DATABASE_URL = "sqlite+aiosqlite:///$backendPath/.pmt-dev.sqlite3"
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
 For a PostgreSQL-backed environment, set `DATABASE_URL` and run Alembic
 migrations before starting the API:
 
@@ -42,6 +51,16 @@ cd nextjs-frontend
 TAURI_BUILD=1 \
 NEXT_PUBLIC_DESKTOP_TARGET=1 \
 NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 \
+pnpm build
+```
+
+Windows PowerShell:
+
+```powershell
+cd nextjs-frontend
+$env:TAURI_BUILD = "1"
+$env:NEXT_PUBLIC_DESKTOP_TARGET = "1"
+$env:NEXT_PUBLIC_DESKTOP_API_BASE_URL = "http://127.0.0.1:18475"
 pnpm build
 ```
 

@@ -47,6 +47,9 @@ the older handoff prompts.
   `/Users/orbot/Developer/work/Portfolio-Management-Tool-reflex` for
   parity checks
 
+Docker is optional. The default documented local path below uses SQLite
+and does not require Docker or PostgreSQL.
+
 Install dependencies once:
 
 ```bash
@@ -86,6 +89,27 @@ cd /Users/orbot/Developer/work/Portfolio-Management-Tool-reflex
 uv run reflex run
 ```
 
+Windows PowerShell equivalents:
+
+```powershell
+cd fastapi_backend
+$backendPath = (Get-Location).Path -replace '\\', '/'
+$env:DATABASE_URL = "sqlite+aiosqlite:///$backendPath/.pmt-dev.sqlite3"
+$env:PMT_AUTH_DISABLED = "true"
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+```powershell
+cd nextjs-frontend
+$env:NEXT_PUBLIC_AUTH_DISABLED = "1"
+pnpm dev
+```
+
+```powershell
+cd C:\path\to\Portfolio-Management-Tool-reflex
+uv run reflex run
+```
+
 Expected URLs:
 
 | Service | URL |
@@ -101,6 +125,14 @@ Health checks:
 curl -sS http://127.0.0.1:8000/api/health
 curl -sSI http://127.0.0.1:3000
 curl -sSI http://127.0.0.1:3001/pmt/
+```
+
+Windows PowerShell:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/api/health
+(Invoke-WebRequest http://127.0.0.1:3000 -Method Head).StatusCode
+(Invoke-WebRequest http://127.0.0.1:3001/pmt/ -Method Head).StatusCode
 ```
 
 ## OpenAPI Client
@@ -130,6 +162,16 @@ cd nextjs-frontend
 TAURI_BUILD=1 \
 NEXT_PUBLIC_DESKTOP_TARGET=1 \
 NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 \
+pnpm build
+```
+
+Windows PowerShell:
+
+```powershell
+cd nextjs-frontend
+$env:TAURI_BUILD = "1"
+$env:NEXT_PUBLIC_DESKTOP_TARGET = "1"
+$env:NEXT_PUBLIC_DESKTOP_API_BASE_URL = "http://127.0.0.1:18475"
 pnpm build
 ```
 
@@ -167,6 +209,15 @@ Backend:
 cd fastapi_backend
 TEST_DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pytest-sqlite.sqlite3 \
   ./.venv/bin/python -m pytest -q
+```
+
+Windows PowerShell:
+
+```powershell
+cd fastapi_backend
+$backendPath = (Get-Location).Path -replace '\\', '/'
+$env:TEST_DATABASE_URL = "sqlite+aiosqlite:///$backendPath/.pytest-sqlite.sqlite3"
+.\.venv\Scripts\python.exe -m pytest -q
 ```
 
 Last known gate-close verification:

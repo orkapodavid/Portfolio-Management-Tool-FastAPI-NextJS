@@ -30,6 +30,24 @@ Verification run during the docs refresh:
 | `pnpm --dir nextjs-frontend exec tsc --noEmit --pretty false` | clean |
 | Backend pytest with sqlite override | 187 passed, 2 skipped in 10.37 s |
 
+Follow-up Windows/non-Docker clarification:
+
+- Added PowerShell equivalents for the FastAPI SQLite dev server,
+  Next.js auth-bypass dev server, health checks, desktop static export,
+  and backend SQLite pytest in `README.md`, `docs/get-started.md`,
+  `docs/additional-settings.md`, and `docs/deployment.md`.
+- Made the non-Docker SQLite path explicit as the default local setup;
+  Docker is now described as optional for PostgreSQL/MailHog-specific
+  tasks.
+
+Verification for the follow-up:
+
+| Check | Result |
+|---|---|
+| `git diff --check` | clean |
+| `rg -n "PMT_AUTH_DISABLED=true\|NEXT_PUBLIC_AUTH_DISABLED=1" . --glob '*.env*'` | only commented backend env lines matched; no frontend `=1` env example |
+| Windows PowerShell commands | source-reviewed only from macOS; not executed in this workspace |
+
 ## Current Status (2026-05-11 — Milestone B/C closed through 82142c9)
 
 Implementation parity gates for Milestone B and Milestone C are closed

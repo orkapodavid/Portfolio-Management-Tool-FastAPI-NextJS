@@ -48,12 +48,23 @@ pnpm lint
 pnpm build
 ```
 
+Windows PowerShell uses the same frontend commands.
+
 Backend with SQLite test DB:
 
 ```bash
 cd fastapi_backend
 TEST_DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pytest-sqlite.sqlite3 \
   ./.venv/bin/python -m pytest -q
+```
+
+Windows PowerShell:
+
+```powershell
+cd fastapi_backend
+$backendPath = (Get-Location).Path -replace '\\', '/'
+$env:TEST_DATABASE_URL = "sqlite+aiosqlite:///$backendPath/.pytest-sqlite.sqlite3"
+.\.venv\Scripts\python.exe -m pytest -q
 ```
 
 Desktop static export:
@@ -66,10 +77,20 @@ NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 \
 pnpm build
 ```
 
+Windows PowerShell:
+
+```powershell
+cd nextjs-frontend
+$env:TAURI_BUILD = "1"
+$env:NEXT_PUBLIC_DESKTOP_TARGET = "1"
+$env:NEXT_PUBLIC_DESKTOP_API_BASE_URL = "http://127.0.0.1:18475"
+pnpm build
+```
+
 ## Docker Services
 
-Docker remains useful for PostgreSQL and MailHog when a task needs the
-compose stack:
+Docker is optional. It remains useful for PostgreSQL and MailHog when a
+task needs the compose stack:
 
 ```bash
 docker compose up db -d

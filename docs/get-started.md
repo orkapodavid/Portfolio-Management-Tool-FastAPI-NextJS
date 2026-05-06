@@ -14,6 +14,11 @@ checks.
 - Reflex reference checkout:
   `/Users/orbot/Developer/work/Portfolio-Management-Tool-reflex`
 
+The main local setup path is non-Docker: FastAPI uses a local SQLite
+file, Next.js runs with `pnpm dev`, and Reflex runs from the sibling
+reference checkout. Use Docker only when a task specifically needs
+PostgreSQL or MailHog.
+
 Install dependencies:
 
 ```bash
@@ -25,6 +30,9 @@ uv sync --all-groups
 cd ../nextjs-frontend
 pnpm install
 ```
+
+On Windows, run the same dependency commands from PowerShell. Python
+executables inside the backend venv live under `.\.venv\Scripts\`.
 
 ## Environment Files
 
@@ -78,12 +86,50 @@ cd /Users/orbot/Developer/work/Portfolio-Management-Tool-reflex
 uv run reflex run
 ```
 
+### Windows PowerShell Parity Loop
+
+Terminal A:
+
+```powershell
+cd fastapi_backend
+$backendPath = (Get-Location).Path -replace '\\', '/'
+$env:DATABASE_URL = "sqlite+aiosqlite:///$backendPath/.pmt-dev.sqlite3"
+$env:PMT_AUTH_DISABLED = "true"
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+Terminal B:
+
+```powershell
+cd nextjs-frontend
+$env:NEXT_PUBLIC_AUTH_DISABLED = "1"
+pnpm dev
+```
+
+Terminal C:
+
+```powershell
+cd C:\path\to\Portfolio-Management-Tool-reflex
+uv run reflex run
+```
+
+The SQLite URL uses forward slashes. The PowerShell examples normalize
+`C:\...` paths to `C:/...` before building the SQLAlchemy URL.
+
 Health checks before browser work:
 
 ```bash
 curl -sS http://127.0.0.1:8000/api/health
 curl -sSI http://127.0.0.1:3000 | sed -n '1,8p'
 curl -sSI http://127.0.0.1:3001/pmt/ | sed -n '1,8p'
+```
+
+Windows PowerShell:
+
+```powershell
+Invoke-RestMethod http://127.0.0.1:8000/api/health
+(Invoke-WebRequest http://127.0.0.1:3000 -Method Head).StatusCode
+(Invoke-WebRequest http://127.0.0.1:3001/pmt/ -Method Head).StatusCode
 ```
 
 Expected entry points:
@@ -126,6 +172,16 @@ NEXT_PUBLIC_DESKTOP_API_BASE_URL=http://127.0.0.1:18475 \
 pnpm build
 ```
 
+Windows PowerShell:
+
+```powershell
+cd nextjs-frontend
+$env:TAURI_BUILD = "1"
+$env:NEXT_PUBLIC_DESKTOP_TARGET = "1"
+$env:NEXT_PUBLIC_DESKTOP_API_BASE_URL = "http://127.0.0.1:18475"
+pnpm build
+```
+
 Desktop commands:
 
 ```bash
@@ -162,6 +218,15 @@ TEST_DATABASE_URL=sqlite+aiosqlite:///$(pwd)/.pytest-sqlite.sqlite3 \
   ./.venv/bin/python -m pytest -q
 ```
 
+Windows PowerShell:
+
+```powershell
+cd fastapi_backend
+$backendPath = (Get-Location).Path -replace '\\', '/'
+$env:TEST_DATABASE_URL = "sqlite+aiosqlite:///$backendPath/.pytest-sqlite.sqlite3"
+.\.venv\Scripts\python.exe -m pytest -q
+```
+
 Last known gate-close results:
 
 | Check | Result |
@@ -188,6 +253,8 @@ route list, expected deltas, and reproduction steps.
 
 - If `pnpm generate-client` fails, confirm the backend is running and
   `http://127.0.0.1:8000/openapi.json` responds.
+- On Windows, use PowerShell `$env:NAME = "value"` assignments instead
+  of POSIX inline `NAME=value command` syntax.
 - If dashboard pages redirect to login during parity work, confirm both
   `PMT_AUTH_DISABLED=true` and `NEXT_PUBLIC_AUTH_DISABLED=1` are set
   in the shell commands that started the backend and frontend.
