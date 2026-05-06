@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, Query
 
@@ -28,9 +28,24 @@ async def get_stock_borrow(
 
 @router.get("/reset-dates")
 async def get_reset_dates(
+    ticker: Annotated[Optional[str], Query()] = None,
+    start_date: Annotated[Optional[str], Query()] = None,
+    end_date: Annotated[Optional[str], Query()] = None,
+    frequency: Annotated[Optional[str], Query()] = None,
+    reset_month: Annotated[Optional[str], Query()] = None,
+    reset_day: Annotated[Optional[str], Query()] = None,
+    reset_up_down: Annotated[Optional[str], Query()] = None,
     user: User = Depends(current_active_user),
 ):
-    return await portfolio_tools_service.get_reset_dates()
+    return await portfolio_tools_service.get_reset_dates(
+        ticker=ticker,
+        start_date=start_date,
+        end_date=end_date,
+        frequency=frequency,
+        reset_month=reset_month,
+        reset_day=reset_day,
+        reset_up_down=reset_up_down,
+    )
 
 
 @router.get("/coming-resets")

@@ -86,6 +86,32 @@ class TestPortfolioToolsDealIndication:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
+class TestPortfolioToolsResetDates:
+    @pytest.mark.asyncio(loop_scope="function")
+    async def test_accepts_filter_query_params(
+        self, test_client, authenticated_user
+    ):
+        response = await test_client.get(
+            "/api/portfolio-tools/reset-dates",
+            headers=authenticated_user["headers"],
+            params={
+                "ticker": "9984 JP_Series 2",
+                "start_date": "2026-03-03",
+                "end_date": "2029-03-08",
+                "frequency": "semiannually",
+                "reset_month": "3",
+                "reset_day": "3",
+                "reset_up_down": "up and down",
+            },
+        )
+        assert response.status_code == status.HTTP_200_OK
+        body = response.json()
+        assert isinstance(body, list)
+        assert body[0]["ticker"] == "9984 JP_Series 2"
+        assert body[0]["reset_date"] == "2026-03-03"
+        assert body[0]["reset_up_down"] == "up and down"
+
+
 class TestPortfolioToolsPoSettlement:
     @pytest.mark.asyncio(loop_scope="function")
     async def test_returns_canonical_shape(self, test_client, authenticated_user):

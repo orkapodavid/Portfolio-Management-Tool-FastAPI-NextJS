@@ -157,6 +157,7 @@ import type {
   PortfolioToolsGetStockBorrowResponses,
   PortfolioToolsGetResetDatesData,
   PortfolioToolsGetResetDatesResponses,
+  PortfolioToolsGetResetDatesErrors,
   PortfolioToolsGetComingResetsData,
   PortfolioToolsGetComingResetsResponses,
   PortfolioToolsGetCbInstallmentsData,
@@ -1478,7 +1479,7 @@ export const portfolioToolsGetResetDates = <
 ) => {
   return (options?.client ?? client).get<
     PortfolioToolsGetResetDatesResponses,
-    unknown,
+    PortfolioToolsGetResetDatesErrors,
     ThrowOnError
   >({
     responseType: "json",

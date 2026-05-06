@@ -6,6 +6,11 @@ import { useRouter } from "next/navigation";
 import { portfolioToolsGetResetDates } from "@/app/clientService";
 import { DataGrid } from "@/components/grid/data-grid";
 import { dateColumn, textColumn } from "@/components/grid/columns";
+import {
+  RESET_DATES_DEFAULT_FILTERS,
+  ResetDatesFilterBar,
+  type ResetDatesFilterState,
+} from "@/components/grid/reset-dates-filter-bar";
 import { getAuthToken } from "@/lib/auth/token-storage";
 import { resetDatesSimulator } from "@/lib/grid-simulators/portfolio-tools";
 import { getApiData, getApiError } from "@/lib/utils";
@@ -56,36 +61,51 @@ export default function ResetDatesPage() {
   const [rows, setRows] = useState<ResetDateRow[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [draftFilters, setDraftFilters] = useState<ResetDatesFilterState>(
+    RESET_DATES_DEFAULT_FILTERS,
+  );
+  const [appliedFilters, setAppliedFilters] = useState<ResetDatesFilterState>(
+    RESET_DATES_DEFAULT_FILTERS,
+  );
 
-  const load = useCallback(async () => {
-    setIsLoading(true);
-    const token = getAuthToken();
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-    const response = await portfolioToolsGetResetDates({
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const error = getApiError(response);
-    if (error) {
-      const status = getStatus(error);
-      if (status === 401 || status === 403) {
+  const load = useCallback(
+    async (filters: ResetDatesFilterState) => {
+      setIsLoading(true);
+      const token = getAuthToken();
+      if (!token) {
         router.replace("/login");
         return;
       }
-      setErrorMessage("Failed to load reset dates.");
+      const response = await portfolioToolsGetResetDates({
+        headers: { Authorization: `Bearer ${token}` },
+        query: filters,
+      });
+      const error = getApiError(response);
+      if (error) {
+        const status = getStatus(error);
+        if (status === 401 || status === 403) {
+          router.replace("/login");
+          return;
+        }
+        setErrorMessage("Failed to load reset dates.");
+        setIsLoading(false);
+        return;
+      }
+      setRows((getApiData(response) as ResetDateRow[]) ?? []);
+      setErrorMessage(null);
       setIsLoading(false);
-      return;
-    }
-    setRows((getApiData(response) as ResetDateRow[]) ?? []);
-    setErrorMessage(null);
-    setIsLoading(false);
-  }, [router]);
+    },
+    [router],
+  );
 
   useEffect(() => {
-    void load();
+    void load(RESET_DATES_DEFAULT_FILTERS);
   }, [load]);
+
+  const onApplyFilters = () => {
+    setAppliedFilters(draftFilters);
+    void load(draftFilters);
+  };
 
   return (
     <DataGrid<ResetDateRow>
@@ -99,10 +119,17 @@ export default function ResetDatesPage() {
       rows={rows}
       isLoading={isLoading}
       errorMessage={errorMessage}
-      onRefresh={load}
+      onRefresh={() => load(appliedFilters)}
       simulateUpdate={resetDatesSimulator}
       emptyMessage="No reset dates available."
       searchPlaceholder="Search reset dates…"
+      filterBar={
+        <ResetDatesFilterBar
+          value={draftFilters}
+          onChange={setDraftFilters}
+          onApply={onApplyFilters}
+        />
+      }
     />
   );
 }

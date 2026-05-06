@@ -2023,9 +2023,48 @@ export type PortfolioToolsGetStockBorrowResponses = {
 export type PortfolioToolsGetResetDatesData = {
   body?: never;
   path?: never;
-  query?: never;
+  query?: {
+    /**
+     * Ticker
+     */
+    ticker?: string | null;
+    /**
+     * Start Date
+     */
+    start_date?: string | null;
+    /**
+     * End Date
+     */
+    end_date?: string | null;
+    /**
+     * Frequency
+     */
+    frequency?: string | null;
+    /**
+     * Reset Month
+     */
+    reset_month?: string | null;
+    /**
+     * Reset Day
+     */
+    reset_day?: string | null;
+    /**
+     * Reset Up Down
+     */
+    reset_up_down?: string | null;
+  };
   url: "/api/portfolio-tools/reset-dates";
 };
+
+export type PortfolioToolsGetResetDatesErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PortfolioToolsGetResetDatesError =
+  PortfolioToolsGetResetDatesErrors[keyof PortfolioToolsGetResetDatesErrors];
 
 export type PortfolioToolsGetResetDatesResponses = {
   /**
