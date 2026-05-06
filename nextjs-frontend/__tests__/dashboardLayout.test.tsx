@@ -7,6 +7,7 @@ import { PerformanceHeader } from "../components/layout/performance-header";
 import { SubtabNavigation } from "../components/layout/subtab-navigation";
 import { NotificationSidebar } from "../components/layout/notification-sidebar";
 import { NotificationsProvider } from "../lib/notifications-context";
+import { GridRegistryProvider } from "../lib/grid-registry";
 
 type WithChildren = { children?: ReactNode };
 
@@ -28,7 +29,10 @@ describe("DashboardLayout", () => {
     const provider = asElement(element.props.children);
     expect(provider.type).toBe(NotificationsProvider);
 
-    const shell = asElement(provider.props.children);
+    const gridProvider = asElement(provider.props.children);
+    expect(gridProvider.type).toBe(GridRegistryProvider);
+
+    const shell = asElement(gridProvider.props.children);
     expect(shell.type).toBe("div");
 
     const shellChildren = Children.toArray(shell.props.children);

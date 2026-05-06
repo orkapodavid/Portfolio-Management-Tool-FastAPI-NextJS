@@ -26,6 +26,7 @@ import {
   Zap,
 } from "lucide-react";
 
+import { useGridRegistry, type GridApiLike } from "@/lib/grid-registry";
 import { cn } from "@/lib/utils";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -212,6 +213,9 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   const storageKey = gridId ? `${STORAGE_PREFIX}${gridId}_state` : "";
   const showLayoutButtons = Boolean(gridId) && !hideLayoutButtons;
 
+  const registry = useGridRegistry();
+  const unregisterRef = useRef<(() => void) | null>(null);
+
   const onGridReady = (event: GridReadyEvent) => {
     gridApiRef.current = event.api;
     if (storageKey && typeof window !== "undefined") {
@@ -225,7 +229,22 @@ export function DataGrid<TRow extends Record<string, unknown>>({
         // Corrupt JSON or AG Grid version drift — ignore and let user re-save.
       }
     }
+    if (gridId && registry) {
+      unregisterRef.current?.();
+      unregisterRef.current = registry.register(gridId, {
+        api: event.api as unknown as GridApiLike,
+        rowIdKey,
+      });
+    }
   };
+
+  useEffect(
+    () => () => {
+      unregisterRef.current?.();
+      unregisterRef.current = null;
+    },
+    []
+  );
 
   const handleSaveLayout = () => {
     const api = gridApiRef.current;

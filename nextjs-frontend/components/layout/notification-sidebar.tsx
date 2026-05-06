@@ -3,6 +3,7 @@
 import { ArrowRight, BellOff, Check, CircleX, Loader2 } from "lucide-react";
 import { useMemo } from "react";
 
+import { useGridRegistry } from "@/lib/grid-registry";
 import { cn } from "@/lib/utils";
 import {
   type NotificationItem,
@@ -26,10 +27,12 @@ function AlertCard({
   notification,
   onMarkRead,
   onDismiss,
+  onGoToDetails,
 }: {
   notification: NotificationItem;
   onMarkRead: () => void;
   onDismiss: () => void;
+  onGoToDetails: () => void;
 }) {
   const textColor =
     notification.type === "info" ? "text-blue-900" : "text-gray-900";
@@ -90,6 +93,7 @@ function AlertCard({
         <button
           type="button"
           title="Go to details"
+          onClick={onGoToDetails}
           className="p-1 rounded hover:bg-white/60 text-gray-700 transition-colors"
         >
           <ArrowRight size={12} />
@@ -143,6 +147,12 @@ export function NotificationSidebar() {
     if (filter === "all") return notifications;
     return notifications.filter((n) => n.type === filter);
   }, [filter, notifications]);
+
+  const registry = useGridRegistry();
+  const handleGoToDetails = (notification: NotificationItem) => {
+    if (!registry || !notification.gridId || !notification.rowId) return;
+    registry.jumpToRow(notification.gridId, notification.rowId);
+  };
 
   return (
     <aside
@@ -198,6 +208,7 @@ export function NotificationSidebar() {
                   notification={n}
                   onMarkRead={() => markRead(n.id)}
                   onDismiss={() => dismiss(n.id)}
+                  onGoToDetails={() => handleGoToDetails(n)}
                 />
               ))
             ) : (
