@@ -2,6 +2,8 @@ import type { ColDef, ValueFormatterParams } from "ag-grid-community";
 
 import { COLORS } from "@/lib/constants";
 
+type AggFunc = "sum" | "avg" | "min" | "max" | "count" | "first" | "last";
+
 type BaseOptions = {
   field: string;
   header: string;
@@ -10,6 +12,11 @@ type BaseOptions = {
   pinned?: "left" | "right";
   align?: "left" | "right" | "center";
   hide?: boolean;
+  tooltipField?: string;
+  enableRowGroup?: boolean;
+  aggFunc?: AggFunc;
+  rowGroup?: boolean;
+  flex?: number;
 };
 
 const baseColDef = ({
@@ -19,6 +26,11 @@ const baseColDef = ({
   minWidth,
   pinned,
   hide,
+  tooltipField,
+  enableRowGroup,
+  aggFunc,
+  rowGroup,
+  flex,
 }: BaseOptions): ColDef => ({
   field,
   headerName: header,
@@ -29,6 +41,11 @@ const baseColDef = ({
   sortable: true,
   resizable: true,
   filter: true,
+  tooltipField: tooltipField ?? field,
+  enableRowGroup,
+  aggFunc,
+  rowGroup,
+  flex,
 });
 
 const alignClass = (align?: BaseOptions["align"]) => {
@@ -80,7 +97,6 @@ export function currencyColumn(
       if (params.value === null || params.value === undefined || params.value === "") {
         return "";
       }
-      // Pass through pre-formatted strings (e.g., the mock data returns "$50,000.00")
       if (typeof params.value === "string" && params.value.startsWith(symbol)) {
         return params.value;
       }
@@ -107,7 +123,6 @@ export function percentColumn(
       if (params.value === null || params.value === undefined || params.value === "") {
         return "";
       }
-      // Pass through pre-formatted strings (mock data returns "+0.5%")
       if (typeof params.value === "string" && params.value.endsWith("%")) {
         return params.value;
       }
