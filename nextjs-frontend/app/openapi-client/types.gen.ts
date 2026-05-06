@@ -1716,6 +1716,35 @@ export type PortfolioToolsGetDealIndicationResponses = {
   200: unknown;
 };
 
+export type PortfolioToolsGetPoSettlementData = {
+  body?: never;
+  path?: never;
+  query?: {
+    /**
+     * Position Date
+     */
+    position_date?: string | null;
+  };
+  url: "/api/portfolio-tools/po-settlement";
+};
+
+export type PortfolioToolsGetPoSettlementErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type PortfolioToolsGetPoSettlementError =
+  PortfolioToolsGetPoSettlementErrors[keyof PortfolioToolsGetPoSettlementErrors];
+
+export type PortfolioToolsGetPoSettlementResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
 export type InstrumentsGetTickerDataData = {
   body?: never;
   path?: never;

@@ -156,6 +156,9 @@ import type {
   PortfolioToolsGetExcessAmountResponses,
   PortfolioToolsGetDealIndicationData,
   PortfolioToolsGetDealIndicationResponses,
+  PortfolioToolsGetPoSettlementData,
+  PortfolioToolsGetPoSettlementResponses,
+  PortfolioToolsGetPoSettlementErrors,
   InstrumentsGetTickerDataData,
   InstrumentsGetTickerDataResponses,
   InstrumentsGetStockScreenerData,
@@ -1499,6 +1502,31 @@ export const portfolioToolsGetDealIndication = <
       },
     ],
     url: "/api/portfolio-tools/deal-indication",
+    ...options,
+  });
+};
+
+/**
+ * Get Po Settlement
+ */
+export const portfolioToolsGetPoSettlement = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<PortfolioToolsGetPoSettlementData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PortfolioToolsGetPoSettlementResponses,
+    PortfolioToolsGetPoSettlementErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/portfolio-tools/po-settlement",
     ...options,
   });
 };

@@ -2556,6 +2556,58 @@
         ]
       }
     },
+    "/api/portfolio-tools/po-settlement": {
+      "get": {
+        "tags": [
+          "portfolio-tools"
+        ],
+        "summary": "Get Po Settlement",
+        "operationId": "portfolio-tools-get_po_settlement",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "position_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Position Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/instruments/ticker-data": {
       "get": {
         "tags": [

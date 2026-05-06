@@ -1,21 +1,93 @@
 "use client";
 
-import { Construction } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { portfolioToolsGetPoSettlement } from "@/app/clientService";
+import { DataGrid } from "@/components/grid/data-grid";
+import { textColumn } from "@/components/grid/columns";
+import { getAuthToken } from "@/lib/auth/token-storage";
+import { getApiData, getApiError } from "@/lib/utils";
+
+type PoSettlementRow = {
+  id: number;
+  deal_num: string;
+  ticker: string;
+  company_name: string;
+  structure: string;
+  currency: string;
+  fx_rate: string;
+  last_price: string;
+  current_position: string;
+  shares_allocated: string;
+  shares_swap: string;
+  shares_hedged: string;
+};
+
+const columns = [
+  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({ field: "deal_num", header: "Deal Num", minWidth: 90 }),
+  textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
+  textColumn({ field: "structure", header: "Structure", minWidth: 100 }),
+  textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
+  textColumn({ field: "fx_rate", header: "FX Rate", minWidth: 90, align: "right" }),
+  textColumn({ field: "last_price", header: "Last Price", minWidth: 100, align: "right" }),
+  textColumn({ field: "current_position", header: "Current Position", minWidth: 130, align: "right" }),
+  textColumn({ field: "shares_allocated", header: "Shares Allocated", minWidth: 130, align: "right" }),
+  textColumn({ field: "shares_swap", header: "Shares in Swap", minWidth: 120, align: "right" }),
+  textColumn({ field: "shares_hedged", header: "Shares Hedged", minWidth: 120, align: "right" }),
+];
+
+const getStatus = (e: unknown): number | undefined => {
+  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  return (e as { response?: { status?: number } }).response?.status;
+};
 
 export default function PoSettlementPage() {
+  const router = useRouter();
+  const [rows, setRows] = useState<PoSettlementRow[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    const token = getAuthToken();
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    const response = await portfolioToolsGetPoSettlement({
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const error = getApiError(response);
+    if (error) {
+      const status = getStatus(error);
+      if (status === 401 || status === 403) {
+        router.replace("/login");
+        return;
+      }
+      setErrorMessage("Failed to load PO settlement.");
+      setIsLoading(false);
+      return;
+    }
+    setRows((getApiData(response) as PoSettlementRow[]) ?? []);
+    setErrorMessage(null);
+    setIsLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-white">
-      <Construction size={48} className="text-gray-300 mb-4" />
-      <h1 className="text-sm font-black text-gray-600 uppercase tracking-widest">
-        PO Settlement
-      </h1>
-      <p className="mt-2 max-w-md text-center text-[11px] font-medium text-gray-500">
-        Mirrors reflex po_settlement_ag_grid.py. Awaits the
-        <code className="mx-1 px-1 py-0.5 bg-gray-100 rounded text-[10px]">
-          GET /api/portfolio-tools/po-settlement
-        </code>
-        endpoint (§8 in the handoff brief).
-      </p>
-    </div>
+    <DataGrid<PoSettlementRow>
+      columns={columns}
+      rows={rows}
+      isLoading={isLoading}
+      errorMessage={errorMessage}
+      onRefresh={load}
+      emptyMessage="No PO settlement entries available."
+      searchPlaceholder="Search PO settlement…"
+    />
   );
 }
