@@ -1,5 +1,72 @@
 # Portfolio Management Tool - Continuation Log
 
+## Review, Test, And Parity Re-Audit (2026-05-06 local session)
+
+Independent post-Milestone-C review found and fixed four defects:
+
+- Market Data `historical-data` now has the Reflex ticker/date-range
+  filter bar and sends `tickers`, `start_date`, and `end_date` query
+  params to `/api/market-data/historical`.
+- Market Data `trading-calendar` now has the Reflex date-range filter
+  bar and sends `start_date` / `end_date` query params to
+  `/api/market-data/trading-calendar`.
+- Shared `DataGrid` Reset now clears the toolbar quick-filter state
+  and AG Grid `quickFilterText`, not just column state and column
+  filters.
+- Compliance `undertakings` now has the Reflex Position Date filter
+  bar and sends `position_date` to `/api/compliance/undertakings`.
+
+Browser parity evidence:
+
+- Health checks passed: FastAPI `/api/health` returned
+  `{"status":"ok","runtime":"server","database_backend":"sqlite"}`;
+  Next.js `/` returned `HTTP/1.1 200 OK`; Reflex `/pmt/` returned
+  `HTTP/1.1 200`.
+- Playwright `nextjs-review` and `reflex-review` sessions ran at
+  1440x900. Compact route probes visited all 50 matrix routes on both
+  apps with no 404s.
+- Reset Dates focused check confirmed five selects, date controls,
+  `Market Price` absent from visible headers, and Apply sending all
+  seven query params:
+  `ticker`, `start_date`, `end_date`, `frequency`, `reset_month`,
+  `reset_day`, `reset_up_down`.
+- Notifications focused checks used a fresh Next.js session. The
+  sidebar opened by default with empty localStorage; after collapse,
+  reload kept `pmt:next:notificationSidebarOpen=false` and the aside
+  rect was width `0`. With 45 mocked notifications and
+  `IntersectionObserver` disabled, the sidebar rendered `Showing 20 of
+  45` initially and the fallback button advanced to `Showing 40 of 45`.
+- Notification jump check with mocked notifications highlighted two
+  same-page Market Data row DOM sections and two cross-page PnL row DOM
+  sections; `pmt:next:pendingHighlight` was cleared in both cases.
+- Compliance Undertakings focused check confirmed the row-group panel
+  remains visible and Apply sends `position_date=2026-05-06`.
+- Canonical screenshot set was not re-shot because the visual fixes
+  touched non-canonical routes; existing 22 canonical PNGs remain the
+  current baseline.
+
+Verification after fixes:
+
+| Check | Result |
+|---|---|
+| `pnpm exec tsc --noEmit --pretty false` | clean in 1.58 s real |
+| `pnpm exec jest --runInBand` | 30 suites / 160 tests passed in 2.293 s; 3.68 s real |
+| `pnpm lint` | 0 errors / 0 warnings in 1.49 s real |
+| `pnpm build` | PASS — 59 / 59 static pages generated in 16.27 s real |
+| Desktop static export (`TAURI_BUILD=1 NEXT_PUBLIC_DESKTOP_TARGET=1 ... pnpm build`) | PASS — 59 / 59 static pages generated in 18.85 s real |
+| Backend pytest with sqlite override | 187 passed, 2 skipped in 8.29 s; 9.86 s real |
+
+Residual risks / intentional deltas:
+
+- F-9 Plotly 3-D pricer chart, F-27 mobile nav, F-28 Reflex ticker-data
+  divergence, and AG Grid Enterprise license procurement remain out of
+  scope.
+- AG Grid header virtualization means compact browser header counts are
+  sanity signals, not full column-diff evidence; documented read-only
+  Next.js column supersets remain intentional.
+- Build/test output still includes stale `baseline-browser-mapping` /
+  Browserslist data warnings, but they did not fail verification.
+
 ## Documentation Refresh (2026-05-06 local session)
 
 Updated the human and agent documentation surface for the Next.js 16 +
