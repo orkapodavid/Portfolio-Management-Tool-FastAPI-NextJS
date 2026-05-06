@@ -106,14 +106,14 @@ describe("GridRegistry", () => {
       PENDING_HIGHLIGHT_STORAGE_KEY,
       JSON.stringify({
         gridId: "pnl_change_grid",
-        rowId: "row-AAPL",
+        rowId: "AAPL",
         rowIdKey: "ticker",
       })
     );
     const { result } = renderHook(() => useGridRegistry(), { wrapper });
 
     act(() => {
-      result.current!.register("pnl_change_grid", { api, rowIdKey: "ticker" });
+      result.current!.register("pnl_change_grid", { api, rowIdKey: "id" });
     });
 
     expect(api.ensureNodeVisible).toHaveBeenCalledWith(node, "middle");

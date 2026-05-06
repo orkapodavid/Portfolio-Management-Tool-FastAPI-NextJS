@@ -33,7 +33,7 @@ type Registration = {
 
 type GridRegistryContextValue = {
   register: (gridId: string, entry: Registration) => () => void;
-  jumpToRow: (gridId: string, rowId: string) => boolean;
+  jumpToRow: (gridId: string, rowId: string, rowIdKeyOverride?: string) => boolean;
 };
 
 type PendingHighlight = {
@@ -95,54 +95,58 @@ export function GridRegistryProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const jumpToRow = useCallback((gridId: string, rowId: string) => {
-    const entry = registry.current.get(gridId);
-    if (!entry) return false;
-    const { api, rowIdKey } = entry;
+  const jumpToRow = useCallback(
+    (gridId: string, rowId: string, rowIdKeyOverride?: string) => {
+      const entry = registry.current.get(gridId);
+      if (!entry) return false;
+      const { api, rowIdKey } = entry;
+      const matchRowIdKey = rowIdKeyOverride || rowIdKey;
 
-    let node = api.getRowNode(rowId);
-    if (!node) {
-      api.forEachNode((current) => {
-        if (node) return;
-        const value = current.data?.[rowIdKey];
-        if (value !== undefined && String(value) === String(rowId)) {
-          node = current;
-        }
-      });
-    }
-    if (!node) return false;
+      let node = api.getRowNode(rowId);
+      if (!node) {
+        api.forEachNode((current) => {
+          if (node) return;
+          const value = current.data?.[matchRowIdKey];
+          if (value !== undefined && String(value) === String(rowId)) {
+            node = current;
+          }
+        });
+      }
+      if (!node) return false;
 
-    api.ensureNodeVisible(node, "middle");
-    api.flashCells({ rowNodes: [node] });
+      api.ensureNodeVisible(node, "middle");
+      api.flashCells({ rowNodes: [node] });
 
-    if (typeof document !== "undefined" && node.id) {
-      clearNotificationHighlight();
-      const highlightedRowId = node.id;
-      const apply = () => {
-        document
-          .querySelectorAll(".pmt-notification-highlight")
-          .forEach((el) => {
-            if (el.getAttribute("row-id") !== highlightedRowId) {
-              el.classList.remove("pmt-notification-highlight");
-            }
-          });
-        document
-          .querySelectorAll<HTMLElement>("[row-id]")
-          .forEach((el) => {
-            if (el.getAttribute("row-id") === highlightedRowId) {
-              el.classList.add("pmt-notification-highlight");
-            }
-          });
-      };
-      apply();
-      highlightIntervalRef.current = window.setInterval(apply, 200);
-      highlightTimeoutRef.current = window.setTimeout(() => {
+      if (typeof document !== "undefined" && node.id) {
         clearNotificationHighlight();
-      }, 1_800);
-    }
+        const highlightedRowId = node.id;
+        const apply = () => {
+          document
+            .querySelectorAll(".pmt-notification-highlight")
+            .forEach((el) => {
+              if (el.getAttribute("row-id") !== highlightedRowId) {
+                el.classList.remove("pmt-notification-highlight");
+              }
+            });
+          document
+            .querySelectorAll<HTMLElement>("[row-id]")
+            .forEach((el) => {
+              if (el.getAttribute("row-id") === highlightedRowId) {
+                el.classList.add("pmt-notification-highlight");
+              }
+            });
+        };
+        apply();
+        highlightIntervalRef.current = window.setInterval(apply, 200);
+        highlightTimeoutRef.current = window.setTimeout(() => {
+          clearNotificationHighlight();
+        }, 1_800);
+      }
 
-    return true;
-  }, [clearNotificationHighlight]);
+      return true;
+    },
+    [clearNotificationHighlight]
+  );
 
   useEffect(
     () => () => {
@@ -161,7 +165,7 @@ export function GridRegistryProvider({ children }: { children: ReactNode }) {
         const tryPendingHighlight = () => {
           const pending = readPendingHighlight();
           if (!pending || pending.gridId !== gridId) return false;
-          if (jumpToRow(pending.gridId, pending.rowId)) {
+          if (jumpToRow(pending.gridId, pending.rowId, pending.rowIdKey)) {
             window.sessionStorage.removeItem(PENDING_HIGHLIGHT_STORAGE_KEY);
             if (retryId !== null) {
               window.clearInterval(retryId);

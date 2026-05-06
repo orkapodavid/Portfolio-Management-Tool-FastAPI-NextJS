@@ -162,7 +162,12 @@ export function NotificationSidebar() {
     if (!notification.gridId || !notification.rowId) return;
     markRead(notification.id);
 
-    const jumped = registry?.jumpToRow(notification.gridId, notification.rowId);
+    const rowIdKey = getNotificationRowIdKey(notification.gridId);
+    const jumped = registry?.jumpToRow(
+      notification.gridId,
+      notification.rowId,
+      rowIdKey
+    );
     if (jumped) return;
 
     if (typeof window !== "undefined") {
@@ -171,7 +176,7 @@ export function NotificationSidebar() {
         JSON.stringify({
           gridId: notification.gridId,
           rowId: notification.rowId,
-          rowIdKey: getNotificationRowIdKey(notification.gridId),
+          rowIdKey,
         })
       );
     }
