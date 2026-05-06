@@ -1702,6 +1702,20 @@ export type PortfolioToolsGetExcessAmountResponses = {
   200: unknown;
 };
 
+export type PortfolioToolsGetDealIndicationData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: "/api/portfolio-tools/deal-indication";
+};
+
+export type PortfolioToolsGetDealIndicationResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
 export type InstrumentsGetTickerDataData = {
   body?: never;
   path?: never;

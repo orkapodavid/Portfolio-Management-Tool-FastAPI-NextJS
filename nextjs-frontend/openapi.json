@@ -2532,6 +2532,30 @@
         ]
       }
     },
+    "/api/portfolio-tools/deal-indication": {
+      "get": {
+        "tags": [
+          "portfolio-tools"
+        ],
+        "summary": "Get Deal Indication",
+        "operationId": "portfolio-tools-get_deal_indication",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
     "/api/instruments/ticker-data": {
       "get": {
         "tags": [

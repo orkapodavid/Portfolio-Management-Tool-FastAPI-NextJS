@@ -154,6 +154,8 @@ import type {
   PortfolioToolsGetCbInstallmentsResponses,
   PortfolioToolsGetExcessAmountData,
   PortfolioToolsGetExcessAmountResponses,
+  PortfolioToolsGetDealIndicationData,
+  PortfolioToolsGetDealIndicationResponses,
   InstrumentsGetTickerDataData,
   InstrumentsGetTickerDataResponses,
   InstrumentsGetStockScreenerData,
@@ -1472,6 +1474,31 @@ export const portfolioToolsGetExcessAmount = <
       },
     ],
     url: "/api/portfolio-tools/excess-amount",
+    ...options,
+  });
+};
+
+/**
+ * Get Deal Indication
+ */
+export const portfolioToolsGetDealIndication = <
+  ThrowOnError extends boolean = false,
+>(
+  options?: Options<PortfolioToolsGetDealIndicationData, ThrowOnError>,
+) => {
+  return (options?.client ?? client).get<
+    PortfolioToolsGetDealIndicationResponses,
+    unknown,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/portfolio-tools/deal-indication",
     ...options,
   });
 };
