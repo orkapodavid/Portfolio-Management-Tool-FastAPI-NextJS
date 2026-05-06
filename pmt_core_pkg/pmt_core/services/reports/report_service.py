@@ -5,7 +5,7 @@ This module mirrors the ReportClass pattern from the PyQt application,
 providing a unified interface for report data extraction and processing.
 """
 
-from typing import Optional, Any
+from typing import Optional
 from pmt_core.utilities import get_logger
 
 logger = get_logger("report_service")

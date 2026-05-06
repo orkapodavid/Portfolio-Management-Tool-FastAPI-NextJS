@@ -2,14 +2,7 @@
 Unit tests for pmt_core.models module.
 """
 
-import pytest
 from pmt_core.models import (
-    PositionRecord,
-    PnLRecord,
-    MarketDataRecord,
-    OrderRecord,
-    ComplianceRecord,
-    RiskRecord,
     InstrumentType,
     DashboardSection,
     OrderStatus,

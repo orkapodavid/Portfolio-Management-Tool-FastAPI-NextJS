@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import List
 from pmt_core.repositories.common import DatabaseRepository
 from pmt_core.models import (
     BeneficialOwnershipRecord,

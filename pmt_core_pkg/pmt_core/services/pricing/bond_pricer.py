@@ -10,7 +10,6 @@ TODO: Replace mock formulas with real pricing engine.
 """
 
 import logging
-from typing import Optional
 
 import numpy as np
 

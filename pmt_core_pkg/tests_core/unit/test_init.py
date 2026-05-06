@@ -2,8 +2,6 @@
 Unit tests for pmt_core package initialization.
 """
 
-import pytest
-
 
 class TestPackageInit:
     """Test package initialization and imports."""
@@ -25,9 +23,12 @@ class TestPackageInit:
             RiskRecord,
         )
 
-        # Just verify imports work
         assert PositionRecord is not None
         assert PnLRecord is not None
+        assert MarketDataRecord is not None
+        assert OrderRecord is not None
+        assert ComplianceRecord is not None
+        assert RiskRecord is not None
 
     def test_enum_imports(self):
         """Test that enums can be imported from package root."""
@@ -38,9 +39,10 @@ class TestPackageInit:
             ComplianceType,
         )
 
-        # Just verify imports work
         assert InstrumentType is not None
         assert DashboardSection is not None
+        assert OrderStatus is not None
+        assert ComplianceType is not None
 
 
 class TestUtilities:

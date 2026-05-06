@@ -8,7 +8,6 @@ TODO: Replace mock data with actual Bloomberg/database integration.
 import logging
 import random
 from typing import Any, Optional
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 

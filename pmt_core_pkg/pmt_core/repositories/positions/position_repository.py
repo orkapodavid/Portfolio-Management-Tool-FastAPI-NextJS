@@ -1,6 +1,6 @@
 from typing import Any, List, Optional
 from pmt_core.repositories.common import DatabaseRepository
-from pmt_core.models import PositionRecord, InstrumentType
+from pmt_core.models import PositionRecord
 import logging
 
 logger = logging.getLogger(__name__)

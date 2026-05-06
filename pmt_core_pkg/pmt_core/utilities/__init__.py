@@ -8,6 +8,8 @@ import logging
 import os
 from typing import Optional
 
+from .config_loader import ConfigLoader
+
 
 def setup_logging(
     level: Optional[str] = None,
@@ -56,8 +58,6 @@ def get_logger(name: str) -> logging.Logger:
     """
     return logging.getLogger(f"pmt_core.{name}")
 
-
-from .config_loader import ConfigLoader
 
 # Initialize default logger
 logger = setup_logging()

@@ -5,7 +5,6 @@ This module provides shared fixtures for pmt_core unit tests.
 """
 
 import pytest
-from typing import Generator
 
 
 @pytest.fixture

@@ -2,7 +2,6 @@
 Tests for pmt_core.services module.
 """
 
-import pytest
 from pmt_core.services import ReportService
 
 

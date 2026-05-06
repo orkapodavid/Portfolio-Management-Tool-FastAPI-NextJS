@@ -10,7 +10,7 @@ TODO: Replace mock data with actual database/repository calls.
 import asyncio
 import logging
 import threading
-from typing import Any, Optional
+from typing import Any
 from datetime import datetime, timedelta
 
 import yfinance as yf
