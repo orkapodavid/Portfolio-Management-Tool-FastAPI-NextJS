@@ -18,6 +18,9 @@ the full historical handoff chain.
 - `codex-team-prompt-review-test-parity-2026-05-11.md` - prompt for a
   Codex team to independently review, test, and run another parity
   comparison pass against Reflex.
+- `codex-team-prompt-remove-vercel-2026-05-11.md` - prompt for a Codex
+  team to remove active Vercel deployment config, workflows, secrets,
+  and docs because Vercel is no longer a deployment target.
 
 ## Historical Handoffs
 
