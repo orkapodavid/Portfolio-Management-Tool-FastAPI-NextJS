@@ -1,14 +1,7 @@
 import configparser
 import logging
-import os
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 from pathlib import Path
-
-# Try to use importlib.resources for modern Python (3.9+)
-try:
-    from importlib import resources
-except ImportError:
-    import importlib_resources as resources  # type: ignore
 
 logger = logging.getLogger(__name__)
 
