@@ -133,6 +133,7 @@ const NORMAL_ROW_HEIGHT = 42;
 const NORMAL_HEADER_HEIGHT = 48;
 
 const STORAGE_PREFIX = "pmt:next:";
+const SEARCH_DEBOUNCE_MS = 300;
 
 type SavedGridState = Record<string, unknown> & {
   columnSizing?: {
@@ -217,7 +218,10 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   }, [rows]);
 
   useEffect(() => {
-    gridApiRef.current?.setGridOption("quickFilterText", searchValue);
+    const timeoutId = window.setTimeout(() => {
+      gridApiRef.current?.setGridOption("quickFilterText", searchValue);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => window.clearTimeout(timeoutId);
   }, [searchValue]);
 
   useEffect(() => {

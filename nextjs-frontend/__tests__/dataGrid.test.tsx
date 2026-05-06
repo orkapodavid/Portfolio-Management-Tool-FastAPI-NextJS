@@ -157,6 +157,34 @@ describe("DataGrid", () => {
     expect(input.value).toBe("");
   });
 
+  it("debounces AG Grid quick-filter updates by 300 ms", async () => {
+    jest.useFakeTimers();
+    const api = buildGridApi();
+    render(
+      <DataGrid<Row>
+        columns={columns}
+        rows={rows}
+        searchPlaceholder="Find…"
+      />
+    );
+    lastGridReadyHandler!({ api });
+
+    const input = screen.getByPlaceholderText("Find…") as HTMLInputElement;
+    fireEvent.change(input, { target: { value: "AAP" } });
+    fireEvent.change(input, { target: { value: "AAPL" } });
+
+    await act(async () => {
+      jest.advanceTimersByTime(299);
+    });
+    expect(api.setGridOption).not.toHaveBeenCalled();
+
+    await act(async () => {
+      jest.advanceTimersByTime(1);
+    });
+    expect(api.setGridOption).toHaveBeenCalledTimes(1);
+    expect(api.setGridOption).toHaveBeenCalledWith("quickFilterText", "AAPL");
+  });
+
   it("persists state under a namespaced key on Save and round-trips on Restore", () => {
     const api = buildGridApi();
     render(<DataGrid<Row> columns={columns} rows={rows} gridId="positions_grid" />);
