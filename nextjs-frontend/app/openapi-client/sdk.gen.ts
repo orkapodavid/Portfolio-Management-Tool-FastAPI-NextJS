@@ -192,6 +192,12 @@ import type {
   OperationsGetDailyProceduresResponses,
   OperationsGetOperationProcessesData,
   OperationsGetOperationProcessesResponses,
+  OperationsRerunProcessData,
+  OperationsRerunProcessResponses,
+  OperationsRerunProcessErrors,
+  OperationsKillProcessData,
+  OperationsKillProcessResponses,
+  OperationsKillProcessErrors,
   OrdersGetOrdersData,
   OrdersGetOrdersResponses,
   OrdersGetOrderRoutesData,
@@ -1871,6 +1877,60 @@ export const operationsGetOperationProcesses = <
     ],
     url: "/api/operations/processes",
     ...options,
+  });
+};
+
+/**
+ * Rerun Process
+ */
+export const operationsRerunProcess = <ThrowOnError extends boolean = false>(
+  options: Options<OperationsRerunProcessData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    OperationsRerunProcessResponses,
+    OperationsRerunProcessErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/operations/processes/{process_id}/rerun",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+};
+
+/**
+ * Kill Process
+ */
+export const operationsKillProcess = <ThrowOnError extends boolean = false>(
+  options: Options<OperationsKillProcessData, ThrowOnError>,
+) => {
+  return (options.client ?? client).post<
+    OperationsKillProcessResponses,
+    OperationsKillProcessErrors,
+    ThrowOnError
+  >({
+    responseType: "json",
+    security: [
+      {
+        scheme: "bearer",
+        type: "http",
+      },
+    ],
+    url: "/api/operations/processes/{process_id}/kill",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
   });
 };
 

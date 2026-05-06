@@ -3128,6 +3128,120 @@
         ]
       }
     },
+    "/api/operations/processes/{process_id}/rerun": {
+      "post": {
+        "tags": [
+          "operations"
+        ],
+        "summary": "Rerun Process",
+        "operationId": "operations-rerun_process",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "process_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Process Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessActionRequest",
+                "default": {
+                  "process_name": ""
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/operations/processes/{process_id}/kill": {
+      "post": {
+        "tags": [
+          "operations"
+        ],
+        "summary": "Kill Process",
+        "operationId": "operations-kill_process",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "process_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Process Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProcessActionRequest",
+                "default": {
+                  "process_name": ""
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/orders/": {
       "get": {
         "tags": [
@@ -3850,6 +3964,17 @@
         ],
         "title": "PayoffCurve",
         "description": "2D curve series for the pricer chart (Spot vs Value/Delta/Gamma)."
+      },
+      "ProcessActionRequest": {
+        "properties": {
+          "process_name": {
+            "type": "string",
+            "title": "Process Name",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "ProcessActionRequest"
       },
       "UserCreate": {
         "properties": {

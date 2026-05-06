@@ -319,6 +319,16 @@ export type PayoffCurve = {
 };
 
 /**
+ * ProcessActionRequest
+ */
+export type ProcessActionRequest = {
+  /**
+   * Process Name
+   */
+  process_name?: string;
+};
+
+/**
  * UserCreate
  */
 export type UserCreate = {
@@ -2294,6 +2304,64 @@ export type OperationsGetOperationProcessesData = {
 };
 
 export type OperationsGetOperationProcessesResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type OperationsRerunProcessData = {
+  body?: ProcessActionRequest;
+  path: {
+    /**
+     * Process Id
+     */
+    process_id: number;
+  };
+  query?: never;
+  url: "/api/operations/processes/{process_id}/rerun";
+};
+
+export type OperationsRerunProcessErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type OperationsRerunProcessError =
+  OperationsRerunProcessErrors[keyof OperationsRerunProcessErrors];
+
+export type OperationsRerunProcessResponses = {
+  /**
+   * Successful Response
+   */
+  200: unknown;
+};
+
+export type OperationsKillProcessData = {
+  body?: ProcessActionRequest;
+  path: {
+    /**
+     * Process Id
+     */
+    process_id: number;
+  };
+  query?: never;
+  url: "/api/operations/processes/{process_id}/kill";
+};
+
+export type OperationsKillProcessErrors = {
+  /**
+   * Validation Error
+   */
+  422: HttpValidationError;
+};
+
+export type OperationsKillProcessError =
+  OperationsKillProcessErrors[keyof OperationsKillProcessErrors];
+
+export type OperationsKillProcessResponses = {
   /**
    * Successful Response
    */
