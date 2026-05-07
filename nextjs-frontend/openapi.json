@@ -444,6 +444,9 @@
               }
             }
           },
+          "401": {
+            "description": "Missing token or inactive user."
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -470,9 +473,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Missing token or inactive user."
           },
           "422": {
             "description": "Validation Error",
@@ -590,6 +590,15 @@
               }
             }
           },
+          "401": {
+            "description": "Missing token or inactive user."
+          },
+          "403": {
+            "description": "Not a superuser."
+          },
+          "404": {
+            "description": "The user does not exist."
+          },
           "400": {
             "content": {
               "application/json": {
@@ -616,15 +625,6 @@
               }
             },
             "description": "Bad Request"
-          },
-          "401": {
-            "description": "Missing token or inactive user."
-          },
-          "403": {
-            "description": "Not a superuser."
-          },
-          "404": {
-            "description": "The user does not exist."
           },
           "422": {
             "description": "Validation Error",
@@ -3812,17 +3812,17 @@
           "notional": {
             "type": "number",
             "title": "Notional",
-            "default": 100
+            "default": 100.0
           },
           "coupon_rate": {
             "type": "number",
             "title": "Coupon Rate",
-            "default": 0
+            "default": 0.0
           },
           "redemption_rate": {
             "type": "number",
             "title": "Redemption Rate",
-            "default": 1
+            "default": 1.0
           },
           "volatility": {
             "type": "number",
@@ -3847,12 +3847,12 @@
           "time_to_maturity_years": {
             "type": "number",
             "title": "Time To Maturity Years",
-            "default": 1
+            "default": 1.0
           },
           "min_exe_disc": {
             "type": "number",
             "title": "Min Exe Disc",
-            "default": 0
+            "default": 0.0
           },
           "exec_redeemed": {
             "type": "integer",
@@ -3877,12 +3877,12 @@
           "jump_lambda": {
             "type": "number",
             "title": "Jump Lambda",
-            "default": 0
+            "default": 0.0
           },
           "jump_mean": {
             "type": "number",
             "title": "Jump Mean",
-            "default": 0
+            "default": 0.0
           },
           "jump_std_dev": {
             "type": "number",
@@ -4090,7 +4090,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 0
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -4102,7 +4102,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 1
+                "minimum": 1.0
               },
               {
                 "type": "null"
@@ -4114,7 +4114,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 1
+                "minimum": 1.0
               },
               {
                 "type": "null"
@@ -4126,7 +4126,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 0
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -4399,12 +4399,12 @@
           "time_to_maturity_years": {
             "type": "number",
             "title": "Time To Maturity Years",
-            "default": 1
+            "default": 1.0
           },
           "min_exe_disc": {
             "type": "number",
             "title": "Min Exe Disc",
-            "default": 0
+            "default": 0.0
           },
           "reset_lookback_days": {
             "type": "integer",
@@ -4434,12 +4434,12 @@
           "jump_lambda": {
             "type": "number",
             "title": "Jump Lambda",
-            "default": 0
+            "default": 0.0
           },
           "jump_mean": {
             "type": "number",
             "title": "Jump Mean",
-            "default": 0
+            "default": 0.0
           },
           "jump_std_dev": {
             "type": "number",
