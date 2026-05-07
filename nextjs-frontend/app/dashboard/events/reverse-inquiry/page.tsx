@@ -23,7 +23,12 @@ type ReverseInquiryRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   textColumn({ field: "company", header: "Company", minWidth: 150 }),
   dateColumn({ field: "inquiry_date", header: "Inquiry Date", minWidth: 110 }),
   dateColumn({ field: "expiry_date", header: "Expiry Date", minWidth: 110 }),
@@ -33,7 +38,8 @@ const columns = [
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -45,32 +51,35 @@ export default function ReverseInquiryPage() {
   const [draftDate, setDraftDate] = useState("");
   const [appliedDate, setAppliedDate] = useState("");
 
-  const load = useCallback(async (date: string) => {
-    setIsLoading(true);
-    const token = getAuthToken();
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-    const response = await eventsGetReverseInquiries({
-      headers: { Authorization: `Bearer ${token}` },
-      query: date ? { position_date: date } : undefined,
-    });
-    const error = getApiError(response);
-    if (error) {
-      const status = getStatus(error);
-      if (status === 401 || status === 403) {
+  const load = useCallback(
+    async (date: string) => {
+      setIsLoading(true);
+      const token = getAuthToken();
+      if (!token) {
         router.replace("/login");
         return;
       }
-      setErrorMessage("Failed to load reverse inquiries.");
+      const response = await eventsGetReverseInquiries({
+        headers: { Authorization: `Bearer ${token}` },
+        query: date ? { position_date: date } : undefined,
+      });
+      const error = getApiError(response);
+      if (error) {
+        const status = getStatus(error);
+        if (status === 401 || status === 403) {
+          router.replace("/login");
+          return;
+        }
+        setErrorMessage("Failed to load reverse inquiries.");
+        setIsLoading(false);
+        return;
+      }
+      setRows((getApiData(response) as ReverseInquiryRow[]) ?? []);
+      setErrorMessage(null);
       setIsLoading(false);
-      return;
-    }
-    setRows((getApiData(response) as ReverseInquiryRow[]) ?? []);
-    setErrorMessage(null);
-    setIsLoading(false);
-  }, [router]);
+    },
+    [router],
+  );
 
   useEffect(() => {
     void load("");

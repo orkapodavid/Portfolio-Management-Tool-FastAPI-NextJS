@@ -25,7 +25,7 @@ const updateDecimalField = <TRow extends GridRow>(
   field: string,
   factorMin: number,
   factorMax: number,
-  decimals: number
+  decimals: number,
 ): TRow => {
   const current = row[field];
   const numeric = toNumber(current);
@@ -39,7 +39,7 @@ const updateRandomRangeField = <TRow extends GridRow>(
   field: string,
   min: number,
   max: number,
-  decimals: number
+  decimals: number,
 ): TRow => {
   if (!(field in row)) return row;
   const current = row[field];
@@ -51,7 +51,7 @@ const updateIntegerField = <TRow extends GridRow>(
   row: TRow,
   field: string,
   factorMin: number,
-  factorMax: number
+  factorMax: number,
 ): TRow => {
   const current = row[field];
   const numeric = toNumber(current);
@@ -60,7 +60,9 @@ const updateIntegerField = <TRow extends GridRow>(
   return { ...row, [field]: formatIntLike(current, numeric * factor) };
 };
 
-export const marketDataSimulator = <TRow extends GridRow>(rows: TRow[]): TRow[] => {
+export const marketDataSimulator = <TRow extends GridRow>(
+  rows: TRow[],
+): TRow[] => {
   if (rows.length === 0) return rows;
 
   const nextRows = [...rows];
@@ -217,12 +219,7 @@ export const simulateNumericTick = <TRow extends GridRow>(
   options: NumericTickOptions,
 ): TRow[] => {
   if (rows.length === 0) return rows;
-  const {
-    fields,
-    numRows = 3,
-    jitter = [0.98, 1.02],
-    decimals = 4,
-  } = options;
+  const { fields, numRows = 3, jitter = [0.98, 1.02], decimals = 4 } = options;
 
   const next = [...rows];
   const count = randomInt(1, Math.min(numRows, next.length));

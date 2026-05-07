@@ -32,7 +32,12 @@ type TradeSummaryRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   textColumn({ field: "deal_num", header: "Deal Num", minWidth: 90 }),
   textColumn({ field: "detail_id", header: "Detail ID", minWidth: 90 }),
   textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
@@ -43,11 +48,17 @@ const columns = [
   textColumn({ field: "subtype", header: "Subtype", minWidth: 90 }),
   textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
   dateColumn({ field: "closing_date", header: "Closing Date", minWidth: 100 }),
-  numberColumn({ field: "divisor", header: "Divisor", minWidth: 80, decimals: 2 }),
+  numberColumn({
+    field: "divisor",
+    header: "Divisor",
+    minWidth: 80,
+    decimals: 2,
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -92,7 +103,7 @@ export default function TradeSummaryPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {
@@ -132,7 +143,9 @@ export default function TradeSummaryPage() {
         <DateRangeFilterBar
           fromValue={draftRange.start}
           toValue={draftRange.end}
-          onFromChange={(start) => setDraftRange((prev) => ({ ...prev, start }))}
+          onFromChange={(start) =>
+            setDraftRange((prev) => ({ ...prev, start }))
+          }
           onToChange={(end) => setDraftRange((prev) => ({ ...prev, end }))}
           onApply={onApply}
           onClear={onClear}

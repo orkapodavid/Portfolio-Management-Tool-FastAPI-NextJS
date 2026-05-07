@@ -41,7 +41,7 @@ export function DataTable({
                 className={cn(
                   "text-[11px] font-semibold text-[#a6adc8] uppercase tracking-wider h-8 px-3",
                   col.align === "right" && "text-right",
-                  col.align === "center" && "text-center"
+                  col.align === "center" && "text-center",
                 )}
               >
                 {col.header}
@@ -101,12 +101,8 @@ export function DataTable({
                         "text-xs px-3 py-1.5",
                         col.align === "right" && "text-right",
                         col.align === "center" && "text-center",
-                        isFinancialValue &&
-                          isPositive &&
-                          "text-[#00A651]",
-                        isFinancialValue &&
-                          isNegative &&
-                          "text-[#C00000]"
+                        isFinancialValue && isPositive && "text-[#00A651]",
+                        isFinancialValue && isNegative && "text-[#C00000]",
                       )}
                     >
                       {displayValue}

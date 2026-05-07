@@ -24,19 +24,65 @@ type MonthlyExerciseLimitRow = {
 };
 
 const columns = [
-  textColumn({ field: "underlying", header: "Underlying", minWidth: 100, enableRowGroup: true }),
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100, enableRowGroup: true }),
+  textColumn({
+    field: "underlying",
+    header: "Underlying",
+    minWidth: 100,
+    enableRowGroup: true,
+  }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+    enableRowGroup: true,
+  }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
-  textColumn({ field: "sec_type", header: "Sec Type", minWidth: 90, enableRowGroup: true }),
-  textColumn({ field: "original_nosh", header: "Original Nosh", minWidth: 110, align: "right" }),
-  textColumn({ field: "original_quantity", header: "Original Quantity", minWidth: 120, align: "right", aggFunc: "sum" }),
-  textColumn({ field: "monthly_exercised_quantity", header: "Monthly Exercised Qty", minWidth: 150, align: "right", aggFunc: "sum" }),
-  textColumn({ field: "monthly_exercised_pct", header: "Monthly Exercised %", minWidth: 130, align: "right", aggFunc: "avg" }),
-  textColumn({ field: "monthly_sal", header: "Monthly Sal", minWidth: 100, align: "right", aggFunc: "sum" }),
+  textColumn({
+    field: "sec_type",
+    header: "Sec Type",
+    minWidth: 90,
+    enableRowGroup: true,
+  }),
+  textColumn({
+    field: "original_nosh",
+    header: "Original Nosh",
+    minWidth: 110,
+    align: "right",
+  }),
+  textColumn({
+    field: "original_quantity",
+    header: "Original Quantity",
+    minWidth: 120,
+    align: "right",
+    aggFunc: "sum",
+  }),
+  textColumn({
+    field: "monthly_exercised_quantity",
+    header: "Monthly Exercised Qty",
+    minWidth: 150,
+    align: "right",
+    aggFunc: "sum",
+  }),
+  textColumn({
+    field: "monthly_exercised_pct",
+    header: "Monthly Exercised %",
+    minWidth: 130,
+    align: "right",
+    aggFunc: "avg",
+  }),
+  textColumn({
+    field: "monthly_sal",
+    header: "Monthly Sal",
+    minWidth: 100,
+    align: "right",
+    aggFunc: "sum",
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -75,7 +121,7 @@ export default function MonthlyExerciseLimitPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

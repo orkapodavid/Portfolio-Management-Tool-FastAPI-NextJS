@@ -27,22 +27,92 @@ type PnlCurrencyRow = {
 };
 
 const columns = [
-  dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100, enableRowGroup: true }),
-  textColumn({ field: "currency", header: "Currency", pinned: "left", minWidth: 90, enableRowGroup: true }),
-  textColumn({ field: "fx_rate", header: "FX Rate", minWidth: 90, align: "right" }),
-  textColumn({ field: "fx_rate_t_1", header: "FX Rate (T-1)", minWidth: 110, align: "right" }),
-  textColumn({ field: "fx_rate_change", header: "FX Rate Change", minWidth: 120, align: "right" }),
-  textColumn({ field: "ccy_exposure", header: "CCY Exposure", minWidth: 110, align: "right", enableRowGroup: true, aggFunc: "sum" }),
-  textColumn({ field: "usd_exposure", header: "USD Exposure", minWidth: 110, align: "right", enableRowGroup: true, aggFunc: "sum" }),
-  textColumn({ field: "pos_ccy_expo", header: "POS CCY Expo", minWidth: 110, align: "right" }),
-  textColumn({ field: "ccy_hedged_pnl", header: "CCY Hedged PnL", minWidth: 120, align: "right", enableRowGroup: true, aggFunc: "sum" }),
-  textColumn({ field: "pos_ccy_pnl", header: "POS CCY PnL", minWidth: 110, align: "right", enableRowGroup: true, aggFunc: "sum" }),
-  textColumn({ field: "net_ccy", header: "Net CC", minWidth: 90, align: "right" }),
-  textColumn({ field: "pos_c_truncated", header: "POS C (truncated)", minWidth: 130, align: "right" }),
+  dateColumn({
+    field: "trade_date",
+    header: "Trade Date",
+    minWidth: 100,
+    enableRowGroup: true,
+  }),
+  textColumn({
+    field: "currency",
+    header: "Currency",
+    pinned: "left",
+    minWidth: 90,
+    enableRowGroup: true,
+  }),
+  textColumn({
+    field: "fx_rate",
+    header: "FX Rate",
+    minWidth: 90,
+    align: "right",
+  }),
+  textColumn({
+    field: "fx_rate_t_1",
+    header: "FX Rate (T-1)",
+    minWidth: 110,
+    align: "right",
+  }),
+  textColumn({
+    field: "fx_rate_change",
+    header: "FX Rate Change",
+    minWidth: 120,
+    align: "right",
+  }),
+  textColumn({
+    field: "ccy_exposure",
+    header: "CCY Exposure",
+    minWidth: 110,
+    align: "right",
+    enableRowGroup: true,
+    aggFunc: "sum",
+  }),
+  textColumn({
+    field: "usd_exposure",
+    header: "USD Exposure",
+    minWidth: 110,
+    align: "right",
+    enableRowGroup: true,
+    aggFunc: "sum",
+  }),
+  textColumn({
+    field: "pos_ccy_expo",
+    header: "POS CCY Expo",
+    minWidth: 110,
+    align: "right",
+  }),
+  textColumn({
+    field: "ccy_hedged_pnl",
+    header: "CCY Hedged PnL",
+    minWidth: 120,
+    align: "right",
+    enableRowGroup: true,
+    aggFunc: "sum",
+  }),
+  textColumn({
+    field: "pos_ccy_pnl",
+    header: "POS CCY PnL",
+    minWidth: 110,
+    align: "right",
+    enableRowGroup: true,
+    aggFunc: "sum",
+  }),
+  textColumn({
+    field: "net_ccy",
+    header: "Net CC",
+    minWidth: 90,
+    align: "right",
+  }),
+  textColumn({
+    field: "pos_c_truncated",
+    header: "POS C (truncated)",
+    minWidth: 130,
+    align: "right",
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -81,7 +151,7 @@ export default function PnlCurrencyPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

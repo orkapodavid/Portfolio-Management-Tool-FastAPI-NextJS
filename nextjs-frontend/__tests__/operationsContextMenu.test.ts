@@ -5,7 +5,9 @@ type MenuItem = { name?: string; action?: () => void } | string;
 const fakeParams = (data: Record<string, unknown> | undefined) =>
   ({
     node: data === undefined ? null : ({ data } as { data: unknown }),
-  }) as unknown as Parameters<ReturnType<typeof getOperationsContextMenuItems>>[0];
+  }) as unknown as Parameters<
+    ReturnType<typeof getOperationsContextMenuItems>
+  >[0];
 
 describe("operations context menu", () => {
   it("prepends Rerun + Kill ahead of the AG Grid default items", () => {
@@ -33,7 +35,10 @@ describe("operations context menu", () => {
       fakeParams({ id: 42, process: "Risk Engine" }),
     ) as MenuItem[];
     (items[0] as { action: () => void }).action();
-    expect(onRerun).toHaveBeenCalledWith({ id: 42, process_name: "Risk Engine" });
+    expect(onRerun).toHaveBeenCalledWith({
+      id: 42,
+      process_name: "Risk Engine",
+    });
     expect(onKill).not.toHaveBeenCalled();
   });
 
@@ -59,5 +64,4 @@ describe("operations context menu", () => {
     (items[0] as { action: () => void }).action();
     expect(onRerun).toHaveBeenCalledWith({ id: 0, process_name: "Unknown" });
   });
-
 });

@@ -33,12 +33,12 @@ describe("DashboardAuthGate auth bypass", () => {
     render(
       <DashboardAuthGate>
         <div data-testid="protected">protected-content</div>
-      </DashboardAuthGate>
+      </DashboardAuthGate>,
     );
 
     expect(screen.getByTestId("protected")).toBeInTheDocument();
     expect(
-      screen.queryByText(/Checking your session/i)
+      screen.queryByText(/Checking your session/i),
     ).not.toBeInTheDocument();
     expect(usersCurrentUserMock).not.toHaveBeenCalled();
     expect(replaceMock).not.toHaveBeenCalled();

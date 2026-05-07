@@ -38,19 +38,25 @@ export function PayoffChart({
   const yRange = yMax - yMin || 1;
 
   const sx = (x: number) => PADDING.left + ((x - xMin) / xRange) * innerWidth;
-  const sy = (y: number) => PADDING.top + (1 - (y - yMin) / yRange) * innerHeight;
+  const sy = (y: number) =>
+    PADDING.top + (1 - (y - yMin) / yRange) * innerHeight;
 
   const path = xValues
-    .map((x, i) => `${i === 0 ? "M" : "L"}${sx(x).toFixed(1)},${sy(yValues[i]).toFixed(1)}`)
+    .map(
+      (x, i) =>
+        `${i === 0 ? "M" : "L"}${sx(x).toFixed(1)},${sy(yValues[i]).toFixed(1)}`,
+    )
     .join(" ");
 
   const yTicks = 5;
-  const tickValues = Array.from({ length: yTicks }, (_, i) =>
-    yMin + (i * yRange) / (yTicks - 1),
+  const tickValues = Array.from(
+    { length: yTicks },
+    (_, i) => yMin + (i * yRange) / (yTicks - 1),
   );
   const xTicks = 6;
-  const xTickValues = Array.from({ length: xTicks }, (_, i) =>
-    xMin + (i * xRange) / (xTicks - 1),
+  const xTickValues = Array.from(
+    { length: xTicks },
+    (_, i) => xMin + (i * xRange) / (xTicks - 1),
   );
 
   return (
@@ -117,7 +123,12 @@ export function PayoffChart({
         y={height - 4}
         textAnchor="middle"
         className="fill-gray-600"
-        style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}
+        style={{
+          fontSize: 10,
+          fontWeight: 600,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+        }}
       >
         {xLabel}
       </text>
@@ -127,7 +138,12 @@ export function PayoffChart({
         textAnchor="middle"
         transform={`rotate(-90 12 ${PADDING.top + innerHeight / 2})`}
         className="fill-gray-600"
-        style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}
+        style={{
+          fontSize: 10,
+          fontWeight: 600,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+        }}
       >
         {yLabel}
       </text>

@@ -194,7 +194,7 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCompact, setIsCompact] = useState(false);
   const [autoRefreshOn, setAutoRefreshOn] = useState(
-    showAutoRefresh && !defaultAutoRefreshOff
+    showAutoRefresh && !defaultAutoRefreshOff,
   );
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [displayRows, setDisplayRows] = useState(rows);
@@ -242,7 +242,8 @@ export function DataGrid<TRow extends Record<string, unknown>>({
   };
 
   const effectiveAutoRefreshInterval =
-    autoRefreshIntervalMs ?? (simulateUpdate ? simulateUpdateIntervalMs : 30_000);
+    autoRefreshIntervalMs ??
+    (simulateUpdate ? simulateUpdateIntervalMs : 30_000);
 
   useEffect(() => {
     if (!showAutoRefresh || !autoRefreshOn) return;
@@ -266,7 +267,12 @@ export function DataGrid<TRow extends Record<string, unknown>>({
       setLastUpdated(new Date());
     }, simulateUpdateIntervalMs);
     return () => window.clearInterval(id);
-  }, [showAutoRefresh, autoRefreshOn, simulateUpdate, simulateUpdateIntervalMs]);
+  }, [
+    showAutoRefresh,
+    autoRefreshOn,
+    simulateUpdate,
+    simulateUpdateIntervalMs,
+  ]);
 
   const storageKey = gridId ? `${STORAGE_PREFIX}${gridId}_state` : "";
   const showLayoutButtons = Boolean(gridId) && !hideLayoutButtons;
@@ -281,7 +287,9 @@ export function DataGrid<TRow extends Record<string, unknown>>({
         const raw = window.localStorage.getItem(storageKey);
         if (raw) {
           const state = stripFlexFromColumns(JSON.parse(raw) as SavedGridState);
-          event.api.setState(state as unknown as Parameters<typeof event.api.setState>[0]);
+          event.api.setState(
+            state as unknown as Parameters<typeof event.api.setState>[0],
+          );
         }
       } catch {
         // Corrupt JSON or AG Grid version drift — ignore and let user re-save.
@@ -301,7 +309,7 @@ export function DataGrid<TRow extends Record<string, unknown>>({
       unregisterRef.current?.();
       unregisterRef.current = null;
     },
-    []
+    [],
   );
 
   const handleSaveLayout = () => {
@@ -373,7 +381,7 @@ export function DataGrid<TRow extends Record<string, unknown>>({
         ? (params: { data: TRow }) =>
             String((params.data as Record<string, unknown>)[rowIdKey])
         : undefined,
-    [hasStableRowIds, rowIdKey]
+    [hasStableRowIds, rowIdKey],
   );
 
   const defaultColDef = useMemo<ColDef>(
@@ -381,10 +389,11 @@ export function DataGrid<TRow extends Record<string, unknown>>({
       enableCellFlash
         ? { ...DEFAULT_COL_DEF, enableCellChangeFlash: true }
         : DEFAULT_COL_DEF,
-    [enableCellFlash]
+    [enableCellFlash],
   );
 
-  const filenamePrefix = exportPrefix ?? (gridId ? gridId.replace(/_grid$/, "") : "");
+  const filenamePrefix =
+    exportPrefix ?? (gridId ? gridId.replace(/_grid$/, "") : "");
   const showExcelButton = Boolean(gridId) && !hideExcelExport;
 
   const handleExportExcel = () => {
@@ -412,7 +421,7 @@ export function DataGrid<TRow extends Record<string, unknown>>({
       enableMultiSelect
         ? { mode: "multiRow", checkboxes: true, headerCheckbox: true }
         : undefined,
-    [enableMultiSelect]
+    [enableMultiSelect],
   );
   const rowNumbers = showRowNumbers ? true : undefined;
   const rowGroupPanelShow = showRowGroupPanel ? "always" : undefined;
@@ -427,7 +436,9 @@ export function DataGrid<TRow extends Record<string, unknown>>({
     : "—";
 
   return (
-    <div className={cn("flex flex-col h-full min-h-0 w-full bg-white", className)}>
+    <div
+      className={cn("flex flex-col h-full min-h-0 w-full bg-white", className)}
+    >
       {showAutoRefresh ? (
         <div className="flex items-center justify-between px-4 py-1.5 bg-gradient-to-r from-slate-50/95 via-white/90 to-slate-50/95 border-b border-slate-200/60 text-[11px] font-medium w-full shadow-sm shrink-0">
           <div className="flex items-center gap-4">
@@ -554,7 +565,10 @@ export function DataGrid<TRow extends Record<string, unknown>>({
           {onToolbarDateChange ? (
             <div className="group relative flex items-center bg-white border border-gray-200/80 rounded-lg h-7 min-w-[140px] shadow-sm hover:shadow-md hover:border-blue-300/60 transition-all duration-200 overflow-hidden cursor-pointer">
               <div className="flex items-center justify-center w-7 h-full bg-gradient-to-br from-blue-50 to-indigo-50 border-r border-gray-100 group-hover:from-blue-100 group-hover:to-indigo-100 transition-all duration-200">
-                <CalendarDays size={14} className="text-blue-500 group-hover:text-blue-600 transition-colors" />
+                <CalendarDays
+                  size={14}
+                  className="text-blue-500 group-hover:text-blue-600 transition-colors"
+                />
               </div>
               <input
                 type="date"
@@ -564,7 +578,10 @@ export function DataGrid<TRow extends Record<string, unknown>>({
                 className="flex-1 bg-transparent text-[11px] font-semibold text-gray-700 outline-none px-2.5 h-full cursor-pointer appearance-none [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer"
               />
               <div className="flex items-center justify-center pr-2">
-                <ChevronDown size={12} className="text-gray-400 group-hover:text-blue-500 transition-colors" />
+                <ChevronDown
+                  size={12}
+                  className="text-gray-400 group-hover:text-blue-500 transition-colors"
+                />
               </div>
             </div>
           ) : null}
@@ -580,13 +597,17 @@ export function DataGrid<TRow extends Record<string, unknown>>({
                   "px-2 h-6 text-[10px] font-bold rounded shadow-sm flex items-center transition-colors border",
                   isCompact
                     ? "bg-violet-100 text-violet-700 border-violet-300"
-                    : "bg-white border-gray-200 text-gray-600 hover:bg-violet-50 hover:text-violet-600"
+                    : "bg-white border-gray-200 text-gray-600 hover:bg-violet-50 hover:text-violet-600",
                 )}
               >
                 <Rows3 size={12} />
-                <span className="ml-1">{isCompact ? "Compact ✓" : "Compact"}</span>
+                <span className="ml-1">
+                  {isCompact ? "Compact ✓" : "Compact"}
+                </span>
               </button>
-              {showLayoutButtons ? <div className="w-px h-4 bg-gray-300 mx-1" /> : null}
+              {showLayoutButtons ? (
+                <div className="w-px h-4 bg-gray-300 mx-1" />
+              ) : null}
             </>
           ) : null}
           {showLayoutButtons ? (

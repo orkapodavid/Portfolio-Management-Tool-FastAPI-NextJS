@@ -26,7 +26,12 @@ type CalendarRow = {
 };
 
 const columns = [
-  dateColumn({ field: "trade_date", header: "Trade Date", pinned: "left", minWidth: 110 }),
+  dateColumn({
+    field: "trade_date",
+    header: "Trade Date",
+    pinned: "left",
+    minWidth: 110,
+  }),
   textColumn({ field: "day_of_week", header: "Day of Week", minWidth: 110 }),
   textColumn({ field: "usa", header: "USA", minWidth: 80, align: "center" }),
   textColumn({ field: "hkg", header: "HKG", minWidth: 80, align: "center" }),
@@ -40,7 +45,8 @@ const columns = [
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -91,7 +97,7 @@ export default function TradingCalendarPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {
@@ -129,7 +135,9 @@ export default function TradingCalendarPage() {
         <DateRangeFilterBar
           fromValue={draftRange.start}
           toValue={draftRange.end}
-          onFromChange={(start) => setDraftRange((prev) => ({ ...prev, start }))}
+          onFromChange={(start) =>
+            setDraftRange((prev) => ({ ...prev, start }))
+          }
           onToChange={(end) => setDraftRange((prev) => ({ ...prev, end }))}
           onApply={onApply}
           onClear={onClear}

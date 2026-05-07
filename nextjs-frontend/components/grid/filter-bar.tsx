@@ -60,7 +60,7 @@ export function FilterBar({
           onClick={onApply}
           className={cn(
             BTN_CLASS,
-            "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-md"
+            "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-md",
           )}
         >
           <Search size={12} />
@@ -72,7 +72,7 @@ export function FilterBar({
             onClick={onClear}
             className={cn(
               BTN_CLASS,
-              "bg-white border border-gray-200 text-gray-500 hover:text-red-500 hover:border-red-300"
+              "bg-white border border-gray-200 text-gray-500 hover:text-red-500 hover:border-red-300",
             )}
           >
             <X size={12} />
@@ -107,7 +107,11 @@ export function DateRangeFilterBar({
   extraLeadingContent,
 }: DateRangeFilterBarProps) {
   return (
-    <FilterBar onApply={onApply} onClear={onClear} hasActiveFilters={hasActiveFilters}>
+    <FilterBar
+      onApply={onApply}
+      onClear={onClear}
+      hasActiveFilters={hasActiveFilters}
+    >
       {extraLeadingContent ? (
         <>
           {extraLeadingContent}
@@ -138,7 +142,11 @@ export function SingleDateFilterBar({
   hasActiveFilters,
 }: SingleDateFilterBarProps) {
   return (
-    <FilterBar onApply={onApply} onClear={onClear} hasActiveFilters={hasActiveFilters}>
+    <FilterBar
+      onApply={onApply}
+      onClear={onClear}
+      hasActiveFilters={hasActiveFilters}
+    >
       <FilterDateInput label={label} value={value} onChange={onChange} />
     </FilterBar>
   );

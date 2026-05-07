@@ -12,7 +12,7 @@ export function isAuthDisabled(): boolean {
   }
 
   return !["0", "false", "no", "off"].includes(
-    configuredValue.trim().toLowerCase()
+    configuredValue.trim().toLowerCase(),
   );
 }
 
@@ -56,12 +56,7 @@ function removeCookie(name: string) {
     return;
   }
 
-  const cookieParts = [
-    `${name}=`,
-    "Path=/",
-    "Max-Age=0",
-    "SameSite=Lax",
-  ];
+  const cookieParts = [`${name}=`, "Path=/", "Max-Age=0", "SameSite=Lax"];
 
   if (window.location.protocol === "https:") {
     cookieParts.push("Secure");

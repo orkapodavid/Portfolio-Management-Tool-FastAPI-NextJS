@@ -26,20 +26,86 @@ type PnlChangeRow = {
 };
 
 const columns = [
-  dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100, enableRowGroup: true }),
-  textColumn({ field: "underlying", header: "Underlying", minWidth: 100, enableRowGroup: true }),
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100, enableRowGroup: true }),
-  textColumn({ field: "pnl_ytd", header: "PnL YTD", minWidth: 100, align: "right", enableRowGroup: true, aggFunc: "sum" }),
-  textColumn({ field: "pnl_chg_1d", header: "PnL Chg 1D", minWidth: 100, align: "right", enableRowGroup: true, aggFunc: "sum" }),
-  textColumn({ field: "pnl_chg_1w", header: "PnL Chg 1W", minWidth: 100, align: "right", enableRowGroup: true, aggFunc: "sum" }),
-  textColumn({ field: "pnl_chg_1m", header: "PnL Chg 1M", minWidth: 100, align: "right", enableRowGroup: true, aggFunc: "sum" }),
-  textColumn({ field: "pnl_chg_pct_1d", header: "PnL Chg% 1D", minWidth: 100, align: "right", enableRowGroup: true, aggFunc: "avg" }),
-  textColumn({ field: "pnl_chg_pct_1w", header: "PnL Chg% 1W", minWidth: 100, align: "right", enableRowGroup: true, aggFunc: "avg" }),
-  textColumn({ field: "pnl_chg_pct_1m", header: "PnL Chg% 1M", minWidth: 100, align: "right", enableRowGroup: true, aggFunc: "avg" }),
+  dateColumn({
+    field: "trade_date",
+    header: "Trade Date",
+    minWidth: 100,
+    enableRowGroup: true,
+  }),
+  textColumn({
+    field: "underlying",
+    header: "Underlying",
+    minWidth: 100,
+    enableRowGroup: true,
+  }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+    enableRowGroup: true,
+  }),
+  textColumn({
+    field: "pnl_ytd",
+    header: "PnL YTD",
+    minWidth: 100,
+    align: "right",
+    enableRowGroup: true,
+    aggFunc: "sum",
+  }),
+  textColumn({
+    field: "pnl_chg_1d",
+    header: "PnL Chg 1D",
+    minWidth: 100,
+    align: "right",
+    enableRowGroup: true,
+    aggFunc: "sum",
+  }),
+  textColumn({
+    field: "pnl_chg_1w",
+    header: "PnL Chg 1W",
+    minWidth: 100,
+    align: "right",
+    enableRowGroup: true,
+    aggFunc: "sum",
+  }),
+  textColumn({
+    field: "pnl_chg_1m",
+    header: "PnL Chg 1M",
+    minWidth: 100,
+    align: "right",
+    enableRowGroup: true,
+    aggFunc: "sum",
+  }),
+  textColumn({
+    field: "pnl_chg_pct_1d",
+    header: "PnL Chg% 1D",
+    minWidth: 100,
+    align: "right",
+    enableRowGroup: true,
+    aggFunc: "avg",
+  }),
+  textColumn({
+    field: "pnl_chg_pct_1w",
+    header: "PnL Chg% 1W",
+    minWidth: 100,
+    align: "right",
+    enableRowGroup: true,
+    aggFunc: "avg",
+  }),
+  textColumn({
+    field: "pnl_chg_pct_1m",
+    header: "PnL Chg% 1M",
+    minWidth: 100,
+    align: "right",
+    enableRowGroup: true,
+    aggFunc: "avg",
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -78,7 +144,7 @@ export default function PnlChangePage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

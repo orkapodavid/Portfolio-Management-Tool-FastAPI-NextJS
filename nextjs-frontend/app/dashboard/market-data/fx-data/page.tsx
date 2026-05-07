@@ -23,8 +23,18 @@ type FxRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
-  numberColumn({ field: "last_price", header: "Last Price", minWidth: 100, decimals: 4 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
+  numberColumn({
+    field: "last_price",
+    header: "Last Price",
+    minWidth: 100,
+    decimals: 4,
+  }),
   numberColumn({ field: "bid", header: "Bid", minWidth: 80, decimals: 4 }),
   numberColumn({ field: "ask", header: "Ask", minWidth: 80, decimals: 4 }),
   textColumn({ field: "created_by", header: "Created by", minWidth: 100 }),
@@ -34,7 +44,8 @@ const columns = [
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

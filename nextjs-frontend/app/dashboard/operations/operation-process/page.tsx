@@ -23,13 +23,23 @@ type OperationProcessRow = {
 };
 
 const columns = [
-  textColumn({ field: "process", header: "Process", pinned: "left", minWidth: 150 }),
+  textColumn({
+    field: "process",
+    header: "Process",
+    pinned: "left",
+    minWidth: 150,
+  }),
   textColumn({ field: "status", header: "Status", minWidth: 100 }),
-  textColumn({ field: "last_run_time", header: "Last Run Time", minWidth: 150 }),
+  textColumn({
+    field: "last_run_time",
+    header: "Last Run Time",
+    minWidth: 150,
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

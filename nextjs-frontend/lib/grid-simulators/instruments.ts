@@ -77,12 +77,15 @@ export const stockScreenerSimulator = <TRow extends GridRow>(
       const cleaned = lp.replace(/,/g, "");
       const parsed = Number(cleaned);
       if (Number.isFinite(parsed)) {
-        const value = Math.round(parsed * randomFloat(0.995, 1.005) * 100) / 100;
-        (next as Record<string, unknown>)["last_price"] =
-          value.toLocaleString("en-US", {
+        const value =
+          Math.round(parsed * randomFloat(0.995, 1.005) * 100) / 100;
+        (next as Record<string, unknown>)["last_price"] = value.toLocaleString(
+          "en-US",
+          {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
-          });
+          },
+        );
       }
     }
     const cap = next["mkt_cap_usd"];
@@ -91,11 +94,13 @@ export const stockScreenerSimulator = <TRow extends GridRow>(
       const parsed = Number(cleaned);
       if (Number.isFinite(parsed)) {
         const value = Math.round(parsed * randomFloat(0.99, 1.01) * 100) / 100;
-        (next as Record<string, unknown>)["mkt_cap_usd"] =
-          value.toLocaleString("en-US", {
+        (next as Record<string, unknown>)["mkt_cap_usd"] = value.toLocaleString(
+          "en-US",
+          {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
-          });
+          },
+        );
       }
     }
     return next;

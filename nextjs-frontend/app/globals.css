@@ -43,7 +43,11 @@
 
 /* Notification → grid jump highlight (mirrors Reflex .notification-highlight). */
 .pmt-notification-highlight {
-  background: linear-gradient(90deg, rgb(59 130 246 / 0.25), rgb(168 85 247 / 0.15)) !important;
+  background: linear-gradient(
+    90deg,
+    rgb(59 130 246 / 0.25),
+    rgb(168 85 247 / 0.15)
+  ) !important;
   border-left: 4px solid #3b82f6 !important;
   transition: background 200ms ease;
 }
@@ -53,5 +57,9 @@
 }
 
 .ag-row.pmt-notification-highlight:hover {
-  background: linear-gradient(90deg, rgb(59 130 246 / 0.35), rgb(168 85 247 / 0.25)) !important;
+  background: linear-gradient(
+    90deg,
+    rgb(59 130 246 / 0.35),
+    rgb(168 85 247 / 0.25)
+  ) !important;
 }

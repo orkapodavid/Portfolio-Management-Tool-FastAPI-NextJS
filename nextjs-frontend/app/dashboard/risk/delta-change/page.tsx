@@ -25,19 +25,50 @@ type DeltaChangeRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
   textColumn({ field: "sec_type", header: "Structure", minWidth: 100 }),
   textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
-  textColumn({ field: "fx_rate", header: "FX Rate", minWidth: 90, align: "right" }),
-  textColumn({ field: "spot_price", header: "Current Price", minWidth: 110, align: "right" }),
-  textColumn({ field: "valuation_price", header: "Valuation Price", minWidth: 120, align: "right" }),
-  textColumn({ field: "pos_delta", header: "POS DELTA", minWidth: 100, align: "right" }),
-  textColumn({ field: "pos_gamma", header: "Pos Gamma", minWidth: 100, align: "right" }),
+  textColumn({
+    field: "fx_rate",
+    header: "FX Rate",
+    minWidth: 90,
+    align: "right",
+  }),
+  textColumn({
+    field: "spot_price",
+    header: "Current Price",
+    minWidth: 110,
+    align: "right",
+  }),
+  textColumn({
+    field: "valuation_price",
+    header: "Valuation Price",
+    minWidth: 120,
+    align: "right",
+  }),
+  textColumn({
+    field: "pos_delta",
+    header: "POS DELTA",
+    minWidth: 100,
+    align: "right",
+  }),
+  textColumn({
+    field: "pos_gamma",
+    header: "Pos Gamma",
+    minWidth: 100,
+    align: "right",
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -76,7 +107,7 @@ export default function DeltaChangePage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

@@ -40,7 +40,9 @@ export const dailyProceduresSimulator = <TRow extends GridRow>(
     if ("status" in updated) {
       const current = updated.status;
       if (typeof current === "string") {
-        const currentIdx = statuses.indexOf(current as (typeof statuses)[number]);
+        const currentIdx = statuses.indexOf(
+          current as (typeof statuses)[number],
+        );
         if (currentIdx >= 0 && currentIdx < statuses.length - 2) {
           if (Math.random() > 0.7) {
             (updated as Record<string, unknown>).status =

@@ -51,8 +51,7 @@ const jitterCommaDecimal = (
   const parsed = Number(cleaned);
   if (!Number.isFinite(parsed)) return raw;
   const factor = jitterMin + Math.random() * (jitterMax - jitterMin);
-  const next =
-    Math.round(parsed * factor * 10 ** decimals) / 10 ** decimals;
+  const next = Math.round(parsed * factor * 10 ** decimals) / 10 ** decimals;
   return formatCommaDecimal(next, decimals);
 };
 
@@ -128,8 +127,7 @@ export const resetDatesSimulator = <TRow extends GridRow>(
  */
 export const comingResetsSimulator = <TRow extends GridRow>(
   rows: TRow[],
-): TRow[] =>
-  jitterFieldOnRandomRows(rows, "cal_days", jitterCountdownInteger);
+): TRow[] => jitterFieldOnRandomRows(rows, "cal_days", jitterCountdownInteger);
 
 /**
  * Reflex parity port of `CBInstallmentsMixin.simulate_cb_installments_update` —
@@ -179,9 +177,7 @@ export const poSettlementSimulator = <TRow extends GridRow>(
  * Reflex parity port of `ShortECLMixin.simulate_short_ecl_update` —
  * jitters comma-formatted integer `short_position` ±2% on 1-3 random rows.
  */
-export const shortEclSimulator = <TRow extends GridRow>(
-  rows: TRow[],
-): TRow[] =>
+export const shortEclSimulator = <TRow extends GridRow>(rows: TRow[]): TRow[] =>
   jitterFieldOnRandomRows(rows, "short_position", (raw) =>
     jitterCommaInteger(raw, 0.98, 1.02),
   );

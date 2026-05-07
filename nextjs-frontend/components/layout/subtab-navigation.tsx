@@ -9,7 +9,7 @@ export function SubtabNavigation() {
   const pathname = usePathname();
 
   const activeModule = MODULES.find((m) =>
-    pathname.startsWith(`/dashboard/${m.id}`)
+    pathname.startsWith(`/dashboard/${m.id}`),
   );
 
   if (!activeModule) return null;
@@ -35,7 +35,7 @@ export function SubtabNavigation() {
                 "px-3 h-full flex items-center text-[9px] uppercase tracking-tighter whitespace-nowrap border-b-2",
                 isActive
                   ? "font-black text-blue-600 border-blue-600"
-                  : "font-bold text-gray-400 border-transparent hover:text-gray-600"
+                  : "font-bold text-gray-400 border-transparent hover:text-gray-600",
               )}
             >
               {subtab.label}

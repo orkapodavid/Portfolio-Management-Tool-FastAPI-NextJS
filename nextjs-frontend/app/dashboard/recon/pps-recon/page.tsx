@@ -24,7 +24,12 @@ type PpsReconRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   dateColumn({ field: "value_date", header: "Value Date", minWidth: 100 }),
   dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
   textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
@@ -36,7 +41,8 @@ const columns = [
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -75,7 +81,7 @@ export default function PpsReconPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

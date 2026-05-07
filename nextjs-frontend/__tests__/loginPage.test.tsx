@@ -83,7 +83,9 @@ describe("Login Page", () => {
       />,
     );
 
-    expect(await screen.findByText("LOGIN_BAD_CREDENTIALS")).toBeInTheDocument();
+    expect(
+      await screen.findByText("LOGIN_BAD_CREDENTIALS"),
+    ).toBeInTheDocument();
   });
 
   it("displays the server error message", async () => {

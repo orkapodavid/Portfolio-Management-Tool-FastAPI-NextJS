@@ -26,19 +26,65 @@ type BeneficialOwnershipRow = {
 
 const columns = [
   dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100, enableRowGroup: true }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+    enableRowGroup: true,
+  }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
-  textColumn({ field: "nosh_reported", header: "NOSH (Reported)", minWidth: 120, align: "right" }),
-  textColumn({ field: "nosh_bbg", header: "NOSH (BBG)", minWidth: 100, align: "right" }),
-  textColumn({ field: "nosh_proforma", header: "NOSH Proforma", minWidth: 120, align: "right" }),
-  textColumn({ field: "stock_shares", header: "Stock Shares", minWidth: 100, align: "right", aggFunc: "sum" }),
-  textColumn({ field: "warrant_shares", header: "Warrant Shares", minWidth: 110, align: "right", aggFunc: "sum" }),
-  textColumn({ field: "bond_shares", header: "Bond Shares", minWidth: 100, align: "right", aggFunc: "sum" }),
-  textColumn({ field: "total_shares", header: "Total Shares", minWidth: 100, align: "right", aggFunc: "sum" }),
+  textColumn({
+    field: "nosh_reported",
+    header: "NOSH (Reported)",
+    minWidth: 120,
+    align: "right",
+  }),
+  textColumn({
+    field: "nosh_bbg",
+    header: "NOSH (BBG)",
+    minWidth: 100,
+    align: "right",
+  }),
+  textColumn({
+    field: "nosh_proforma",
+    header: "NOSH Proforma",
+    minWidth: 120,
+    align: "right",
+  }),
+  textColumn({
+    field: "stock_shares",
+    header: "Stock Shares",
+    minWidth: 100,
+    align: "right",
+    aggFunc: "sum",
+  }),
+  textColumn({
+    field: "warrant_shares",
+    header: "Warrant Shares",
+    minWidth: 110,
+    align: "right",
+    aggFunc: "sum",
+  }),
+  textColumn({
+    field: "bond_shares",
+    header: "Bond Shares",
+    minWidth: 100,
+    align: "right",
+    aggFunc: "sum",
+  }),
+  textColumn({
+    field: "total_shares",
+    header: "Total Shares",
+    minWidth: 100,
+    align: "right",
+    aggFunc: "sum",
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -77,7 +123,7 @@ export default function BeneficialOwnershipPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

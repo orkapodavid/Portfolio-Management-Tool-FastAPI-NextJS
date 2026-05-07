@@ -45,7 +45,7 @@ export function TopNavigation() {
   const authDisabled = isAuthDisabled();
 
   const activeModuleId = MODULES.find((m) =>
-    pathname.startsWith(`/dashboard/${m.id}`)
+    pathname.startsWith(`/dashboard/${m.id}`),
   )?.id;
 
   const handleLogout = async () => {
@@ -86,7 +86,7 @@ export function TopNavigation() {
                 "h-full flex items-center px-2 border-b-2 relative",
                 isActive
                   ? "border-blue-500 bg-white/10"
-                  : "border-transparent hover:bg-white/5"
+                  : "border-transparent hover:bg-white/5",
               )}
             >
               <div className="flex flex-row items-center gap-1.5 relative">
@@ -101,7 +101,7 @@ export function TopNavigation() {
                     "text-[9px] uppercase",
                     isActive
                       ? "font-bold text-white"
-                      : "font-medium text-gray-400 hover:text-gray-200"
+                      : "font-medium text-gray-400 hover:text-gray-200",
                   )}
                 >
                   {mod.label}
@@ -122,16 +122,14 @@ export function TopNavigation() {
           onClick={toggleOpen}
           className={cn(
             "group p-1 rounded-md transition-all duration-200 relative",
-            isOpen
-              ? "bg-white/20 text-white"
-              : "hover:bg-white/10"
+            isOpen ? "bg-white/20 text-white" : "hover:bg-white/10",
           )}
         >
           <div className="relative">
             <Bell
               size={16}
               className={cn(
-                isOpen ? "text-white" : "text-gray-400 group-hover:text-white"
+                isOpen ? "text-white" : "text-gray-400 group-hover:text-white",
               )}
             />
             {unreadCount > 0 && (

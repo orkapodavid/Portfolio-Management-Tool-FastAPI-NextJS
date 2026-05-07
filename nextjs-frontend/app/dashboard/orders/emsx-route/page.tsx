@@ -22,17 +22,43 @@ type RouteRow = {
 };
 
 const columns = [
-  textColumn({ field: "route_id", header: "Route ID", pinned: "left", minWidth: 110 }),
-  numberColumn({ field: "order_id", header: "Order ID", minWidth: 90, decimals: 0 }),
+  textColumn({
+    field: "route_id",
+    header: "Route ID",
+    pinned: "left",
+    minWidth: 110,
+  }),
+  numberColumn({
+    field: "order_id",
+    header: "Order ID",
+    minWidth: 90,
+    decimals: 0,
+  }),
   textColumn({ field: "broker", header: "Broker", minWidth: 90 }),
-  numberColumn({ field: "quantity", header: "Quantity", minWidth: 100, decimals: 0 }),
-  numberColumn({ field: "filled_quantity", header: "Filled Quantity", minWidth: 130, decimals: 0 }),
-  textColumn({ field: "avg_price", header: "Avg Price", minWidth: 100, align: "right" }),
+  numberColumn({
+    field: "quantity",
+    header: "Quantity",
+    minWidth: 100,
+    decimals: 0,
+  }),
+  numberColumn({
+    field: "filled_quantity",
+    header: "Filled Quantity",
+    minWidth: 130,
+    decimals: 0,
+  }),
+  textColumn({
+    field: "avg_price",
+    header: "Avg Price",
+    minWidth: 100,
+    align: "right",
+  }),
   textColumn({ field: "status", header: "Status", minWidth: 100 }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

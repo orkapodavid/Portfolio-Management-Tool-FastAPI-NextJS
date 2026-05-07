@@ -61,9 +61,7 @@ describe("orders simulators", () => {
     });
 
     it("reseeds filled_quantity if the value is missing", () => {
-      const rows: Array<{ id: number; filled_quantity?: number }> = [
-        { id: 1 },
-      ];
+      const rows: Array<{ id: number; filled_quantity?: number }> = [{ id: 1 }];
       const next = emsxRouteSimulator(rows);
       const value = (next[0] as { filled_quantity: number }).filled_quantity;
       // Missing → parsed as 0 → bumped by 50..500.

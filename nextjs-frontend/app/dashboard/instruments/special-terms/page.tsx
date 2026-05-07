@@ -23,18 +23,33 @@ type SpecialTermRow = {
 };
 
 const columns = [
-  textColumn({ field: "deal_num", header: "Deal Num", pinned: "left", minWidth: 90 }),
+  textColumn({
+    field: "deal_num",
+    header: "Deal Num",
+    pinned: "left",
+    minWidth: 90,
+  }),
   textColumn({ field: "ticker", header: "Ticker", minWidth: 100 }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
   textColumn({ field: "sec_type", header: "Sec Type", minWidth: 90 }),
   textColumn({ field: "pos_loc", header: "Position Location", minWidth: 130 }),
   textColumn({ field: "account", header: "Account", minWidth: 100 }),
-  dateColumn({ field: "effective_date", header: "Effective Date", minWidth: 110 }),
-  textColumn({ field: "position", header: "Position", minWidth: 90, align: "right" }),
+  dateColumn({
+    field: "effective_date",
+    header: "Effective Date",
+    minWidth: 110,
+  }),
+  textColumn({
+    field: "position",
+    header: "Position",
+    minWidth: 90,
+    align: "right",
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

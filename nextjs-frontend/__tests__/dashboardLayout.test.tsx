@@ -1,4 +1,9 @@
-import { Children, isValidElement, type ReactElement, type ReactNode } from "react";
+import {
+  Children,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 
 import DashboardLayout from "../app/dashboard/layout";
 import { DashboardAuthGate } from "../components/auth/dashboard-auth-gate";
@@ -51,7 +56,7 @@ describe("DashboardLayout", () => {
     const main = asElement(columnChildren[1]);
     expect(main.type).toBe("main");
     expect((main.props as { children: unknown }).children).toEqual(
-      <div>dashboard-content</div>
+      <div>dashboard-content</div>,
     );
 
     expect(asElement(lowerChildren[1]).type).toBe(NotificationSidebar);

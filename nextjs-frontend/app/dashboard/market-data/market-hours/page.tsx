@@ -21,17 +21,27 @@ type MarketHoursRow = {
 };
 
 const columns = [
-  textColumn({ field: "market", header: "Market", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "market",
+    header: "Market",
+    pinned: "left",
+    minWidth: 100,
+  }),
   textColumn({ field: "ticker", header: "Ticker", minWidth: 100 }),
   textColumn({ field: "session", header: "Session", minWidth: 100 }),
   textColumn({ field: "local_time", header: "Local Time", minWidth: 110 }),
-  textColumn({ field: "session_period", header: "Session Period", minWidth: 120 }),
+  textColumn({
+    field: "session_period",
+    header: "Session Period",
+    minWidth: 120,
+  }),
   textColumn({ field: "is_open", header: "Is Open?", minWidth: 100 }),
   textColumn({ field: "timezone", header: "Timezone", minWidth: 100 }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

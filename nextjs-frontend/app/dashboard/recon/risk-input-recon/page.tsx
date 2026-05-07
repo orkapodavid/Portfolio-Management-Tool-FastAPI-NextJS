@@ -24,19 +24,50 @@ type RiskInputReconRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   dateColumn({ field: "value_date", header: "Value Date", minWidth: 100 }),
   textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
   textColumn({ field: "sec_type", header: "Sec Type", minWidth: 90 }),
-  textColumn({ field: "spot_mc", header: "Spot (MC)", minWidth: 90, align: "right" }),
-  textColumn({ field: "spot_ppd", header: "Spot (PPD)", minWidth: 90, align: "right" }),
-  textColumn({ field: "position", header: "Position", minWidth: 90, align: "right" }),
-  textColumn({ field: "value_mc", header: "Value (MC)", minWidth: 90, align: "right" }),
-  textColumn({ field: "value_ppd", header: "Value (PPD)", minWidth: 90, align: "right" }),
+  textColumn({
+    field: "spot_mc",
+    header: "Spot (MC)",
+    minWidth: 90,
+    align: "right",
+  }),
+  textColumn({
+    field: "spot_ppd",
+    header: "Spot (PPD)",
+    minWidth: 90,
+    align: "right",
+  }),
+  textColumn({
+    field: "position",
+    header: "Position",
+    minWidth: 90,
+    align: "right",
+  }),
+  textColumn({
+    field: "value_mc",
+    header: "Value (MC)",
+    minWidth: 90,
+    align: "right",
+  }),
+  textColumn({
+    field: "value_ppd",
+    header: "Value (PPD)",
+    minWidth: 90,
+    align: "right",
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -75,7 +106,7 @@ export default function RiskInputReconPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

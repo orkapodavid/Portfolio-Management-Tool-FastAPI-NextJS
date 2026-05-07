@@ -15,7 +15,7 @@ export type GridApiLike = {
   forEachNode: (cb: (node: RowNodeLike) => void) => void;
   ensureNodeVisible: (
     node: RowNodeLike | string | ((row: RowNodeLike) => boolean),
-    pos?: "top" | "middle" | "bottom"
+    pos?: "top" | "middle" | "bottom",
   ) => void;
   flashCells: (params: { rowNodes: RowNodeLike[] }) => void;
 };
@@ -33,7 +33,11 @@ type Registration = {
 
 type GridRegistryContextValue = {
   register: (gridId: string, entry: Registration) => () => void;
-  jumpToRow: (gridId: string, rowId: string, rowIdKeyOverride?: string) => boolean;
+  jumpToRow: (
+    gridId: string,
+    rowId: string,
+    rowIdKeyOverride?: string,
+  ) => boolean;
 };
 
 type PendingHighlight = {
@@ -45,7 +49,9 @@ type PendingHighlight = {
 export const PENDING_HIGHLIGHT_STORAGE_KEY = "pmt:next:pendingHighlight";
 const PENDING_HIGHLIGHT_RETRY_TIMEOUT_MS = 15_000;
 
-const GridRegistryContext = createContext<GridRegistryContextValue | null>(null);
+const GridRegistryContext = createContext<GridRegistryContextValue | null>(
+  null,
+);
 
 const normalizePendingHighlight = (value: unknown): PendingHighlight | null => {
   if (typeof value !== "object" || value === null) return null;
@@ -129,13 +135,11 @@ export function GridRegistryProvider({ children }: { children: ReactNode }) {
                 el.classList.remove("pmt-notification-highlight");
               }
             });
-          document
-            .querySelectorAll<HTMLElement>("[row-id]")
-            .forEach((el) => {
-              if (el.getAttribute("row-id") === highlightedRowId) {
-                el.classList.add("pmt-notification-highlight");
-              }
-            });
+          document.querySelectorAll<HTMLElement>("[row-id]").forEach((el) => {
+            if (el.getAttribute("row-id") === highlightedRowId) {
+              el.classList.add("pmt-notification-highlight");
+            }
+          });
         };
         apply();
         highlightIntervalRef.current = window.setInterval(apply, 200);
@@ -146,14 +150,14 @@ export function GridRegistryProvider({ children }: { children: ReactNode }) {
 
       return true;
     },
-    [clearNotificationHighlight]
+    [clearNotificationHighlight],
   );
 
   useEffect(
     () => () => {
       clearNotificationHighlight();
     },
-    [clearNotificationHighlight]
+    [clearNotificationHighlight],
   );
 
   const register = useCallback(
@@ -200,12 +204,12 @@ export function GridRegistryProvider({ children }: { children: ReactNode }) {
         }
       };
     },
-    [jumpToRow]
+    [jumpToRow],
   );
 
   const value = useMemo<GridRegistryContextValue>(
     () => ({ register, jumpToRow }),
-    [register, jumpToRow]
+    [register, jumpToRow],
   );
 
   return (

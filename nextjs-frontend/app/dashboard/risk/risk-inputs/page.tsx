@@ -28,23 +28,64 @@ type RiskInputRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   textColumn({ field: "seed", header: "Seed", minWidth: 80, align: "right" }),
-  textColumn({ field: "simulation_num", header: "Simulation#", minWidth: 100, align: "right" }),
-  textColumn({ field: "trial_num", header: "Trial#", minWidth: 80, align: "right" }),
+  textColumn({
+    field: "simulation_num",
+    header: "Simulation#",
+    minWidth: 100,
+    align: "right",
+  }),
+  textColumn({
+    field: "trial_num",
+    header: "Trial#",
+    minWidth: 80,
+    align: "right",
+  }),
   textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
   textColumn({ field: "sec_type", header: "Sec Type", minWidth: 90 }),
   textColumn({ field: "is_private", header: "Is Private", minWidth: 90 }),
-  textColumn({ field: "notional", header: "Notional", minWidth: 90, align: "right" }),
-  textColumn({ field: "notional_used", header: "Notional Used", minWidth: 110, align: "right" }),
-  textColumn({ field: "notional_current", header: "Notional Current", minWidth: 120, align: "right" }),
+  textColumn({
+    field: "notional",
+    header: "Notional",
+    minWidth: 90,
+    align: "right",
+  }),
+  textColumn({
+    field: "notional_used",
+    header: "Notional Used",
+    minWidth: 110,
+    align: "right",
+  }),
+  textColumn({
+    field: "notional_current",
+    header: "Notional Current",
+    minWidth: 120,
+    align: "right",
+  }),
   textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
-  textColumn({ field: "fx_rate", header: "FX Rate", minWidth: 90, align: "right" }),
-  textColumn({ field: "spot_price", header: "Spot Price", minWidth: 100, align: "right" }),
+  textColumn({
+    field: "fx_rate",
+    header: "FX Rate",
+    minWidth: 90,
+    align: "right",
+  }),
+  textColumn({
+    field: "spot_price",
+    header: "Spot Price",
+    minWidth: 100,
+    align: "right",
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

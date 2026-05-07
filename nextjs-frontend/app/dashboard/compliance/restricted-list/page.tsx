@@ -23,19 +23,35 @@ type RestrictedListRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100, enableRowGroup: true }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+    enableRowGroup: true,
+  }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
   textColumn({ field: "in_emsx", header: "In EMSX?", minWidth: 80 }),
-  textColumn({ field: "compliance_type", header: "Compliance Type", minWidth: 120, enableRowGroup: true }),
+  textColumn({
+    field: "compliance_type",
+    header: "Compliance Type",
+    minWidth: 120,
+    enableRowGroup: true,
+  }),
   textColumn({ field: "firm_block", header: "Firm Block", minWidth: 100 }),
-  textColumn({ field: "compliance_start", header: "Compliance Start", minWidth: 120 }),
+  textColumn({
+    field: "compliance_start",
+    header: "Compliance Start",
+    minWidth: 120,
+  }),
   textColumn({ field: "nda_end", header: "NDA End", minWidth: 90 }),
   textColumn({ field: "mnpi_end", header: "MNPI End", minWidth: 90 }),
   textColumn({ field: "wc_end", header: "WC End", minWidth: 90 }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

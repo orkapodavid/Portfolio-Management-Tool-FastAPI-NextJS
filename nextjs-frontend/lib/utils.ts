@@ -21,8 +21,7 @@ export function getErrorMessage(
   ) {
     // If detail is an object with a 'reason' key, use that
     const reason = error.detail["reason"];
-    errorMessage =
-      typeof reason === "string" ? reason : JSON.stringify(reason);
+    errorMessage = typeof reason === "string" ? reason : JSON.stringify(reason);
   }
 
   return errorMessage;

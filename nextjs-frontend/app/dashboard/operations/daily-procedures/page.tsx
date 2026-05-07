@@ -30,20 +30,42 @@ type DailyProcedureRow = {
 };
 
 const columns = [
-  textColumn({ field: "procedure_name", header: "Procedure", pinned: "left", minWidth: 150 }),
+  textColumn({
+    field: "procedure_name",
+    header: "Procedure",
+    pinned: "left",
+    minWidth: 150,
+  }),
   dateColumn({ field: "check_date", header: "Check Date", minWidth: 110 }),
-  dateColumn({ field: "host_run_date", header: "Host Run Date", minWidth: 120 }),
-  textColumn({ field: "scheduled_time", header: "Scheduled Time", minWidth: 120 }),
+  dateColumn({
+    field: "host_run_date",
+    header: "Host Run Date",
+    minWidth: 120,
+  }),
+  textColumn({
+    field: "scheduled_time",
+    header: "Scheduled Time",
+    minWidth: 120,
+  }),
   textColumn({ field: "status", header: "Status", minWidth: 100 }),
-  textColumn({ field: "error_message", header: "Error Message", minWidth: 150 }),
+  textColumn({
+    field: "error_message",
+    header: "Error Message",
+    minWidth: 150,
+  }),
   textColumn({ field: "frequency", header: "Frequency", minWidth: 100 }),
-  textColumn({ field: "scheduled_day", header: "Scheduled Day", minWidth: 110 }),
+  textColumn({
+    field: "scheduled_day",
+    header: "Scheduled Day",
+    minWidth: 110,
+  }),
   textColumn({ field: "created_by", header: "Created By", minWidth: 100 }),
   textColumn({ field: "created_time", header: "Created Time", minWidth: 130 }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

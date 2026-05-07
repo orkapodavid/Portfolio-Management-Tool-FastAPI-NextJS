@@ -30,16 +30,34 @@ type MarketDataRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
-  numberColumn({ field: "listed_shares", header: "Listed Shares (mm)", minWidth: 130 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
+  numberColumn({
+    field: "listed_shares",
+    header: "Listed Shares (mm)",
+    minWidth: 130,
+  }),
   numberColumn({ field: "last_volume", header: "Last Volume", minWidth: 110 }),
   numberColumn({ field: "last_price", header: "Last Price", minWidth: 100 }),
   numberColumn({ field: "vwap_price", header: "vWAP Price", minWidth: 100 }),
   numberColumn({ field: "bid", header: "Bid", minWidth: 80 }),
   numberColumn({ field: "ask", header: "Ask", minWidth: 80 }),
   percentColumn({ field: "chg_1d_pct", header: "1D Change %", minWidth: 110 }),
-  percentColumn({ field: "implied_vol_pct", header: "Implied Vol %", minWidth: 110, colorBySign: false }),
-  textColumn({ field: "market_status", header: "Market Status", minWidth: 120 }),
+  percentColumn({
+    field: "implied_vol_pct",
+    header: "Implied Vol %",
+    minWidth: 110,
+    colorBySign: false,
+  }),
+  textColumn({
+    field: "market_status",
+    header: "Market Status",
+    minWidth: 120,
+  }),
   textColumn({ field: "created_by", header: "Created by", minWidth: 100 }),
 ];
 

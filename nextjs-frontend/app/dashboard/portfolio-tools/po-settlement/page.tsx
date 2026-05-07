@@ -27,21 +27,57 @@ type PoSettlementRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   textColumn({ field: "deal_num", header: "Deal Num", minWidth: 90 }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
   textColumn({ field: "structure", header: "Structure", minWidth: 100 }),
   textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
-  textColumn({ field: "fx_rate", header: "FX Rate", minWidth: 90, align: "right" }),
-  textColumn({ field: "last_price", header: "Last Price", minWidth: 100, align: "right" }),
-  textColumn({ field: "current_position", header: "Current Position", minWidth: 130, align: "right" }),
-  textColumn({ field: "shares_allocated", header: "Shares Allocated", minWidth: 130, align: "right" }),
-  textColumn({ field: "shares_swap", header: "Shares in Swap", minWidth: 120, align: "right" }),
-  textColumn({ field: "shares_hedged", header: "Shares Hedged", minWidth: 120, align: "right" }),
+  textColumn({
+    field: "fx_rate",
+    header: "FX Rate",
+    minWidth: 90,
+    align: "right",
+  }),
+  textColumn({
+    field: "last_price",
+    header: "Last Price",
+    minWidth: 100,
+    align: "right",
+  }),
+  textColumn({
+    field: "current_position",
+    header: "Current Position",
+    minWidth: 130,
+    align: "right",
+  }),
+  textColumn({
+    field: "shares_allocated",
+    header: "Shares Allocated",
+    minWidth: 130,
+    align: "right",
+  }),
+  textColumn({
+    field: "shares_swap",
+    header: "Shares in Swap",
+    minWidth: 120,
+    align: "right",
+  }),
+  textColumn({
+    field: "shares_hedged",
+    header: "Shares Hedged",
+    minWidth: 120,
+    align: "right",
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -80,7 +116,7 @@ export default function PoSettlementPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

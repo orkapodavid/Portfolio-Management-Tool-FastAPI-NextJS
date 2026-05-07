@@ -79,7 +79,9 @@ describe("Password Reset Page", () => {
     );
 
     expect(
-      await screen.findByText("Password reset instructions sent to your email."),
+      await screen.findByText(
+        "Password reset instructions sent to your email.",
+      ),
     ).toBeInTheDocument();
 
     rerender(

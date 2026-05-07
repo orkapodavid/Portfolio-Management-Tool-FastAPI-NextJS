@@ -16,10 +16,8 @@ export type OperationsContextMenuOptions = {
   onKill: (row: { id: number; process_name: string }) => void | Promise<void>;
 };
 
-const ICON_RERUN =
-  '<span style="font-size:14px;margin-right:6px">🔄</span>';
-const ICON_KILL =
-  '<span style="font-size:14px;margin-right:6px">🛑</span>';
+const ICON_RERUN = '<span style="font-size:14px;margin-right:6px">🔄</span>';
+const ICON_KILL = '<span style="font-size:14px;margin-right:6px">🛑</span>';
 
 const resolveProcessName = (row: OperationsRow): string =>
   row.process ?? row.procedure_name ?? "Unknown";

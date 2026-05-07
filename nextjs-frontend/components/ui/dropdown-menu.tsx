@@ -24,7 +24,9 @@ const DropdownMenuSubTrigger = React.forwardRef<
   HTMLDivElement,
   DivProps & { inset?: boolean }
 >(({ className, inset, children, ...props }, ref) => {
-  const Comp = DropdownMenuPrimitive.SubTrigger as React.ComponentType<DivProps & { ref?: React.Ref<HTMLDivElement> }>;
+  const Comp = DropdownMenuPrimitive.SubTrigger as React.ComponentType<
+    DivProps & { ref?: React.Ref<HTMLDivElement> }
+  >;
   return (
     <Comp
       ref={ref}
@@ -44,7 +46,9 @@ DropdownMenuSubTrigger.displayName = "DropdownMenuSubTrigger";
 
 const DropdownMenuSubContent = React.forwardRef<HTMLDivElement, DivProps>(
   ({ className, ...props }, ref) => {
-    const Comp = DropdownMenuPrimitive.SubContent as React.ComponentType<DivProps & { ref?: React.Ref<HTMLDivElement> }>;
+    const Comp = DropdownMenuPrimitive.SubContent as React.ComponentType<
+      DivProps & { ref?: React.Ref<HTMLDivElement> }
+    >;
     return (
       <Comp
         ref={ref}
@@ -63,7 +67,9 @@ const DropdownMenuContent = React.forwardRef<
   HTMLDivElement,
   DivProps & { sideOffset?: number }
 >(({ className, sideOffset = 4, ...props }, ref) => {
-  const Comp = DropdownMenuPrimitive.Content as React.ComponentType<DivProps & { ref?: React.Ref<HTMLDivElement>; sideOffset?: number }>;
+  const Comp = DropdownMenuPrimitive.Content as React.ComponentType<
+    DivProps & { ref?: React.Ref<HTMLDivElement>; sideOffset?: number }
+  >;
   return (
     <DropdownMenuPrimitive.Portal>
       <Comp
@@ -85,7 +91,9 @@ const DropdownMenuItem = React.forwardRef<
   HTMLDivElement,
   DivProps & { inset?: boolean; disabled?: boolean }
 >(({ className, inset, ...props }, ref) => {
-  const Comp = DropdownMenuPrimitive.Item as React.ComponentType<DivProps & { ref?: React.Ref<HTMLDivElement> }>;
+  const Comp = DropdownMenuPrimitive.Item as React.ComponentType<
+    DivProps & { ref?: React.Ref<HTMLDivElement> }
+  >;
   return (
     <Comp
       ref={ref}
@@ -104,7 +112,9 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   HTMLDivElement,
   DivProps & { checked?: boolean }
 >(({ className, children, checked, ...props }, ref) => {
-  const Comp = DropdownMenuPrimitive.CheckboxItem as React.ComponentType<DivProps & { ref?: React.Ref<HTMLDivElement>; checked?: boolean }>;
+  const Comp = DropdownMenuPrimitive.CheckboxItem as React.ComponentType<
+    DivProps & { ref?: React.Ref<HTMLDivElement>; checked?: boolean }
+  >;
   return (
     <Comp
       ref={ref}
@@ -130,7 +140,9 @@ const DropdownMenuRadioItem = React.forwardRef<
   HTMLDivElement,
   DivProps & { value: string }
 >(({ className, children, ...props }, ref) => {
-  const Comp = DropdownMenuPrimitive.RadioItem as React.ComponentType<DivProps & { ref?: React.Ref<HTMLDivElement>; value: string }>;
+  const Comp = DropdownMenuPrimitive.RadioItem as React.ComponentType<
+    DivProps & { ref?: React.Ref<HTMLDivElement>; value: string }
+  >;
   return (
     <Comp
       ref={ref}
@@ -155,7 +167,9 @@ const DropdownMenuLabel = React.forwardRef<
   HTMLDivElement,
   DivProps & { inset?: boolean }
 >(({ className, inset, ...props }, ref) => {
-  const Comp = DropdownMenuPrimitive.Label as React.ComponentType<DivProps & { ref?: React.Ref<HTMLDivElement> }>;
+  const Comp = DropdownMenuPrimitive.Label as React.ComponentType<
+    DivProps & { ref?: React.Ref<HTMLDivElement> }
+  >;
   return (
     <Comp
       ref={ref}
@@ -172,7 +186,9 @@ DropdownMenuLabel.displayName = "DropdownMenuLabel";
 
 const DropdownMenuSeparator = React.forwardRef<HTMLDivElement, DivProps>(
   ({ className, ...props }, ref) => {
-    const Comp = DropdownMenuPrimitive.Separator as React.ComponentType<DivProps & { ref?: React.Ref<HTMLDivElement> }>;
+    const Comp = DropdownMenuPrimitive.Separator as React.ComponentType<
+      DivProps & { ref?: React.Ref<HTMLDivElement> }
+    >;
     return (
       <Comp
         ref={ref}

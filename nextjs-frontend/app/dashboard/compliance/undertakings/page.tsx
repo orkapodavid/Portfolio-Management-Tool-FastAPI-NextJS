@@ -23,16 +23,41 @@ type UndertakingRow = {
 
 const columns = [
   textColumn({ field: "deal_num", header: "Deal Num", minWidth: 90 }),
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100, enableRowGroup: true }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+    enableRowGroup: true,
+  }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
-  textColumn({ field: "account", header: "Account", minWidth: 100, enableRowGroup: true }),
-  textColumn({ field: "undertaking_expiry", header: "Undertaking Expiry", minWidth: 130 }),
-  textColumn({ field: "undertaking_type", header: "Undertaking Type", minWidth: 120, enableRowGroup: true }),
-  textColumn({ field: "undertaking_details", header: "Undertaking Details", minWidth: 150 }),
+  textColumn({
+    field: "account",
+    header: "Account",
+    minWidth: 100,
+    enableRowGroup: true,
+  }),
+  textColumn({
+    field: "undertaking_expiry",
+    header: "Undertaking Expiry",
+    minWidth: 130,
+  }),
+  textColumn({
+    field: "undertaking_type",
+    header: "Undertaking Type",
+    minWidth: 120,
+    enableRowGroup: true,
+  }),
+  textColumn({
+    field: "undertaking_details",
+    header: "Undertaking Details",
+    minWidth: 150,
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -71,7 +96,7 @@ export default function UndertakingsPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

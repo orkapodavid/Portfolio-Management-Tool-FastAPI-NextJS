@@ -60,7 +60,7 @@ function KpiCard({ metric }: { metric: KPIMetric }) {
     <div
       className={cn(
         "flex items-center bg-white px-2 h-[28px] shadow-sm border-l-[3px] border-y border-r border-gray-200 min-w-[155px] flex-1 hover:bg-gray-50 transition-colors",
-        accent
+        accent,
       )}
     >
       <div className="flex items-center justify-between w-full">
@@ -68,16 +68,14 @@ function KpiCard({ metric }: { metric: KPIMetric }) {
           <span className="text-[7px] font-black text-gray-400 uppercase tracking-[0.15em] truncate">
             {metric.label}
           </span>
-          <span
-            className={cn(
-              "text-[10px] font-black tracking-tighter",
-              text
-            )}
-          >
+          <span className={cn("text-[10px] font-black tracking-tighter", text)}>
             {metric.value}
           </span>
         </div>
-        <svg viewBox="0 0 50 24" className="w-8 h-4 opacity-40 shrink-0 ml-auto">
+        <svg
+          viewBox="0 0 50 24"
+          className="w-8 h-4 opacity-40 shrink-0 ml-auto"
+        >
           <polyline
             points={metric.trend_data}
             stroke={stroke}
@@ -109,7 +107,7 @@ function SummaryCard({
     <div
       className={cn(
         "bg-white shadow-sm px-2 py-0 border-y border-r border-gray-200 flex items-center min-w-[160px] h-[28px] hover:bg-gray-50 transition-colors",
-        accent
+        accent,
       )}
     >
       <div className="flex flex-row items-center justify-between w-full">
@@ -144,7 +142,7 @@ function MoverRow({ item }: { item: TopMover }) {
       <td
         className={cn(
           "py-0 pr-2 font-black text-right truncate text-[8px]",
-          changeColor
+          changeColor,
         )}
       >
         {item.change}
@@ -173,8 +171,7 @@ function MiniGrid({ title, data }: { title: string; data: TopMover[] }) {
 const formatCurrency = (n: number) =>
   `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-const formatPercent = (n: number) =>
-  `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
+const formatPercent = (n: number) => `${n >= 0 ? "+" : ""}${n.toFixed(2)}%`;
 
 export function PerformanceHeader() {
   const [kpiMetrics, setKpiMetrics] = useState<KPIMetric[]>([]);
@@ -198,7 +195,7 @@ export function PerformanceHeader() {
       getKpiData(auth),
       getPortfolioHoldings(auth),
       ...MOVER_CATEGORIES.map(({ key }) =>
-        getTopMovers({ ...auth, query: { category: key } })
+        getTopMovers({ ...auth, query: { category: key } }),
       ),
     ]).then((responses) => {
       const [kpiResp, holdingsResp, ...moverResps] = responses;
@@ -228,20 +225,21 @@ export function PerformanceHeader() {
 
   const totalValue = holdings.reduce(
     (sum, h) => sum + h.shares * h.current_price,
-    0
+    0,
   );
   const totalCostBasis = holdings.reduce(
     (sum, h) => sum + h.shares * h.avg_cost,
-    0
+    0,
   );
   const totalGainLoss = totalValue - totalCostBasis;
   const totalGainLossPct =
     totalCostBasis === 0 ? 0 : (totalGainLoss / totalCostBasis) * 100;
   const dailyChangeValue = holdings.reduce(
     (sum, h) => sum + h.shares * h.current_price * (h.daily_change_pct / 100),
-    0
+    0,
   );
-  const dailyChangePct = totalValue === 0 ? 0 : (dailyChangeValue / totalValue) * 100;
+  const dailyChangePct =
+    totalValue === 0 ? 0 : (dailyChangeValue / totalValue) * 100;
 
   return (
     <section

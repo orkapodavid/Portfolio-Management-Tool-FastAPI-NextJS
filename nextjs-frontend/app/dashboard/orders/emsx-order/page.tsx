@@ -26,21 +26,52 @@ type OrderRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
-  textColumn({ field: "sequence", header: "Sequence", minWidth: 90, align: "right" }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
+  textColumn({
+    field: "sequence",
+    header: "Sequence",
+    minWidth: 90,
+    align: "right",
+  }),
   textColumn({ field: "underlying", header: "Underlying", minWidth: 110 }),
   textColumn({ field: "broker", header: "Broker", minWidth: 90 }),
   textColumn({ field: "pos_loc", header: "Pos Loc", minWidth: 80 }),
   textColumn({ field: "side", header: "Side", minWidth: 80 }),
   textColumn({ field: "status", header: "Status", minWidth: 100 }),
-  textColumn({ field: "emsx_amount", header: "EMSX Amount", minWidth: 120, align: "right" }),
-  textColumn({ field: "emsx_routed", header: "EMSX Routed", minWidth: 110, align: "right" }),
-  textColumn({ field: "emsx_working", header: "EMSX Working", minWidth: 120, align: "right" }),
-  textColumn({ field: "emsx_filled", header: "EMSX Filled", minWidth: 110, align: "right" }),
+  textColumn({
+    field: "emsx_amount",
+    header: "EMSX Amount",
+    minWidth: 120,
+    align: "right",
+  }),
+  textColumn({
+    field: "emsx_routed",
+    header: "EMSX Routed",
+    minWidth: 110,
+    align: "right",
+  }),
+  textColumn({
+    field: "emsx_working",
+    header: "EMSX Working",
+    minWidth: 120,
+    align: "right",
+  }),
+  textColumn({
+    field: "emsx_filled",
+    header: "EMSX Filled",
+    minWidth: 110,
+    align: "right",
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

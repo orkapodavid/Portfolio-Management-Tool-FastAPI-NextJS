@@ -2,7 +2,11 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 import { DataGrid } from "@/components/grid/data-grid";
-import { textColumn, currencyColumn, percentColumn } from "@/components/grid/columns";
+import {
+  textColumn,
+  currencyColumn,
+  percentColumn,
+} from "@/components/grid/columns";
 
 let lastGridReadyHandler: ((event: { api: GridApiStub }) => void) | null = null;
 let lastGetRowId:
@@ -21,7 +25,11 @@ type GridApiStub = {
 
 const buildGridApi = (overrides: Partial<GridApiStub> = {}): GridApiStub => ({
   setGridOption: jest.fn(),
-  getState: jest.fn(() => ({ columnSizing: { columnSizingModel: [{ colId: "ticker", width: 100, flex: 1 }] } })),
+  getState: jest.fn(() => ({
+    columnSizing: {
+      columnSizingModel: [{ colId: "ticker", width: 100, flex: 1 }],
+    },
+  })),
   setState: jest.fn(),
   getSelectedRows: jest.fn(() => []),
   exportDataAsExcel: jest.fn(),
@@ -106,7 +114,7 @@ describe("DataGrid", () => {
         rows={rows}
         onRefresh={() => {}}
         searchPlaceholder="Search rows…"
-      />
+      />,
     );
 
     expect(screen.getByPlaceholderText("Search rows…")).toBeInTheDocument();
@@ -124,7 +132,7 @@ describe("DataGrid", () => {
         columns={columns}
         rows={[]}
         errorMessage="Could not load market data."
-      />
+      />,
     );
 
     expect(screen.getByText("Could not load market data.")).toBeInTheDocument();
@@ -134,18 +142,20 @@ describe("DataGrid", () => {
   it("does not show the layout / export buttons when no gridId is provided", () => {
     render(<DataGrid<Row> columns={columns} rows={rows} />);
 
-    expect(screen.queryByRole("button", { name: /save/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /restore/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /excel/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /save/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /restore/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /excel/i }),
+    ).not.toBeInTheDocument();
   });
 
   it("clears the search input when the X button is clicked", () => {
     render(
-      <DataGrid<Row>
-        columns={columns}
-        rows={rows}
-        searchPlaceholder="Find…"
-      />
+      <DataGrid<Row> columns={columns} rows={rows} searchPlaceholder="Find…" />,
     );
 
     const input = screen.getByPlaceholderText("Find…") as HTMLInputElement;
@@ -161,11 +171,7 @@ describe("DataGrid", () => {
     jest.useFakeTimers();
     const api = buildGridApi();
     render(
-      <DataGrid<Row>
-        columns={columns}
-        rows={rows}
-        searchPlaceholder="Find…"
-      />
+      <DataGrid<Row> columns={columns} rows={rows} searchPlaceholder="Find…" />,
     );
     lastGridReadyHandler!({ api });
 
@@ -187,22 +193,30 @@ describe("DataGrid", () => {
 
   it("persists state under a namespaced key on Save and round-trips on Restore", () => {
     const api = buildGridApi();
-    render(<DataGrid<Row> columns={columns} rows={rows} gridId="positions_grid" />);
+    render(
+      <DataGrid<Row> columns={columns} rows={rows} gridId="positions_grid" />,
+    );
 
     expect(lastGridReadyHandler).not.toBeNull();
     lastGridReadyHandler!({ api });
 
     fireEvent.click(screen.getByRole("button", { name: /save/i }));
     expect(api.getState).toHaveBeenCalled();
-    const persisted = window.localStorage.getItem("pmt:next:positions_grid_state");
+    const persisted = window.localStorage.getItem(
+      "pmt:next:positions_grid_state",
+    );
     expect(persisted).not.toBeNull();
-    expect(JSON.parse(persisted!).columnSizing.columnSizingModel[0].width).toBe(100);
+    expect(JSON.parse(persisted!).columnSizing.columnSizingModel[0].width).toBe(
+      100,
+    );
 
     fireEvent.click(screen.getByRole("button", { name: /restore/i }));
     expect(api.setState).toHaveBeenCalled();
     const restored = api.setState.mock.calls.at(-1)?.[0];
     // flex must have been stripped when restoring
-    expect(restored.columnSizing.columnSizingModel[0]).not.toHaveProperty("flex");
+    expect(restored.columnSizing.columnSizingModel[0]).not.toHaveProperty(
+      "flex",
+    );
   });
 
   it("clears storage, grid filters, and toolbar search when Reset is clicked", async () => {
@@ -210,7 +224,7 @@ describe("DataGrid", () => {
     const api = buildGridApi();
     window.localStorage.setItem(
       "pmt:next:positions_grid_state",
-      JSON.stringify({ columnSizing: { columnSizingModel: [] } })
+      JSON.stringify({ columnSizing: { columnSizingModel: [] } }),
     );
     render(
       <DataGrid<Row>
@@ -218,7 +232,7 @@ describe("DataGrid", () => {
         rows={rows}
         gridId="positions_grid"
         searchPlaceholder="Find…"
-      />
+      />,
     );
     lastGridReadyHandler!({ api });
 
@@ -227,19 +241,26 @@ describe("DataGrid", () => {
     await act(async () => {
       jest.advanceTimersByTime(300);
     });
-    expect(api.setGridOption).toHaveBeenLastCalledWith("quickFilterText", "AAPL");
+    expect(api.setGridOption).toHaveBeenLastCalledWith(
+      "quickFilterText",
+      "AAPL",
+    );
 
     fireEvent.click(screen.getByRole("button", { name: /reset/i }));
     expect(api.resetColumnState).toHaveBeenCalled();
     expect(api.setFilterModel).toHaveBeenCalledWith(null);
     expect(input.value).toBe("");
     expect(api.setGridOption).toHaveBeenLastCalledWith("quickFilterText", "");
-    expect(window.localStorage.getItem("pmt:next:positions_grid_state")).toBeNull();
+    expect(
+      window.localStorage.getItem("pmt:next:positions_grid_state"),
+    ).toBeNull();
   });
 
   it("Excel button calls exportDataAsExcel with a timestamped .xlsx filename", () => {
     const api = buildGridApi();
-    render(<DataGrid<Row> columns={columns} rows={rows} gridId="positions_grid" />);
+    render(
+      <DataGrid<Row> columns={columns} rows={rows} gridId="positions_grid" />,
+    );
     lastGridReadyHandler!({ api });
 
     fireEvent.click(screen.getByRole("button", { name: /excel/i }));
@@ -264,10 +285,12 @@ describe("DataGrid", () => {
           showAutoRefresh
           autoRefreshIntervalMs={intervalMs}
           onRefresh={refresh}
-        />
+        />,
       );
 
-      const switchInput = screen.getByLabelText("Auto refresh") as HTMLInputElement;
+      const switchInput = screen.getByLabelText(
+        "Auto refresh",
+      ) as HTMLInputElement;
       expect(switchInput.checked).toBe(true);
 
       await act(async () => {
@@ -284,7 +307,7 @@ describe("DataGrid", () => {
       });
       expect(refresh).not.toHaveBeenCalled();
       jest.useRealTimers();
-    }
+    },
   );
 
   it("polling cadence implicitly matches simulator interval when simulateUpdate is set without an explicit autoRefreshIntervalMs", async () => {
@@ -301,7 +324,7 @@ describe("DataGrid", () => {
         simulateUpdate={simulateUpdate}
         simulateUpdateIntervalMs={2_000}
         onRefresh={refresh}
-      />
+      />,
     );
 
     await act(async () => {
@@ -330,7 +353,7 @@ describe("DataGrid", () => {
         simulateUpdate={simulateUpdate}
         simulateUpdateIntervalMs={2_000}
         onRefresh={refresh}
-      />
+      />,
     );
 
     await act(async () => {
@@ -352,9 +375,11 @@ describe("DataGrid", () => {
         showAutoRefresh
         defaultAutoRefreshOff
         onRefresh={() => Promise.resolve()}
-      />
+      />,
     );
-    const switchInput = screen.getByLabelText("Auto refresh") as HTMLInputElement;
+    const switchInput = screen.getByLabelText(
+      "Auto refresh",
+    ) as HTMLInputElement;
     expect(switchInput.checked).toBe(false);
   });
 
@@ -362,8 +387,8 @@ describe("DataGrid", () => {
     jest.useFakeTimers();
     const simulateUpdate = jest.fn((currentRows: Row[]) =>
       currentRows.map((row) =>
-        row.ticker === "AAPL" ? { ...row, price: row.price + 1 } : row
-      )
+        row.ticker === "AAPL" ? { ...row, price: row.price + 1 } : row,
+      ),
     );
 
     render(
@@ -374,7 +399,7 @@ describe("DataGrid", () => {
         showAutoRefresh
         simulateUpdate={simulateUpdate}
         simulateUpdateIntervalMs={2_000}
-      />
+      />,
     );
 
     await act(async () => {
@@ -384,7 +409,9 @@ describe("DataGrid", () => {
 
     expect(simulateUpdate).toHaveBeenCalledTimes(2);
 
-    const switchInput = screen.getByLabelText("Auto refresh") as HTMLInputElement;
+    const switchInput = screen.getByLabelText(
+      "Auto refresh",
+    ) as HTMLInputElement;
     fireEvent.click(switchInput);
     simulateUpdate.mockClear();
 
@@ -404,7 +431,7 @@ describe("DataGrid", () => {
         gridId="positions_grid"
         showAutoRefresh
         isLoading
-      />
+      />,
     );
     expect(screen.getByText("—")).toBeInTheDocument();
 
@@ -415,19 +442,13 @@ describe("DataGrid", () => {
         gridId="positions_grid"
         showAutoRefresh
         isLoading={false}
-      />
+      />,
     );
     expect(screen.queryByText("—")).not.toBeInTheDocument();
   });
 
   it("provides getRowId when rows have the rowIdKey field (cell flash works)", () => {
-    render(
-      <DataGrid<Row>
-        columns={columns}
-        rows={rows}
-        rowIdKey="ticker"
-      />
-    );
+    render(<DataGrid<Row> columns={columns} rows={rows} rowIdKey="ticker" />);
     expect(lastGetRowId).toBeDefined();
     expect(lastGetRowId!({ data: { ticker: "AAPL" } })).toBe("AAPL");
   });
@@ -447,18 +468,22 @@ describe("DataGrid", () => {
   });
 
   it("Excel button skips unselected rows when at least one row is selected", () => {
-    const api = buildGridApi({ getSelectedRows: jest.fn(() => [{ ticker: "AAPL" }]) });
-    render(<DataGrid<Row> columns={columns} rows={rows} gridId="positions_grid" />);
+    const api = buildGridApi({
+      getSelectedRows: jest.fn(() => [{ ticker: "AAPL" }]),
+    });
+    render(
+      <DataGrid<Row> columns={columns} rows={rows} gridId="positions_grid" />,
+    );
     lastGridReadyHandler!({ api });
 
     fireEvent.click(screen.getByRole("button", { name: /excel/i }));
     const params = api.exportDataAsExcel.mock.calls[0][0];
     expect(typeof params.shouldRowBeSkipped).toBe("function");
     expect(
-      params.shouldRowBeSkipped({ node: { isSelected: () => true } })
+      params.shouldRowBeSkipped({ node: { isSelected: () => true } }),
     ).toBe(false);
     expect(
-      params.shouldRowBeSkipped({ node: { isSelected: () => false } })
+      params.shouldRowBeSkipped({ node: { isSelected: () => false } }),
     ).toBe(true);
   });
 });

@@ -33,9 +33,8 @@ async function loadDesktopRuntimeConfig(): Promise<RuntimeConfig> {
 
   try {
     const tauriCore = await import("@tauri-apps/api/core");
-    const runtimeConfig = await tauriCore.invoke<RuntimeConfig>(
-      "get_runtime_config",
-    );
+    const runtimeConfig =
+      await tauriCore.invoke<RuntimeConfig>("get_runtime_config");
     window.__PMT_RUNTIME_CONFIG__ = runtimeConfig;
     return runtimeConfig;
   } catch (error) {

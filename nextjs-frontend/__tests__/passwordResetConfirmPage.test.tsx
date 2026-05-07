@@ -35,7 +35,9 @@ describe("Password Reset Confirm Page", () => {
     );
 
     expect(await screen.findByLabelText("Password")).toBeInTheDocument();
-    expect(await screen.findByLabelText("Password Confirm")).toBeInTheDocument();
+    expect(
+      await screen.findByLabelText("Password Confirm"),
+    ).toBeInTheDocument();
     expect(await screen.findByDisplayValue("mock-token")).toBeInTheDocument();
     expect(
       await screen.findByRole("button", { name: /send/i }),
@@ -80,7 +82,9 @@ describe("Password Reset Confirm Page", () => {
         token="mock-token"
         state={{
           errors: {
-            password: ["Password should contain at least one uppercase letter."],
+            password: [
+              "Password should contain at least one uppercase letter.",
+            ],
             passwordConfirm: ["Passwords must match."],
           },
         }}
@@ -92,6 +96,8 @@ describe("Password Reset Confirm Page", () => {
         "Password should contain at least one uppercase letter.",
       ),
     ).toBeInTheDocument();
-    expect(await screen.findByText("Passwords must match.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Passwords must match."),
+    ).toBeInTheDocument();
   });
 });

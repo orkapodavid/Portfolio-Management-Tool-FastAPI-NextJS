@@ -31,26 +31,56 @@ type FailedTradeRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   dateColumn({ field: "report_date", header: "Report Date", minWidth: 100 }),
   dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
   dateColumn({ field: "value_date", header: "Value Date", minWidth: 100 }),
-  dateColumn({ field: "settlement_date", header: "Settlement Date", minWidth: 110 }),
-  textColumn({ field: "portfolio_code", header: "Portfolio Code", minWidth: 110 }),
-  textColumn({ field: "instrument_ref", header: "Instrument Ref", minWidth: 110 }),
-  textColumn({ field: "instrument_name", header: "Instrument Name", minWidth: 130 }),
+  dateColumn({
+    field: "settlement_date",
+    header: "Settlement Date",
+    minWidth: 110,
+  }),
+  textColumn({
+    field: "portfolio_code",
+    header: "Portfolio Code",
+    minWidth: 110,
+  }),
+  textColumn({
+    field: "instrument_ref",
+    header: "Instrument Ref",
+    minWidth: 110,
+  }),
+  textColumn({
+    field: "instrument_name",
+    header: "Instrument Name",
+    minWidth: 130,
+  }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
   textColumn({ field: "isin", header: "ISIN", minWidth: 110 }),
   textColumn({ field: "sedol", header: "SEDOL", minWidth: 90 }),
   textColumn({ field: "broker", header: "Broker", minWidth: 100 }),
-  textColumn({ field: "glass_reference", header: "Glass Reference", minWidth: 120 }),
-  textColumn({ field: "trade_reference", header: "Trade Reference", minWidth: 120 }),
+  textColumn({
+    field: "glass_reference",
+    header: "Glass Reference",
+    minWidth: 120,
+  }),
+  textColumn({
+    field: "trade_reference",
+    header: "Trade Reference",
+    minWidth: 120,
+  }),
   textColumn({ field: "deal_type", header: "Deal Type", minWidth: 90 }),
   textColumn({ field: "q", header: "Q", minWidth: 60, align: "right" }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -89,7 +119,7 @@ export default function FailedTradesPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

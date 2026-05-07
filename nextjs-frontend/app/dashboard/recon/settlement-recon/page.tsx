@@ -25,20 +25,40 @@ type SettlementReconRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
-  dateColumn({ field: "ml_report_date", header: "ML Report Date", minWidth: 110 }),
+  dateColumn({
+    field: "ml_report_date",
+    header: "ML Report Date",
+    minWidth: 110,
+  }),
   textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
   textColumn({ field: "pos_loc", header: "Pos Loc", minWidth: 80 }),
   textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
   textColumn({ field: "sec_type", header: "Sec Type", minWidth: 90 }),
-  textColumn({ field: "position_settled", header: "Position Settled", minWidth: 120, align: "right" }),
-  textColumn({ field: "ml_inventory", header: "ML Inventory", minWidth: 110, align: "right" }),
+  textColumn({
+    field: "position_settled",
+    header: "Position Settled",
+    minWidth: 120,
+    align: "right",
+  }),
+  textColumn({
+    field: "ml_inventory",
+    header: "ML Inventory",
+    minWidth: 110,
+    align: "right",
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -77,7 +97,7 @@ export default function SettlementReconPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

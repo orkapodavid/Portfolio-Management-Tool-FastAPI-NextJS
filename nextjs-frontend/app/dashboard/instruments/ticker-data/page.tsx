@@ -29,20 +29,45 @@ type TickerRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
-  numberColumn({ field: "fx_rate", header: "FX Rate", minWidth: 90, decimals: 4 }),
+  numberColumn({
+    field: "fx_rate",
+    header: "FX Rate",
+    minWidth: 90,
+    decimals: 4,
+  }),
   textColumn({ field: "sector", header: "Sector", minWidth: 100 }),
   textColumn({ field: "company", header: "Company", minWidth: 150 }),
-  textColumn({ field: "po_lead_manager", header: "PO Lead Manager", minWidth: 130 }),
-  textColumn({ field: "fmat_cap", header: "FMat Cap", minWidth: 100, align: "right" }),
-  textColumn({ field: "smkt_cap", header: "SMkt Cap", minWidth: 100, align: "right" }),
+  textColumn({
+    field: "po_lead_manager",
+    header: "PO Lead Manager",
+    minWidth: 130,
+  }),
+  textColumn({
+    field: "fmat_cap",
+    header: "FMat Cap",
+    minWidth: 100,
+    align: "right",
+  }),
+  textColumn({
+    field: "smkt_cap",
+    header: "SMkt Cap",
+    minWidth: 100,
+    align: "right",
+  }),
   percentColumn({ field: "chg_1d_pct", header: "1D%", minWidth: 80 }),
   textColumn({ field: "dtl", header: "DTL", minWidth: 80 }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

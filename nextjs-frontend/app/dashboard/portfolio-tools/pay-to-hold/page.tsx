@@ -29,23 +29,52 @@ type PayToHoldRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
   textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
-  textColumn({ field: "counter_party", header: "Counter Party", minWidth: 110 }),
+  textColumn({
+    field: "counter_party",
+    header: "Counter Party",
+    minWidth: 110,
+  }),
   textColumn({ field: "side", header: "Side", minWidth: 80 }),
-  textColumn({ field: "sl_rate", header: "SL Rate", minWidth: 90, align: "right" }),
-  textColumn({ field: "pth_amount_sod", header: "PTH Amount SOD", minWidth: 130, align: "right" }),
-  textColumn({ field: "pth_amount", header: "PTH Amount", minWidth: 110, align: "right" }),
+  textColumn({
+    field: "sl_rate",
+    header: "SL Rate",
+    minWidth: 90,
+    align: "right",
+  }),
+  textColumn({
+    field: "pth_amount_sod",
+    header: "PTH Amount SOD",
+    minWidth: 130,
+    align: "right",
+  }),
+  textColumn({
+    field: "pth_amount",
+    header: "PTH Amount",
+    minWidth: 110,
+    align: "right",
+  }),
   textColumn({ field: "emsx_order", header: "EMSX Order", minWidth: 100 }),
   textColumn({ field: "emsx_remark", header: "EMSX Remark", minWidth: 110 }),
   textColumn({ field: "emsx_working", header: "EMSX Working", minWidth: 110 }),
-  textColumn({ field: "emsx_order_col", header: "EMSX Order Col", minWidth: 120 }),
+  textColumn({
+    field: "emsx_order_col",
+    header: "EMSX Order Col",
+    minWidth: 120,
+  }),
   textColumn({ field: "emsx_filled", header: "EMSX Filled", minWidth: 100 }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -84,7 +113,7 @@ export default function PayToHoldPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

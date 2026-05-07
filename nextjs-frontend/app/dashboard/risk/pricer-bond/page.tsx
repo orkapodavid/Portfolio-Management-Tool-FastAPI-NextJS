@@ -18,7 +18,12 @@ type BondOutput = {
   bond_floor: number;
   bond_parity: number;
   currency: string;
-  yield_curve: { x_values: number[]; y_values: number[]; x_label: string; y_label: string };
+  yield_curve: {
+    x_values: number[];
+    y_values: number[];
+    x_label: string;
+    y_label: string;
+  };
 };
 
 type BondFormState = {
@@ -113,7 +118,8 @@ const INITIAL: BondFormState = {
   y_axis: "Yield",
 };
 
-const LABEL_CLS = "text-[9px] font-bold text-gray-500 uppercase tracking-[0.08em] mb-0.5 block";
+const LABEL_CLS =
+  "text-[9px] font-bold text-gray-500 uppercase tracking-[0.08em] mb-0.5 block";
 const INPUT_CLS =
   "h-7 w-full px-2 text-[11px] font-medium text-gray-800 bg-white border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors";
 const SECTION_HEADER_CLS =
@@ -214,7 +220,8 @@ const BOND_PRICING_RESULTS: BondPricingRow[] = [
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -245,10 +252,16 @@ export default function PricerBondPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const set = <K extends keyof BondFormState>(name: K, value: BondFormState[K]) =>
-    setForm((prev) => ({ ...prev, [name]: value }));
+  const set = <K extends keyof BondFormState>(
+    name: K,
+    value: BondFormState[K],
+  ) => setForm((prev) => ({ ...prev, [name]: value }));
 
-  const F = <K extends keyof BondFormState>({ name, label, type = "text" }: FieldDef<K>) => (
+  const F = <K extends keyof BondFormState>({
+    name,
+    label,
+    type = "text",
+  }: FieldDef<K>) => (
     <div className="flex flex-col">
       <label className={LABEL_CLS}>{label}</label>
       <input
@@ -260,7 +273,11 @@ export default function PricerBondPage() {
     </div>
   );
 
-  const S = <K extends keyof BondFormState>({ name, label, options }: SelectDef<K>) => (
+  const S = <K extends keyof BondFormState>({
+    name,
+    label,
+    options,
+  }: SelectDef<K>) => (
     <div className="flex flex-col">
       <label className={LABEL_CLS}>{label}</label>
       <select
@@ -364,12 +381,33 @@ export default function PricerBondPage() {
               <S
                 name="reset_frequency"
                 label="Reset Frequency"
-                options={["(none)", "daily", "weekly", "biweekly", "monthly", "quarterly"]}
+                options={[
+                  "(none)",
+                  "daily",
+                  "weekly",
+                  "biweekly",
+                  "monthly",
+                  "quarterly",
+                ]}
               />
               <S
                 name="reset_month"
                 label="Reset Month"
-                options={["(none)", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]}
+                options={[
+                  "(none)",
+                  "1",
+                  "2",
+                  "3",
+                  "4",
+                  "5",
+                  "6",
+                  "7",
+                  "8",
+                  "9",
+                  "10",
+                  "11",
+                  "12",
+                ]}
               />
               <S
                 name="reset_on_day"
@@ -427,21 +465,38 @@ export default function PricerBondPage() {
               <F name="jump_lambda" label="Jump Lambda" />
               <F name="jump_mean" label="Jump Mean" />
               <F name="jump_std_dev" label="Jump Std Dev" />
-              <S name="jump_to_zero" label="Jump to 0" options={["False", "True"]} />
+              <S
+                name="jump_to_zero"
+                label="Jump to 0"
+                options={["False", "True"]}
+              />
             </div>
           </div>
           <div className="p-4 bg-gray-50 border-t border-gray-200">
             <h3 className={SECTION_HEADER_CLS}>Outputs</h3>
             <div className="grid grid-cols-3 gap-4 mb-4">
-              <Out label="Fair Value" value={output?.fair_value?.toFixed(3) ?? "—"} accent />
+              <Out
+                label="Fair Value"
+                value={output?.fair_value?.toFixed(3) ?? "—"}
+                accent
+              />
               <Out label="Delta" value={output?.delta?.toFixed(3) ?? "—"} />
               <Out
                 label="Exp. Discount"
                 value={output ? `${output.expected_discount.toFixed(2)}%` : "—"}
               />
-              <Out label="Bond Delta" value={output?.bond_delta?.toFixed(3) ?? "—"} />
-              <Out label="Bond Floor" value={output?.bond_floor?.toFixed(3) ?? "—"} />
-              <Out label="Bond Parity" value={output?.bond_parity?.toFixed(3) ?? "—"} />
+              <Out
+                label="Bond Delta"
+                value={output?.bond_delta?.toFixed(3) ?? "—"}
+              />
+              <Out
+                label="Bond Floor"
+                value={output?.bond_floor?.toFixed(3) ?? "—"}
+              />
+              <Out
+                label="Bond Parity"
+                value={output?.bond_parity?.toFixed(3) ?? "—"}
+              />
             </div>
             <button
               onClick={onCalculate}
@@ -449,7 +504,9 @@ export default function PricerBondPage() {
               className="flex items-center justify-center gap-2 w-full h-9 bg-[#2563EB] hover:bg-blue-700 text-white rounded-lg font-bold transition-colors shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <Calculator size={14} />
-              <span className="text-xs font-bold">{isLoading ? "Calculating…" : "Calculate"}</span>
+              <span className="text-xs font-bold">
+                {isLoading ? "Calculating…" : "Calculate"}
+              </span>
             </button>
             {errorMessage && (
               <div className="mt-3 px-3 py-2 text-[10px] text-red-700 bg-red-50 border border-red-200 rounded">
@@ -469,7 +526,10 @@ export default function PricerBondPage() {
             <span className="ml-1">Notes</span>
           </h4>
           {PRICER_NOTES.map((n) => (
-            <p key={n} className="text-[9px] text-gray-500 leading-relaxed mb-1">
+            <p
+              key={n}
+              className="text-[9px] text-gray-500 leading-relaxed mb-1"
+            >
               • {n}
             </p>
           ))}
@@ -536,7 +596,13 @@ function BondPricingResultsTable() {
   );
 }
 
-function HeaderCell({ label, align = "left" }: { label: string; align?: "left" | "right" }) {
+function HeaderCell({
+  label,
+  align = "left",
+}: {
+  label: string;
+  align?: "left" | "right";
+}) {
   return (
     <th
       className={`px-3 py-3 text-[10px] font-bold text-gray-700 uppercase tracking-widest border-b-2 border-gray-400 bg-[#E5E7EB] sticky top-0 z-30 shadow-sm h-[44px] whitespace-nowrap ${
@@ -560,7 +626,9 @@ function NumberCell({ value, tone }: { value: string; tone?: NumericTone }) {
   return (
     <td
       className={`px-3 py-2 text-[10px] font-mono border-b border-gray-200 text-right ${
-        tone === "negative" ? "font-bold text-[#DD0000]" : "font-medium text-gray-700"
+        tone === "negative"
+          ? "font-bold text-[#DD0000]"
+          : "font-medium text-gray-700"
       }`}
     >
       {value}
@@ -568,7 +636,15 @@ function NumberCell({ value, tone }: { value: string; tone?: NumericTone }) {
   );
 }
 
-function Out({ label, value, accent = false }: { label: string; value: string; accent?: boolean }) {
+function Out({
+  label,
+  value,
+  accent = false,
+}: {
+  label: string;
+  value: string;
+  accent?: boolean;
+}) {
   return (
     <div className="flex flex-col">
       <span className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.1em] block mb-0.5">

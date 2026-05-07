@@ -55,18 +55,18 @@ const moduleSlug = (value: string): string => {
 const resolveModule = (value: string) => {
   const slug = moduleSlug(value);
   return MODULES.find(
-    (module) => module.id === slug || moduleSlug(module.label) === slug
+    (module) => module.id === slug || moduleSlug(module.label) === slug,
   );
 };
 
 const resolveSubtab = (
   module: (typeof MODULES)[number] | undefined,
-  value: string
+  value: string,
 ) => {
   const rawSlug = slugifySegment(value);
   const slug = SUBTAB_SLUG_OVERRIDES[rawSlug] ?? rawSlug;
   return module?.subtabs.find(
-    (subtab) => subtab.id === slug || slugifySegment(subtab.label) === slug
+    (subtab) => subtab.id === slug || slugifySegment(subtab.label) === slug,
   );
 };
 

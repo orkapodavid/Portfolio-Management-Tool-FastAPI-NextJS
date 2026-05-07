@@ -89,7 +89,9 @@ describe("grid-simulators utilities", () => {
     });
 
     it("fxDataSimulator returns a fresh array", () => {
-      const rows = [{ ticker: "USDJPY", last_price: 150, bid: 149.9, ask: 150.1 }];
+      const rows = [
+        { ticker: "USDJPY", last_price: 150, bid: 149.9, ask: 150.1 },
+      ];
       expect(fxDataSimulator(rows)).not.toBe(rows);
     });
   });

@@ -24,19 +24,37 @@ type InstrumentTermRow = {
 };
 
 const columns = [
-  textColumn({ field: "deal_num", header: "Deal Num", pinned: "left", minWidth: 90 }),
+  textColumn({
+    field: "deal_num",
+    header: "Deal Num",
+    pinned: "left",
+    minWidth: 90,
+  }),
   textColumn({ field: "detail_id", header: "Detail ID", minWidth: 90 }),
   textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
   textColumn({ field: "ticker", header: "Ticker", minWidth: 100 }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
   textColumn({ field: "sec_type", header: "Sec Type", minWidth: 90 }),
-  dateColumn({ field: "effective_date", header: "Effective Date", minWidth: 110 }),
-  dateColumn({ field: "maturity_date", header: "Maturity Date", minWidth: 110 }),
-  dateColumn({ field: "first_reset_da", header: "First Reset Da", minWidth: 120 }),
+  dateColumn({
+    field: "effective_date",
+    header: "Effective Date",
+    minWidth: 110,
+  }),
+  dateColumn({
+    field: "maturity_date",
+    header: "Maturity Date",
+    minWidth: 110,
+  }),
+  dateColumn({
+    field: "first_reset_da",
+    header: "First Reset Da",
+    minWidth: 120,
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

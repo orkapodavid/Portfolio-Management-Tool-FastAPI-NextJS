@@ -47,7 +47,9 @@ const simulateAlphanumericIdTick = <TRow extends GridRow>(
  * Reflex parity port of `PositionsMixin.simulate_positions_update` —
  * jitters `notional` ±1% on 1-3 random rows.
  */
-export const positionsSimulator = <TRow extends GridRow>(rows: TRow[]): TRow[] =>
+export const positionsSimulator = <TRow extends GridRow>(
+  rows: TRow[],
+): TRow[] =>
   simulateFinancialTick(rows, {
     valueFields: ["notional"],
     numRows: 3,

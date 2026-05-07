@@ -9,7 +9,9 @@ import {
 describe("instruments simulators", () => {
   describe("tickerDataSimulator", () => {
     it("returns a fresh array reference", () => {
-      const rows = [{ id: 1, ticker: "AAPL", chg_1d_pct: "+1.50%", fx_rate: "1.2345" }];
+      const rows = [
+        { id: 1, ticker: "AAPL", chg_1d_pct: "+1.50%", fx_rate: "1.2345" },
+      ];
       const next = tickerDataSimulator(rows);
       expect(next).not.toBe(rows);
     });

@@ -119,7 +119,9 @@ describe("Register Page", () => {
       />,
     );
 
-    expect(await screen.findByText("Invalid email address")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Invalid email address"),
+    ).toBeInTheDocument();
     expect(
       await screen.findByText(
         "Password should contain at least one uppercase letter.",

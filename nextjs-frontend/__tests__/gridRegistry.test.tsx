@@ -50,7 +50,10 @@ describe("GridRegistry", () => {
 
     let unregister!: () => void;
     act(() => {
-      unregister = result.current!.register("positions_grid", { api, rowIdKey: "ticker" });
+      unregister = result.current!.register("positions_grid", {
+        api,
+        rowIdKey: "ticker",
+      });
     });
 
     let jumped = false;
@@ -108,7 +111,7 @@ describe("GridRegistry", () => {
         gridId: "pnl_change_grid",
         rowId: "AAPL",
         rowIdKey: "ticker",
-      })
+      }),
     );
     const { result } = renderHook(() => useGridRegistry(), { wrapper });
 
@@ -118,7 +121,9 @@ describe("GridRegistry", () => {
 
     expect(api.ensureNodeVisible).toHaveBeenCalledWith(node, "middle");
     expect(api.flashCells).toHaveBeenCalledWith({ rowNodes: [node] });
-    expect(window.sessionStorage.getItem(PENDING_HIGHLIGHT_STORAGE_KEY)).toBeNull();
+    expect(
+      window.sessionStorage.getItem(PENDING_HIGHLIGHT_STORAGE_KEY),
+    ).toBeNull();
   });
 
   it("keeps retrying pending highlights beyond 10 seconds", () => {
@@ -139,7 +144,7 @@ describe("GridRegistry", () => {
         gridId: "pnl_change_grid",
         rowId: "AAPL",
         rowIdKey: "ticker",
-      })
+      }),
     );
     const { result } = renderHook(() => useGridRegistry(), { wrapper });
 
@@ -148,7 +153,9 @@ describe("GridRegistry", () => {
       jest.advanceTimersByTime(10_200);
     });
     expect(api.ensureNodeVisible).not.toHaveBeenCalled();
-    expect(window.sessionStorage.getItem(PENDING_HIGHLIGHT_STORAGE_KEY)).not.toBeNull();
+    expect(
+      window.sessionStorage.getItem(PENDING_HIGHLIGHT_STORAGE_KEY),
+    ).not.toBeNull();
 
     rowIsLoaded = true;
     act(() => {
@@ -157,7 +164,9 @@ describe("GridRegistry", () => {
 
     expect(api.ensureNodeVisible).toHaveBeenCalledWith(node, "middle");
     expect(api.flashCells).toHaveBeenCalledWith({ rowNodes: [node] });
-    expect(window.sessionStorage.getItem(PENDING_HIGHLIGHT_STORAGE_KEY)).toBeNull();
+    expect(
+      window.sessionStorage.getItem(PENDING_HIGHLIGHT_STORAGE_KEY),
+    ).toBeNull();
   });
 
   it("re-applies the sticky highlight every 200ms and clears it after 1.8s", () => {

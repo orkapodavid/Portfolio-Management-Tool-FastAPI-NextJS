@@ -58,7 +58,7 @@ export const eventCalendarSimulator = <TRow extends GridRow>(
     const minutePart = parts[1].replace(/ AM/g, "").replace(/ PM/g, "");
     const minute = Number(minutePart);
     if (!Number.isFinite(hour) || !Number.isFinite(minute)) return next;
-    const adjusted = ((minute + randomInt(-5, 5)) % 60 + 60) % 60;
+    const adjusted = (((minute + randomInt(-5, 5)) % 60) + 60) % 60;
     const ampm = hour < 12 ? "AM" : "PM";
     let displayHour = hour <= 12 ? hour : hour - 12;
     if (displayHour === 0) displayHour = 12;

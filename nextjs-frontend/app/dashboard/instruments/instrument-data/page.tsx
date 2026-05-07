@@ -24,7 +24,12 @@ type InstrumentDataRow = {
 };
 
 const columns = [
-  textColumn({ field: "deal_num", header: "Deal Num", pinned: "left", minWidth: 90 }),
+  textColumn({
+    field: "deal_num",
+    header: "Deal Num",
+    pinned: "left",
+    minWidth: 90,
+  }),
   textColumn({ field: "detail_id", header: "Detail ID", minWidth: 90 }),
   textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
   textColumn({ field: "ticker", header: "Ticker", minWidth: 100 }),
@@ -36,7 +41,8 @@ const columns = [
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

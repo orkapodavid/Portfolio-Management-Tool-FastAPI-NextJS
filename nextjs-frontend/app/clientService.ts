@@ -23,7 +23,9 @@ export type {
   AuthRegisterRegisterError as RegisterRegisterError,
 } from "./openapi-client";
 
-const withConfiguredClient = async <T>(callback: () => T): Promise<Awaited<T>> => {
+const withConfiguredClient = async <T>(
+  callback: () => T,
+): Promise<Awaited<T>> => {
   await ensureClientConfigured();
   return await callback();
 };

@@ -23,7 +23,12 @@ type EventCalendarRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   textColumn({ field: "underlying", header: "Underlying", minWidth: 100 }),
   textColumn({ field: "company", header: "Company", minWidth: 150 }),
   dateColumn({ field: "event_date", header: "Event Date", minWidth: 110 }),
@@ -33,7 +38,8 @@ const columns = [
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -78,7 +84,7 @@ export default function EventCalendarPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {
@@ -118,7 +124,9 @@ export default function EventCalendarPage() {
         <DateRangeFilterBar
           fromValue={draftRange.start}
           toValue={draftRange.end}
-          onFromChange={(start) => setDraftRange((prev) => ({ ...prev, start }))}
+          onFromChange={(start) =>
+            setDraftRange((prev) => ({ ...prev, start }))
+          }
           onToChange={(end) => setDraftRange((prev) => ({ ...prev, end }))}
           onApply={onApply}
           onClear={onClear}

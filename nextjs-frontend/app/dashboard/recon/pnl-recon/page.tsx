@@ -25,20 +25,40 @@ type PnlReconRow = {
 };
 
 const columns = [
-  textColumn({ field: "underlying", header: "Underlying", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "underlying",
+    header: "Underlying",
+    pinned: "left",
+    minWidth: 100,
+  }),
   dateColumn({ field: "trade_date", header: "Trade Date", minWidth: 100 }),
   dateColumn({ field: "report_date", header: "Report Date", minWidth: 100 }),
   textColumn({ field: "deal_num", header: "Deal Num", minWidth: 90 }),
-  textColumn({ field: "row_index", header: "Row Index", minWidth: 90, align: "right" }),
+  textColumn({
+    field: "row_index",
+    header: "Row Index",
+    minWidth: 90,
+    align: "right",
+  }),
   textColumn({ field: "pos_loc", header: "Pos Loc", minWidth: 80 }),
   textColumn({ field: "stock_sec_id", header: "Stock SecID", minWidth: 100 }),
-  textColumn({ field: "warrant_sec_id", header: "Warrant SecID", minWidth: 110 }),
+  textColumn({
+    field: "warrant_sec_id",
+    header: "Warrant SecID",
+    minWidth: 110,
+  }),
   textColumn({ field: "bond_sec_id", header: "Bond SecID", minWidth: 100 }),
-  textColumn({ field: "stock_position", header: "Stock Position", minWidth: 110, align: "right" }),
+  textColumn({
+    field: "stock_position",
+    header: "Stock Position",
+    minWidth: 110,
+    align: "right",
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 
@@ -77,7 +97,7 @@ export default function PnlReconPage() {
       setErrorMessage(null);
       setIsLoading(false);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

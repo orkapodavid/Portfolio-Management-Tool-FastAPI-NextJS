@@ -26,21 +26,50 @@ type DealIndicationRow = {
 };
 
 const columns = [
-  textColumn({ field: "ticker", header: "Ticker", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "ticker",
+    header: "Ticker",
+    pinned: "left",
+    minWidth: 100,
+  }),
   textColumn({ field: "company_name", header: "Company Name", minWidth: 150 }),
-  textColumn({ field: "identification", header: "Identification", minWidth: 120 }),
+  textColumn({
+    field: "identification",
+    header: "Identification",
+    minWidth: 120,
+  }),
   textColumn({ field: "deal_type", header: "Deal Type", minWidth: 100 }),
   textColumn({ field: "agent", header: "Agent", minWidth: 100 }),
   textColumn({ field: "captain", header: "Deal Captain", minWidth: 110 }),
-  dateColumn({ field: "indication_date", header: "Indication Date", minWidth: 120 }),
+  dateColumn({
+    field: "indication_date",
+    header: "Indication Date",
+    minWidth: 120,
+  }),
   textColumn({ field: "currency", header: "Currency", minWidth: 90 }),
-  textColumn({ field: "market_cap_loc", header: "Market Cap LOC", minWidth: 130, align: "right" }),
-  textColumn({ field: "gross_proceed_loc", header: "Gross Proceed LOC", minWidth: 140, align: "right" }),
-  textColumn({ field: "indication_amount", header: "Indication Amount", minWidth: 140, align: "right" }),
+  textColumn({
+    field: "market_cap_loc",
+    header: "Market Cap LOC",
+    minWidth: 130,
+    align: "right",
+  }),
+  textColumn({
+    field: "gross_proceed_loc",
+    header: "Gross Proceed LOC",
+    minWidth: 140,
+    align: "right",
+  }),
+  textColumn({
+    field: "indication_amount",
+    header: "Indication Amount",
+    minWidth: 140,
+    align: "right",
+  }),
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

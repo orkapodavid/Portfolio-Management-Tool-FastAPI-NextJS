@@ -63,7 +63,7 @@ export function textColumn(options: BaseOptions): ColDef {
 }
 
 export function numberColumn(
-  options: BaseOptions & { decimals?: number }
+  options: BaseOptions & { decimals?: number },
 ): ColDef {
   const decimals = options.decimals ?? 2;
   return {
@@ -71,10 +71,15 @@ export function numberColumn(
     filter: "agNumberColumnFilter",
     cellClass: alignClass(options.align ?? "right"),
     valueFormatter: (params: ValueFormatterParams) => {
-      if (params.value === null || params.value === undefined || params.value === "") {
+      if (
+        params.value === null ||
+        params.value === undefined ||
+        params.value === ""
+      ) {
         return "";
       }
-      const num = typeof params.value === "number" ? params.value : Number(params.value);
+      const num =
+        typeof params.value === "number" ? params.value : Number(params.value);
       if (Number.isNaN(num)) return String(params.value);
       return num.toLocaleString(undefined, {
         minimumFractionDigits: decimals,
@@ -85,7 +90,7 @@ export function numberColumn(
 }
 
 export function currencyColumn(
-  options: BaseOptions & { decimals?: number; currency?: string }
+  options: BaseOptions & { decimals?: number; currency?: string },
 ): ColDef {
   const decimals = options.decimals ?? 2;
   const symbol = options.currency ?? "$";
@@ -94,13 +99,18 @@ export function currencyColumn(
     filter: "agNumberColumnFilter",
     cellClass: alignClass(options.align ?? "right"),
     valueFormatter: (params: ValueFormatterParams) => {
-      if (params.value === null || params.value === undefined || params.value === "") {
+      if (
+        params.value === null ||
+        params.value === undefined ||
+        params.value === ""
+      ) {
         return "";
       }
       if (typeof params.value === "string" && params.value.startsWith(symbol)) {
         return params.value;
       }
-      const num = typeof params.value === "number" ? params.value : Number(params.value);
+      const num =
+        typeof params.value === "number" ? params.value : Number(params.value);
       if (Number.isNaN(num)) return String(params.value);
       return `${symbol}${num.toLocaleString(undefined, {
         minimumFractionDigits: decimals,
@@ -111,7 +121,7 @@ export function currencyColumn(
 }
 
 export function percentColumn(
-  options: BaseOptions & { decimals?: number; colorBySign?: boolean }
+  options: BaseOptions & { decimals?: number; colorBySign?: boolean },
 ): ColDef {
   const decimals = options.decimals ?? 2;
   const colorBySign = options.colorBySign ?? true;
@@ -120,13 +130,18 @@ export function percentColumn(
     filter: "agNumberColumnFilter",
     cellClass: alignClass(options.align ?? "right"),
     valueFormatter: (params: ValueFormatterParams) => {
-      if (params.value === null || params.value === undefined || params.value === "") {
+      if (
+        params.value === null ||
+        params.value === undefined ||
+        params.value === ""
+      ) {
         return "";
       }
       if (typeof params.value === "string" && params.value.endsWith("%")) {
         return params.value;
       }
-      const num = typeof params.value === "number" ? params.value : Number(params.value);
+      const num =
+        typeof params.value === "number" ? params.value : Number(params.value);
       if (Number.isNaN(num)) return String(params.value);
       const sign = num > 0 ? "+" : "";
       return `${sign}${num.toFixed(decimals)}%`;
@@ -134,7 +149,9 @@ export function percentColumn(
     cellStyle: colorBySign
       ? (params) => {
           const raw =
-            typeof params.value === "number" ? params.value : parseFloat(String(params.value));
+            typeof params.value === "number"
+              ? params.value
+              : parseFloat(String(params.value));
           if (Number.isNaN(raw)) return undefined;
           if (raw > 0) return { color: COLORS.POSITIVE_GREEN };
           if (raw < 0) return { color: COLORS.NEGATIVE_RED };

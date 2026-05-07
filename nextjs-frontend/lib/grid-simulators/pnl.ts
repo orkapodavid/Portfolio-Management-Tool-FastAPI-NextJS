@@ -9,7 +9,9 @@ const randomInt = (min: number, max: number): number =>
  * Reflex parity port of `pnl_change_mixin.simulate_pnl_change_update`.
  * Jitters dollar-formatted PnL fields and percent-formatted change fields.
  */
-export const pnlChangeSimulator = <TRow extends GridRow>(rows: TRow[]): TRow[] =>
+export const pnlChangeSimulator = <TRow extends GridRow>(
+  rows: TRow[],
+): TRow[] =>
   simulateFinancialTick(rows, {
     valueFields: ["pnl_chg_1d", "pnl_chg_1w", "pnl_chg_1m", "pnl_ytd"],
     pctFields: ["pnl_chg_pct_1d", "pnl_chg_pct_1w", "pnl_chg_pct_1m"],
@@ -69,7 +71,9 @@ const jitterFixedDecimal = (
  * Updates 1–3 random rows; jitters `price` (0.995–1.005, comma-formatted)
  * and `fx_rate` (0.9999–1.0001, 4 decimals).
  */
-export const pnlSummarySimulator = <TRow extends GridRow>(rows: TRow[]): TRow[] => {
+export const pnlSummarySimulator = <TRow extends GridRow>(
+  rows: TRow[],
+): TRow[] => {
   if (rows.length === 0) return rows;
   const next = [...rows];
   const count = randomInt(1, Math.min(3, next.length));
@@ -105,7 +109,9 @@ export const pnlSummarySimulator = <TRow extends GridRow>(rows: TRow[]): TRow[] 
  * Reflex parity port of `pnl_currency_mixin.simulate_pnl_currency_update`.
  * Updates 1–3 random rows; jitters `fx_rate` (0.999–1.001, 4 decimals).
  */
-export const pnlCurrencySimulator = <TRow extends GridRow>(rows: TRow[]): TRow[] => {
+export const pnlCurrencySimulator = <TRow extends GridRow>(
+  rows: TRow[],
+): TRow[] => {
   if (rows.length === 0) return rows;
   const next = [...rows];
   const count = randomInt(1, Math.min(3, next.length));

@@ -28,7 +28,12 @@ type EventStreamRow = {
 };
 
 const columns = [
-  textColumn({ field: "symbol", header: "Symbol", pinned: "left", minWidth: 100 }),
+  textColumn({
+    field: "symbol",
+    header: "Symbol",
+    pinned: "left",
+    minWidth: 100,
+  }),
   dateColumn({ field: "record_date", header: "Record Date", minWidth: 110 }),
   dateColumn({ field: "event_date", header: "Event Date", minWidth: 110 }),
   textColumn({ field: "day_of_week", header: "Day", minWidth: 80 }),
@@ -44,7 +49,8 @@ const columns = [
 ];
 
 const getStatus = (e: unknown): number | undefined => {
-  if (typeof e !== "object" || e === null || !("response" in e)) return undefined;
+  if (typeof e !== "object" || e === null || !("response" in e))
+    return undefined;
   return (e as { response?: { status?: number } }).response?.status;
 };
 

@@ -24,14 +24,14 @@ export const createEmptyHistoricalDataFilters =
     end: "",
   });
 
-export const hasHistoricalDataFilters = (
-  filters: HistoricalDataFilterState,
-) => Boolean(filters.tickers.length > 0 || filters.start || filters.end);
+export const hasHistoricalDataFilters = (filters: HistoricalDataFilterState) =>
+  Boolean(filters.tickers.length > 0 || filters.start || filters.end);
 
 export const buildHistoricalDataQuery = (
   filters: HistoricalDataFilterState,
 ): { tickers?: string; start_date?: string; end_date?: string } | undefined => {
-  const query: { tickers?: string; start_date?: string; end_date?: string } = {};
+  const query: { tickers?: string; start_date?: string; end_date?: string } =
+    {};
 
   if (filters.tickers.length > 0) query.tickers = filters.tickers.join(",");
   if (filters.start) query.start_date = filters.start;
@@ -72,8 +72,8 @@ export function HistoricalDataFilterBar({
 
   const tickerOptions = useMemo(
     () =>
-      Array.from(new Set([...availableTickers, ...value.tickers])).sort((a, b) =>
-        a.localeCompare(b),
+      Array.from(new Set([...availableTickers, ...value.tickers])).sort(
+        (a, b) => a.localeCompare(b),
       ),
     [availableTickers, value.tickers],
   );
