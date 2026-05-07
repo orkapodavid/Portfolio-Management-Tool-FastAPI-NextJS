@@ -12,7 +12,7 @@
           "auth"
         ],
         "summary": "Auth:Jwt.Login",
-        "operationId": "auth-auth:jwt.login",
+        "operationId": "auth:jwt.login",
         "requestBody": {
           "content": {
             "application/x-www-form-urlencoded": {
@@ -81,7 +81,7 @@
           "auth"
         ],
         "summary": "Auth:Jwt.Logout",
-        "operationId": "auth-auth:jwt.logout",
+        "operationId": "auth:jwt.logout",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -118,7 +118,7 @@
           "auth"
         ],
         "summary": "Register:Register",
-        "operationId": "auth-register:register",
+        "operationId": "register:register",
         "requestBody": {
           "content": {
             "application/json": {
@@ -186,7 +186,7 @@
           "auth"
         ],
         "summary": "Reset:Forgot Password",
-        "operationId": "auth-reset:forgot_password",
+        "operationId": "reset:forgot_password",
         "requestBody": {
           "content": {
             "application/json": {
@@ -225,7 +225,7 @@
           "auth"
         ],
         "summary": "Reset:Reset Password",
-        "operationId": "auth-reset:reset_password",
+        "operationId": "reset:reset_password",
         "requestBody": {
           "content": {
             "application/json": {
@@ -291,7 +291,7 @@
           "auth"
         ],
         "summary": "Verify:Request-Token",
-        "operationId": "auth-verify:request-token",
+        "operationId": "verify:request-token",
         "requestBody": {
           "content": {
             "application/json": {
@@ -330,7 +330,7 @@
           "auth"
         ],
         "summary": "Verify:Verify",
-        "operationId": "auth-verify:verify",
+        "operationId": "verify:verify",
         "requestBody": {
           "content": {
             "application/json": {
@@ -395,7 +395,7 @@
           "users"
         ],
         "summary": "Users:Current User",
-        "operationId": "users-users:current_user",
+        "operationId": "users:current_user",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -422,7 +422,7 @@
           "users"
         ],
         "summary": "Users:Patch Current User",
-        "operationId": "users-users:patch_current_user",
+        "operationId": "users:patch_current_user",
         "requestBody": {
           "content": {
             "application/json": {
@@ -443,6 +443,9 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing token or inactive user."
           },
           "400": {
             "description": "Bad Request",
@@ -471,9 +474,6 @@
               }
             }
           },
-          "401": {
-            "description": "Missing token or inactive user."
-          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -498,7 +498,7 @@
           "users"
         ],
         "summary": "Users:User",
-        "operationId": "users-users:user",
+        "operationId": "users:user",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -552,7 +552,7 @@
           "users"
         ],
         "summary": "Users:Patch User",
-        "operationId": "users-users:patch_user",
+        "operationId": "users:patch_user",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -590,6 +590,15 @@
               }
             }
           },
+          "401": {
+            "description": "Missing token or inactive user."
+          },
+          "403": {
+            "description": "Not a superuser."
+          },
+          "404": {
+            "description": "The user does not exist."
+          },
           "400": {
             "content": {
               "application/json": {
@@ -617,15 +626,6 @@
             },
             "description": "Bad Request"
           },
-          "401": {
-            "description": "Missing token or inactive user."
-          },
-          "403": {
-            "description": "Not a superuser."
-          },
-          "404": {
-            "description": "The user does not exist."
-          },
           "422": {
             "description": "Validation Error",
             "content": {
@@ -643,7 +643,7 @@
           "users"
         ],
         "summary": "Users:Delete User",
-        "operationId": "users-users:delete_user",
+        "operationId": "users:delete_user",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -692,7 +692,7 @@
           "health"
         ],
         "summary": "Health",
-        "operationId": "health-health",
+        "operationId": "health",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -717,7 +717,7 @@
           "item"
         ],
         "summary": "Read Item",
-        "operationId": "item-read_item",
+        "operationId": "read_item",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -780,7 +780,7 @@
           "item"
         ],
         "summary": "Create Item",
-        "operationId": "item-create_item",
+        "operationId": "create_item",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -826,7 +826,7 @@
           "item"
         ],
         "summary": "Delete Item",
-        "operationId": "item-delete_item",
+        "operationId": "delete_item",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -872,7 +872,7 @@
           "positions"
         ],
         "summary": "Get Positions",
-        "operationId": "positions-get_positions",
+        "operationId": "get_positions",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -926,7 +926,7 @@
           "positions"
         ],
         "summary": "Get Stock Positions",
-        "operationId": "positions-get_stock_positions",
+        "operationId": "get_stock_positions",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -978,7 +978,7 @@
           "positions"
         ],
         "summary": "Get Warrant Positions",
-        "operationId": "positions-get_warrant_positions",
+        "operationId": "get_warrant_positions",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1030,7 +1030,7 @@
           "positions"
         ],
         "summary": "Get Bond Positions",
-        "operationId": "positions-get_bond_positions",
+        "operationId": "get_bond_positions",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1082,7 +1082,7 @@
           "positions"
         ],
         "summary": "Get Trade Summary",
-        "operationId": "positions-get_trade_summary",
+        "operationId": "get_trade_summary",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1150,7 +1150,7 @@
           "pnl"
         ],
         "summary": "Get Pnl Changes",
-        "operationId": "pnl-get_pnl_changes",
+        "operationId": "get_pnl_changes",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1204,7 +1204,7 @@
           "pnl"
         ],
         "summary": "Get Pnl Summary",
-        "operationId": "pnl-get_pnl_summary",
+        "operationId": "get_pnl_summary",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1256,7 +1256,7 @@
           "pnl"
         ],
         "summary": "Get Pnl By Currency",
-        "operationId": "pnl-get_pnl_by_currency",
+        "operationId": "get_pnl_by_currency",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1308,7 +1308,7 @@
           "pnl"
         ],
         "summary": "Get Pnl Full",
-        "operationId": "pnl-get_pnl_full",
+        "operationId": "get_pnl_full",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1360,7 +1360,7 @@
           "pnl"
         ],
         "summary": "Get Kpi Metrics",
-        "operationId": "pnl-get_kpi_metrics",
+        "operationId": "get_kpi_metrics",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1384,7 +1384,7 @@
           "market-data"
         ],
         "summary": "Get Market Data",
-        "operationId": "market-data-get_market_data",
+        "operationId": "get_market_data",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1408,7 +1408,7 @@
           "market-data"
         ],
         "summary": "Get Fx Data",
-        "operationId": "market-data-get_fx_data",
+        "operationId": "get_fx_data",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1432,7 +1432,7 @@
           "market-data"
         ],
         "summary": "Get Top Movers",
-        "operationId": "market-data-get_top_movers",
+        "operationId": "get_top_movers",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1487,7 +1487,7 @@
           "market-data"
         ],
         "summary": "Get Trading Calendar",
-        "operationId": "market-data-get_trading_calendar",
+        "operationId": "get_trading_calendar",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1559,7 +1559,7 @@
           "market-data"
         ],
         "summary": "Get Market Hours",
-        "operationId": "market-data-get_market_hours",
+        "operationId": "get_market_hours",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1583,7 +1583,7 @@
           "market-data"
         ],
         "summary": "Get Ticker Data",
-        "operationId": "market-data-get_ticker_data",
+        "operationId": "get_ticker_data",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1607,7 +1607,7 @@
           "market-data"
         ],
         "summary": "Get Historical Data",
-        "operationId": "market-data-get_historical_data",
+        "operationId": "get_historical_data",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1697,7 +1697,7 @@
           "market-data"
         ],
         "summary": "Get Stock Data",
-        "operationId": "market-data-get_stock_data",
+        "operationId": "get_stock_data",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1742,7 +1742,7 @@
           "market-data"
         ],
         "summary": "Get Stock History",
-        "operationId": "market-data-get_stock_history",
+        "operationId": "get_stock_history",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1809,7 +1809,7 @@
           "market-data"
         ],
         "summary": "Get Stock News",
-        "operationId": "market-data-get_stock_news",
+        "operationId": "get_stock_news",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1854,7 +1854,7 @@
           "risk"
         ],
         "summary": "Get Delta Change",
-        "operationId": "risk-get_delta_change",
+        "operationId": "get_delta_change",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1906,7 +1906,7 @@
           "risk"
         ],
         "summary": "Get Risk Measures",
-        "operationId": "risk-get_risk_measures",
+        "operationId": "get_risk_measures",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -1958,7 +1958,7 @@
           "risk"
         ],
         "summary": "Get Risk Inputs",
-        "operationId": "risk-get_risk_inputs",
+        "operationId": "get_risk_inputs",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2011,7 +2011,7 @@
         ],
         "summary": "Price Warrant",
         "description": "Run the warrant pricer with the 21 Term + 7 Simulation inputs.\n\nMirrors the Reflex `pricer_warrant_view` calculate handler. The chart\nseries is the 2D payoff curve (Spot vs Value/Delta/Gamma) computed\nby `WarrantPricer.generate_payoff_curve`.",
-        "operationId": "risk-price_warrant",
+        "operationId": "price_warrant",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2058,7 +2058,7 @@
         ],
         "summary": "Price Bond",
         "description": "Run the convertible-bond pricer with the full Term + Simulation set.\n\nMirrors the Reflex `pricer_bond_view` calculate handler. The chart\nseries is the 2D yield-vs-maturity (or other axis pair) curve.",
-        "operationId": "risk-price_bond",
+        "operationId": "price_bond",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2104,7 +2104,7 @@
           "compliance"
         ],
         "summary": "Get Restricted List",
-        "operationId": "compliance-get_restricted_list",
+        "operationId": "get_restricted_list",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -2128,7 +2128,7 @@
           "compliance"
         ],
         "summary": "Get Undertakings",
-        "operationId": "compliance-get_undertakings",
+        "operationId": "get_undertakings",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2180,7 +2180,7 @@
           "compliance"
         ],
         "summary": "Get Beneficial Ownership",
-        "operationId": "compliance-get_beneficial_ownership",
+        "operationId": "get_beneficial_ownership",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2232,7 +2232,7 @@
           "compliance"
         ],
         "summary": "Get Monthly Exercise Limit",
-        "operationId": "compliance-get_monthly_exercise_limit",
+        "operationId": "get_monthly_exercise_limit",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2284,7 +2284,7 @@
           "reconciliation"
         ],
         "summary": "Get Pps Recon",
-        "operationId": "reconciliation-get_pps_recon",
+        "operationId": "get_pps_recon",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2336,7 +2336,7 @@
           "reconciliation"
         ],
         "summary": "Get Settlement Recon",
-        "operationId": "reconciliation-get_settlement_recon",
+        "operationId": "get_settlement_recon",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2388,7 +2388,7 @@
           "reconciliation"
         ],
         "summary": "Get Failed Trades",
-        "operationId": "reconciliation-get_failed_trades",
+        "operationId": "get_failed_trades",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2440,7 +2440,7 @@
           "reconciliation"
         ],
         "summary": "Get Pnl Recon",
-        "operationId": "reconciliation-get_pnl_recon",
+        "operationId": "get_pnl_recon",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2492,7 +2492,7 @@
           "reconciliation"
         ],
         "summary": "Get Risk Input Recon",
-        "operationId": "reconciliation-get_risk_input_recon",
+        "operationId": "get_risk_input_recon",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2544,7 +2544,7 @@
           "portfolio-tools"
         ],
         "summary": "Get Pay To Hold",
-        "operationId": "portfolio-tools-get_pay_to_hold",
+        "operationId": "get_pay_to_hold",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2596,7 +2596,7 @@
           "portfolio-tools"
         ],
         "summary": "Get Stock Borrow",
-        "operationId": "portfolio-tools-get_stock_borrow",
+        "operationId": "get_stock_borrow",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -2620,7 +2620,7 @@
           "portfolio-tools"
         ],
         "summary": "Get Reset Dates",
-        "operationId": "portfolio-tools-get_reset_dates",
+        "operationId": "get_reset_dates",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2768,7 +2768,7 @@
           "portfolio-tools"
         ],
         "summary": "Get Coming Resets",
-        "operationId": "portfolio-tools-get_coming_resets",
+        "operationId": "get_coming_resets",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -2792,7 +2792,7 @@
           "portfolio-tools"
         ],
         "summary": "Get Cb Installments",
-        "operationId": "portfolio-tools-get_cb_installments",
+        "operationId": "get_cb_installments",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2844,7 +2844,7 @@
           "portfolio-tools"
         ],
         "summary": "Get Excess Amount",
-        "operationId": "portfolio-tools-get_excess_amount",
+        "operationId": "get_excess_amount",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2896,7 +2896,7 @@
           "portfolio-tools"
         ],
         "summary": "Get Deal Indication",
-        "operationId": "portfolio-tools-get_deal_indication",
+        "operationId": "get_deal_indication",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -2920,7 +2920,7 @@
           "portfolio-tools"
         ],
         "summary": "Get Po Settlement",
-        "operationId": "portfolio-tools-get_po_settlement",
+        "operationId": "get_po_settlement",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -2972,7 +2972,7 @@
           "portfolio-tools"
         ],
         "summary": "Get Short Ecl",
-        "operationId": "portfolio-tools-get_short_ecl",
+        "operationId": "get_short_ecl",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -2996,7 +2996,7 @@
           "instruments"
         ],
         "summary": "Get Ticker Data",
-        "operationId": "instruments-get_ticker_data",
+        "operationId": "get_ticker_data",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3020,7 +3020,7 @@
           "instruments"
         ],
         "summary": "Get Stock Screener",
-        "operationId": "instruments-get_stock_screener",
+        "operationId": "get_stock_screener",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3044,7 +3044,7 @@
           "instruments"
         ],
         "summary": "Get Special Terms",
-        "operationId": "instruments-get_special_terms",
+        "operationId": "get_special_terms",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -3096,7 +3096,7 @@
           "instruments"
         ],
         "summary": "Get Instrument Data",
-        "operationId": "instruments-get_instrument_data",
+        "operationId": "get_instrument_data",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3120,7 +3120,7 @@
           "instruments"
         ],
         "summary": "Get Instrument Term",
-        "operationId": "instruments-get_instrument_term",
+        "operationId": "get_instrument_term",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3144,7 +3144,7 @@
           "events"
         ],
         "summary": "Get Event Calendar",
-        "operationId": "events-get_event_calendar",
+        "operationId": "get_event_calendar",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -3216,7 +3216,7 @@
           "events"
         ],
         "summary": "Get Event Stream",
-        "operationId": "events-get_event_stream",
+        "operationId": "get_event_stream",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3240,7 +3240,7 @@
           "events"
         ],
         "summary": "Get Reverse Inquiries",
-        "operationId": "events-get_reverse_inquiries",
+        "operationId": "get_reverse_inquiries",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -3294,7 +3294,7 @@
           "operations"
         ],
         "summary": "Get Daily Procedures",
-        "operationId": "operations-get_daily_procedures",
+        "operationId": "get_daily_procedures",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3318,7 +3318,7 @@
           "operations"
         ],
         "summary": "Get Operation Processes",
-        "operationId": "operations-get_operation_processes",
+        "operationId": "get_operation_processes",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3342,7 +3342,7 @@
           "operations"
         ],
         "summary": "Rerun Process",
-        "operationId": "operations-rerun_process",
+        "operationId": "rerun_process",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -3399,7 +3399,7 @@
           "operations"
         ],
         "summary": "Kill Process",
-        "operationId": "operations-kill_process",
+        "operationId": "kill_process",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -3456,7 +3456,7 @@
           "orders"
         ],
         "summary": "Get Orders",
-        "operationId": "orders-get_orders",
+        "operationId": "get_orders",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3480,7 +3480,7 @@
           "orders"
         ],
         "summary": "Get Order Routes",
-        "operationId": "orders-get_order_routes",
+        "operationId": "get_order_routes",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -3535,7 +3535,7 @@
           "performance"
         ],
         "summary": "Get Kpi Data",
-        "operationId": "performance-get_kpi_data",
+        "operationId": "get_kpi_data",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3559,7 +3559,7 @@
           "performance"
         ],
         "summary": "Get Top Movers",
-        "operationId": "performance-get_top_movers",
+        "operationId": "get_top_movers",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3583,7 +3583,7 @@
           "performance"
         ],
         "summary": "Get Portfolio Holdings",
-        "operationId": "performance-get_portfolio_holdings",
+        "operationId": "get_portfolio_holdings",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -3607,7 +3607,7 @@
           "notifications"
         ],
         "summary": "Get Notifications",
-        "operationId": "notifications-get_notifications",
+        "operationId": "get_notifications",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -3812,17 +3812,17 @@
           "notional": {
             "type": "number",
             "title": "Notional",
-            "default": 100
+            "default": 100.0
           },
           "coupon_rate": {
             "type": "number",
             "title": "Coupon Rate",
-            "default": 0
+            "default": 0.0
           },
           "redemption_rate": {
             "type": "number",
             "title": "Redemption Rate",
-            "default": 1
+            "default": 1.0
           },
           "volatility": {
             "type": "number",
@@ -3847,12 +3847,12 @@
           "time_to_maturity_years": {
             "type": "number",
             "title": "Time To Maturity Years",
-            "default": 1
+            "default": 1.0
           },
           "min_exe_disc": {
             "type": "number",
             "title": "Min Exe Disc",
-            "default": 0
+            "default": 0.0
           },
           "exec_redeemed": {
             "type": "integer",
@@ -3877,12 +3877,12 @@
           "jump_lambda": {
             "type": "number",
             "title": "Jump Lambda",
-            "default": 0
+            "default": 0.0
           },
           "jump_mean": {
             "type": "number",
             "title": "Jump Mean",
-            "default": 0
+            "default": 0.0
           },
           "jump_std_dev": {
             "type": "number",
@@ -4090,7 +4090,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 0
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -4102,7 +4102,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 1
+                "minimum": 1.0
               },
               {
                 "type": "null"
@@ -4114,7 +4114,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 1
+                "minimum": 1.0
               },
               {
                 "type": "null"
@@ -4126,7 +4126,7 @@
             "anyOf": [
               {
                 "type": "integer",
-                "minimum": 0
+                "minimum": 0.0
               },
               {
                 "type": "null"
@@ -4399,12 +4399,12 @@
           "time_to_maturity_years": {
             "type": "number",
             "title": "Time To Maturity Years",
-            "default": 1
+            "default": 1.0
           },
           "min_exe_disc": {
             "type": "number",
             "title": "Min Exe Disc",
-            "default": 0
+            "default": 0.0
           },
           "reset_lookback_days": {
             "type": "integer",
@@ -4434,12 +4434,12 @@
           "jump_lambda": {
             "type": "number",
             "title": "Jump Lambda",
-            "default": 0
+            "default": 0.0
           },
           "jump_mean": {
             "type": "number",
             "title": "Jump Mean",
-            "default": 0
+            "default": 0.0
           },
           "jump_std_dev": {
             "type": "number",
