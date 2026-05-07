@@ -8,38 +8,12 @@ const { config } = require("dotenv");
 config({ path: ".env.local" });
 
 async function main() {
-  const apiBaseUrl = process.env.API_BASE_URL ?? "http://localhost:8000";
   const openapiOutputFile = process.env.OPENAPI_OUTPUT_FILE ?? "openapi.json";
-  const openapiUrl = new URL("/openapi.json", apiBaseUrl).toString();
   const outputPath = path.resolve(openapiOutputFile);
 
-  try {
-    const response = await fetch(openapiUrl);
-
-    if (!response.ok) {
-      throw new Error(
-        `Failed to fetch live OpenAPI schema from ${openapiUrl}: ${response.status} ${response.statusText}`,
-      );
-    }
-
-    const schema = await response.json();
-    fs.writeFileSync(
-      outputPath,
-      JSON.stringify(schema, null, 2) + "\n",
-      "utf8",
-    );
-
-    const pathCount = Object.keys(schema.paths ?? {}).length;
-    console.log(
-      `Fetched live schema from ${openapiUrl} and wrote ${pathCount} paths to ${outputPath}`,
-    );
-  } catch (err) {
-    if (!fs.existsSync(outputPath)) {
-      throw err;
-    }
-    const reason = err instanceof Error ? err.message : String(err);
-    console.warn(
-      `Could not fetch ${openapiUrl} (${reason}); regenerating client from cached ${outputPath}.`,
+  if (!fs.existsSync(outputPath)) {
+    throw new Error(
+      `Cannot regenerate client: ${outputPath} not found. Run \`uv run python -m commands.generate_openapi_schema\` from fastapi_backend first.`,
     );
   }
 
