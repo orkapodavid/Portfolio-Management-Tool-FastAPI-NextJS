@@ -27,8 +27,11 @@ const jitterFieldOnRandomRows = <TRow extends GridRow>(
   if (rows.length === 0) return rows;
   const next = [...rows];
   const count = randomInt(1, Math.min(numRows, next.length));
-  for (let i = 0; i < count; i += 1) {
-    const idx = randomInt(0, next.length - 1);
+  const picked = new Set<number>();
+  while (picked.size < count) {
+    picked.add(randomInt(0, next.length - 1));
+  }
+  for (const idx of picked) {
     const original = next[idx];
     if (!original) continue;
     const value = original[field];
