@@ -49,9 +49,9 @@ class TestMarketDataTopMovers:
                 headers=authenticated_user["headers"],
                 params={"category": category},
             )
-            assert (
-                response.status_code == status.HTTP_200_OK
-            ), f"category={category} failed"
+            assert response.status_code == status.HTTP_200_OK, (
+                f"category={category} failed"
+            )
 
     @pytest.mark.asyncio(loop_scope="function")
     async def test_rejects_invalid_category(self, test_client, authenticated_user):
