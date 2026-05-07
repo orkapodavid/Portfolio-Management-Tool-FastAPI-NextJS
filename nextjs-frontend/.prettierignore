@@ -1,1 +1,7 @@
 openapi.json
+
+# build artefacts (gitignored locally, but pnpm prettier's recursive
+# glob otherwise tries to lint Tauri/Next.js binary outputs and fails)
+.next
+src-tauri/target
+src-tauri/gen
